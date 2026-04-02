@@ -20,6 +20,8 @@
                 "python.testing.pytestArgs": ["tests"]
             },
             "extensions": [
+                "cschleiden.vscode-github-actions",
+                "vivaxy.vscode-conventional-commits",
                 "charliermarsh.ruff",      // Linter & Formatter
                 "ms-python.python",        // Python Support
                 "ms-python.vscode-pylance", // Language Server
