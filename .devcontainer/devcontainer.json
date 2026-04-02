@@ -1,13 +1,35 @@
 {
-  "name": "lametric-local",
-  "image": "mcr.microsoft.com/devcontainers/python:3.14",
-  "features": {},
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-python.python",
-        "ms-python.vscode-pylance"
-      ]
-    }
-  }
+    "name": "lametric-local",
+    "image": "mcr.microsoft.com/devcontainers/python:3.14",
+    
+    "features": {
+        "ghcr.io/devcontainers-contrib/features/uv:1": {}
+    },
+
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.analysis.typeCheckingMode": "strict",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.ruff": "always",
+                    "source.organizeImports.ruff": "always"
+                },
+                "python.testing.pytestEnabled": true,
+                "python.testing.pytestArgs": ["tests"]
+            },
+            "extensions": [
+                "charliermarsh.ruff",      // Linter & Formatter
+                "ms-python.python",        // Python Support
+                "ms-python.vscode-pylance", // Language Server
+                "ms-python.debugpy"        // Debugger
+            ]
+        }
+    },
+
+    // Installiert alle Tools und aktiviert die Git-Hooks beim Start
+    "postCreateCommand": "uv sync && pre-commit install",
+    
+    "remoteUser": "vscode"
 }
