@@ -192,7 +192,9 @@ class LaMetricConfigFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
 
         return await self.async_step_choice_manual_or_cloud()
 
-    async def async_step_choice_manual_or_cloud(self) -> ConfigFlowResult:
+    async def async_step_choice_manual_or_cloud(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
         """Show the menu to choose manual setup or cloud OAuth."""
         return self.async_show_menu(
             step_id="choice_manual_or_cloud",
