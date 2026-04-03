@@ -1488,7 +1488,7 @@ dev = [
 
 [[package]]
 name = "lametric-py"
-version = "1.0.3"
+version = "1.0.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", version = "3.13.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
@@ -1501,9 +1501,9 @@ dependencies = [
     { name = "yarl", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
     { name = "yarl", version = "1.23.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14.2'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/4e/3b9200824a6d975a11786eadf3594a40a09284367356b82d7d37f13f9959/lametric_py-1.0.3.tar.gz", hash = "sha256:55219930d109706e108c529e038f1373d7e588eea5fa609d0b263a2f46cc92e6", size = 74459, upload-time = "2026-04-03T13:12:55.226Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5d/62/efb54dce38a4ca3cd8508b21afcbcc543470d67fdd84d22add120a669497/lametric_py-1.0.4.tar.gz", hash = "sha256:a2b520128d453cdc4b688861f2db74eb3d66364f2517a05b259346be37c49582", size = 74459, upload-time = "2026-04-03T21:13:56.507Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/66/bf/a2870a12eb8b4b6c319cabf32c9ff11acab3f26693c6e66d60279de1c97a/lametric_py-1.0.3-py3-none-any.whl", hash = "sha256:4b87b740786b62a8a73250e04f34fd9c8f0f5d569df5c5297b255bfa617b481f", size = 15484, upload-time = "2026-04-03T13:12:53.549Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/68/1baed3999d8045d8c42d397a00a86abeb1c4f1d65fcb96da88da303e7404/lametric_py-1.0.4-py3-none-any.whl", hash = "sha256:6e776adb70e9ac2d435e7afc5ac171a215499918739f78a27d1e54812824bd68", size = 15496, upload-time = "2026-04-03T21:13:55.169Z" },
 ]
 
 [[package]]
