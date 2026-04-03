@@ -89,3 +89,7 @@ class LaMetricButtonEntity(LaMetricEntity, ButtonEntity):
     async def async_press(self) -> None:
         """Run the configured button action on the device."""
         await self.entity_description.action(self.coordinator.device)
+
+        await super().async_press()
+
+        await self.coordinator.async_request_refresh()

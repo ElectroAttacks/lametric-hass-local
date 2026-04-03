@@ -94,4 +94,6 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
                 widget_id=self.widget_id,
             )
 
-        await super().async_activate()
+        await super().async_activate(**_kwargs)
+
+        await self.coordinator.async_request_refresh()

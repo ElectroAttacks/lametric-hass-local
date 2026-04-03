@@ -122,6 +122,8 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
                 self.coordinator.device, brightness
             )
 
+        await super().async_turn_on(**kwargs)
+
         await self.coordinator.async_request_refresh()
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
@@ -129,4 +131,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         """Turn the display light off."""
 
         await self.entity_description.state_set(self.coordinator.device, False)
+
+        await super().async_turn_off(**_kwargs)
+
         await self.coordinator.async_request_refresh()
