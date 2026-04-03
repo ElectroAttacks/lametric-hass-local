@@ -7,7 +7,13 @@ from typing import Final
 from homeassistant.const import Platform
 
 DOMAIN: Final = "lametric_hass_local"
-PLATFORMS = [Platform.BUTTON, Platform.LIGHT, Platform.SCENE, Platform.SWITCH]
+PLATFORMS = [
+    Platform.BUTTON,
+    Platform.LIGHT,
+    Platform.SCENE,
+    Platform.SWITCH,
+    Platform.UPDATE,
+]
 
 UPDATE_INTERVAL = timedelta(seconds=30)
 
