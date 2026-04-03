@@ -1,0 +1,97 @@
+"""Scene platform for LaMetric app/widget activation."""
+
+from __future__ import annotations
+
+from typing import Any
+
+from homeassistant.components.scene import Scene as SceneEntity
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+
+from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
+from .entity import LaMetricEntity
+from .helpers import lametric_api_exception_handler
+
+ATTR_ACTION_ID = "action_id"  # Action to trigger on the widget
+ATTR_ACTION_PARAMETERS = "action_parameters"  # Optional action parameters
+ATTR_ACTION_VISIBLE = "visible"  # Bring widget to foreground on activation
+
+
+async def async_setup_entry(
+    hass: HomeAssistant,
+    config_entry: LaMetricConfigEntry,
+    async_add_entities: AddConfigEntryEntitiesCallback,
+) -> None:
+    """Set up one scene entity per installed LaMetric app widget."""
+
+    coordinator = config_entry.runtime_data
+
+    apps = await coordinator.device.installed_apps
+
+    entities: list[LaMetricSceneEntity] = []
+
+    for app in apps.values():
+        for widget_id, widget in app.widgets.items():
+            entities.append(
+                LaMetricSceneEntity(
+                    coordinator=coordinator,
+                    app_id=app.id,
+                    widget_id=widget_id,
+                    app_title=app.title,
+                    widget_index=widget.index,
+                )
+            )
+
+    async_add_entities(entities)
+
+
+class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
+    """Scene entity that targets one fixed app/widget pair."""
+
+    app_id: str
+    widget_id: str
+
+    def __init__(
+        self,
+        coordinator: LaMetricCoordinator,
+        app_id: str,
+        widget_id: str,
+        app_title: str | None,
+        widget_index: int,
+    ) -> None:
+        """Initialize metadata for a specific app/widget scene."""
+
+        super().__init__(coordinator)
+
+        self.app_id = app_id
+        self.widget_id = widget_id
+        self._attr_unique_id = f"{coordinator.data.serial_number}-{app_id}-{widget_id}"
+
+        display_name = app_title or app_id
+        self._attr_name = f"{display_name} Widget {widget_index + 1}"
+
+    @lametric_api_exception_handler  # type: ignore[arg-type]
+    async def async_activate(self, **_kwargs: Any) -> None:
+        """Activate widget or widget action using optional service kwargs.
+
+        Supported kwargs:
+        - action_id: Action to execute on the configured widget.
+        - action_parameters: Optional action parameters payload.
+        - visible: Whether the action should bring the widget to foreground.
+        """
+
+        if (action_id := _kwargs.get(ATTR_ACTION_ID)) is not None:
+            await self.coordinator.device.activate_action(
+                app_id=self.app_id,
+                widget_id=self.widget_id,
+                action_id=action_id,
+                action_parameters=_kwargs.get(ATTR_ACTION_PARAMETERS),
+                visible=_kwargs.get(ATTR_ACTION_VISIBLE, True),
+            )
+        else:
+            await self.coordinator.device.activate_widget(
+                app_id=self.app_id,
+                widget_id=self.widget_id,
+            )
+
+        await super().async_activate()

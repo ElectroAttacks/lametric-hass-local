@@ -7,6 +7,7 @@ authors = [
 ]
 dependencies = [
     "lametric-py>=1.0.0",
+    "homeassistant>=2026.1.0",
 ]
 requires-python = ">=3.14"
 readme = "README.md"
@@ -58,7 +59,7 @@ disallow_untyped_defs = true
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "--cov=src --cov-report=term-missing"
+addopts = "--cov=custom_components/lametric_hass_local --cov-report=term-missing"
 
 # ------------------------------------------------------------------------------
 # SEMANTIC RELEASE (Auto-Versioning)
