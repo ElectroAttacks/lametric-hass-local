@@ -3,9 +3,10 @@ name = "lametric-local"
 version = "0.1.0"
 description = ""
 authors = [
-    { name = "Caspar Weber", email = "" }
+    { name = "Caspar Weber" }
 ]
 dependencies = [
+    "lametric-py>=1.0.0",
 ]
 requires-python = ">=3.14"
 readme = "README.md"
@@ -14,15 +15,15 @@ license = { text = "MIT" }
 # ------------------------------------------------------------------------------
 # UV & DEV DEPENDENCIES
 # ------------------------------------------------------------------------------
-[tool.uv]
-dev-dependencies = [
-    "pytest>=8.0.0",           
-    "pytest-cov>=4.1.0",      
-    "mypy>=1.9.0",           
-    "ruff>=0.3.0",             
-    "pre-commit>=3.6.0",      
-    "python-semantic-release>=9.0.0", 
-    "commitizen>=3.0.0",  
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=4.1.0",
+    "mypy>=1.9.0",
+    "ruff>=0.3.0",
+    "pre-commit>=3.6.0",
+    "python-semantic-release>=9.0.0",
+    "commitizen>=3.0.0",
 ]
 
 # ------------------------------------------------------------------------------
@@ -63,10 +64,8 @@ addopts = "--cov=src --cov-report=term-missing"
 # SEMANTIC RELEASE (Auto-Versioning)
 # ------------------------------------------------------------------------------
 [tool.semantic_release]
-version_toml = ["project.version"]
-version_variable = "src/__init__.py:__version__"
+version_toml = ["pyproject.toml:project.version"]
 major_on_zero = false
-build_command = "uv build"
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = ["chore", "ci"]
