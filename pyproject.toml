@@ -65,11 +65,18 @@ addopts = "--cov=custom_components/lametric_hass_local --cov-report=term-missing
 # SEMANTIC RELEASE (Auto-Versioning)
 # ------------------------------------------------------------------------------
 [tool.semantic_release]
-version_toml = [
-    "pyproject.toml:project.version",
-    "custom_components/lametric_hass_local/manifest.json:version",
-]
+version_toml = ["pyproject.toml:project.version"]
 major_on_zero = false
+build_command = """
+python3 -c "
+import json, pathlib, tomllib
+manifest = pathlib.Path('custom_components/lametric_hass_local/manifest.json')
+version = tomllib.loads(pathlib.Path('pyproject.toml').read_bytes())['project']['version']
+data = json.loads(manifest.read_text())
+data['version'] = version
+manifest.write_text(json.dumps(data, indent=4) + chr(10))
+" && git add custom_components/lametric_hass_local/manifest.json
+"""
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = ["chore", "ci"]
