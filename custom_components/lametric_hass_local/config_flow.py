@@ -252,7 +252,7 @@ class LaMetricConfigFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
             schema = schema.extend({vol.Required(CONF_HOST): TextSelector()})
 
         return self.async_show_form(
-            step_id="manual_entry",
+            step_id="manual",
             data_schema=schema,
             description_placeholders={"devices_url": DEVICES_URL},
             errors=validation_errors,
