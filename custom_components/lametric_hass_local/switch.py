@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.switch import SwitchEntity, SwitchEntityDescription
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from lametric import DeviceModels, DeviceState, LaMetricDevice
@@ -34,17 +35,10 @@ SWITCHES = [
         key="bluetooth_active",
         translation_key="bluetooth_active",
         icon="mdi:bluetooth",
+        entity_category=EntityCategory.CONFIG,
         available=lambda state: state.bluetooth.active or False,
         get_state=lambda state: state.bluetooth.active or False,
         set_state=lambda device, active: device.set_bluetooth(active=active),
-    ),
-    LaMetricSwitchEntityDescription(
-        key="display_on",
-        translation_key="display_on",
-        icon="mdi:monitor",
-        available=lambda state: True,
-        get_state=lambda state: state.display.on,
-        set_state=lambda device, on: device.set_display(on=on),
     ),
 ]
 

@@ -66,9 +66,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
         self.app_id = app_id
         self.widget_id = widget_id
         self._attr_unique_id = f"{coordinator.data.serial_number}-{app_id}-{widget_id}"
-
-        display_name = app_title or app_id
-        self._attr_name = f"{display_name} Widget {widget_index + 1}"
+        self._attr_name = app_title or app_id
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
     async def async_activate(self, **_kwargs: Any) -> None:

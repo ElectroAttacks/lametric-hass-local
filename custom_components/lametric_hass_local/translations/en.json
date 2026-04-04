@@ -74,11 +74,7 @@
                 "name": "Previous app"
             }
         },
-        "light": {
-            "sky_light": {
-                "name": "Sky light"
-            }
-        },
+        "light": {},
         "number": {
             "brightness": {
                 "name": "Brightness"

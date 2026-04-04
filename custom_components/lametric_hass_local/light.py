@@ -13,7 +13,6 @@ from homeassistant.components.light import (
     LightEntityDescription,
 )
 from homeassistant.components.light.const import ColorMode
-from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util.color import brightness_to_value, value_to_brightness
@@ -43,7 +42,6 @@ LIGHTS = [
     LaMetricLightEntityDescription(
         key="sky_light",
         translation_key="sky_light",
-        entity_category=EntityCategory.CONFIG,
         brightness_get=lambda state: state.display.brightness,
         brightness_set=lambda device, brightness: device.set_display(
             brightness=brightness

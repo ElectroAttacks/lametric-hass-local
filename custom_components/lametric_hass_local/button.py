@@ -7,7 +7,6 @@ from dataclasses import dataclass
 from typing import Any
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
-from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from lametric import LaMetricDevice
@@ -32,28 +31,24 @@ BUTTONS = [
         key="next_app",
         translation_key="next_app",
         icon="mdi:skip-next",
-        entity_category=EntityCategory.CONFIG,
         action=lambda device: device.activate_next_app(),
     ),
     LaMetricButtonEntityDescription(
         key="previous_app",
         translation_key="previous_app",
         icon="mdi:skip-previous",
-        entity_category=EntityCategory.CONFIG,
         action=lambda device: device.activate_previous_app(),
     ),
     LaMetricButtonEntityDescription(
         key="dismiss_current_notification",
         translation_key="dismiss_current_notification",
         icon="mdi:bell-off",
-        entity_category=EntityCategory.CONFIG,
         action=lambda device: device.dismiss_current_notification(),
     ),
     LaMetricButtonEntityDescription(
         key="dismiss_all_notifications",
         translation_key="dismiss_all_notifications",
         icon="mdi:bell-remove",
-        entity_category=EntityCategory.CONFIG,
         action=lambda device: device.dismiss_all_notifications(),
     ),
 ]
