@@ -1472,7 +1472,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "homeassistant", specifier = ">=2026.1.0" },
-    { name = "lametric-py", specifier = ">=1.0.4" },
+    { name = "lametric-py", specifier = ">=1.0.6" },
 ]
 
 [package.metadata.requires-dev]
@@ -1488,7 +1488,7 @@ dev = [
 
 [[package]]
 name = "lametric-py"
-version = "1.0.4"
+version = "1.0.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", version = "3.13.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
@@ -1501,9 +1501,9 @@ dependencies = [
     { name = "yarl", version = "1.22.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.14.2'" },
     { name = "yarl", version = "1.23.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14.2'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/62/efb54dce38a4ca3cd8508b21afcbcc543470d67fdd84d22add120a669497/lametric_py-1.0.4.tar.gz", hash = "sha256:a2b520128d453cdc4b688861f2db74eb3d66364f2517a05b259346be37c49582", size = 74459, upload-time = "2026-04-03T21:13:56.507Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f1/0c/2d74d1670b17bc0d51e3f9fcfcc54e5935500af856dce1e4c4f36a7a5a1e/lametric_py-1.0.6.tar.gz", hash = "sha256:1589c481877d066017ba0b593ebf933efd1ebbf1e1f1cc40fa5c4ce9a986401c", size = 76788, upload-time = "2026-04-04T12:05:33.586Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/68/1baed3999d8045d8c42d397a00a86abeb1c4f1d65fcb96da88da303e7404/lametric_py-1.0.4-py3-none-any.whl", hash = "sha256:6e776adb70e9ac2d435e7afc5ac171a215499918739f78a27d1e54812824bd68", size = 15496, upload-time = "2026-04-03T21:13:55.169Z" },
+    { url = "https://files.pythonhosted.org/packages/46/c7/404fdc7421c4ef8986064d7b991bd99732bb78e7fe1a29235330fed65b0a/lametric_py-1.0.6-py3-none-any.whl", hash = "sha256:497e62c1e3a26ed4483597c6f1dd02f02f41bfe373a4b4512f5401784260c8d5", size = 15601, upload-time = "2026-04-04T12:05:32.258Z" },
 ]
 
 [[package]]
