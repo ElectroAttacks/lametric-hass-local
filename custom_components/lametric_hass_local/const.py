@@ -42,3 +42,5 @@ SERVICE_SHOW_CHART: Final = "show_chart"
 SERVICE_START_STREAM: Final = "start_stream"
 SERVICE_STOP_STREAM: Final = "stop_stream"
 SERVICE_SEND_STREAM_DATA: Final = "send_stream_data"
+
+DEVICES_URL: Final = "https://developer.lametric.com/user/devices"

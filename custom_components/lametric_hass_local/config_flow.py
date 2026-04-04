@@ -45,9 +45,7 @@ from lametric import (
 )
 from yarl import URL
 
-from .const import DOMAIN, LOGGER
-
-DEVICES_URL = "https://developer.lametric.com/user/devices"
+from .const import DEVICES_URL, DOMAIN, LOGGER
 
 
 class LaMetricConfigFlowHandler(AbstractOAuth2FlowHandler, domain=DOMAIN):
