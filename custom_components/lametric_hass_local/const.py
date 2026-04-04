@@ -10,6 +10,7 @@ DOMAIN: Final = "lametric_hass_local"
 PLATFORMS = [
     Platform.BUTTON,
     Platform.LIGHT,
+    Platform.NUMBER,
     Platform.SCENE,
     Platform.SENSOR,
     Platform.SELECT,
