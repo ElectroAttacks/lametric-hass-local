@@ -6,7 +6,7 @@ authors = [
     { name = "Caspar Weber" }
 ]
 dependencies = [
-    "lametric-py>=1.0.6",
+    "lametric-py>=1.0.7",
     "homeassistant>=2026.1.0",
 ]
 requires-python = ">=3.14"

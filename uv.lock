@@ -1472,7 +1472,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "homeassistant", specifier = ">=2026.1.0" },
-    { name = "lametric-py", specifier = ">=1.0.6" },
+    { name = "lametric-py", specifier = ">=1.0.7" },
 ]
 
 [package.metadata.requires-dev]
