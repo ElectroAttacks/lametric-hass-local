@@ -12,6 +12,7 @@ PLATFORMS = [
     Platform.LIGHT,
     Platform.SCENE,
     Platform.SENSOR,
+    Platform.SELECT,
     Platform.SWITCH,
     Platform.UPDATE,
 ]
