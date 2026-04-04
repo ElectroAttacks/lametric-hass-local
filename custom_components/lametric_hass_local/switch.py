@@ -49,7 +49,7 @@ SWITCHES = [
 
 async def async_setup_entry(
     hass: HomeAssistant,
-    entry: LaMetricConfigEntry,
+    config_entry: LaMetricConfigEntry,
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up LaMetric switch entities for a config entry.
@@ -58,7 +58,7 @@ async def async_setup_entry(
     the hardware controls exposed by these switches.
     """
 
-    coordinator = entry.runtime_data
+    coordinator = config_entry.runtime_data
 
     if coordinator.data.model == DeviceModels.SKY:
         return

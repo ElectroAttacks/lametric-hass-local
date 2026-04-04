@@ -22,3 +22,12 @@ UPDATE_INTERVAL = timedelta(seconds=30)
 
 
 LOGGER = logging.getLogger(__package__)
+
+
+CONF_CYCLES: Final = "cycles"
+CONF_DATA: Final = "data"
+CONF_ICON_TYPE: Final = "icon_type"
+CONF_LIFETIME: Final = "lifetime"
+CONF_MESSAGE: Final = "message"
+CONF_PRIORITY: Final = "priority"
+CONF_SOUND: Final = "sound"
