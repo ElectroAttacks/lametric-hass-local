@@ -31,3 +31,14 @@ CONF_LIFETIME: Final = "lifetime"
 CONF_MESSAGE: Final = "message"
 CONF_PRIORITY: Final = "priority"
 CONF_SOUND: Final = "sound"
+
+CONF_STREAM_CONFIG: Final = "config"
+CONF_STREAM_SESSION_ID: Final = "session_id"
+CONF_STREAM_RGB_DATA: Final = "rgb_data"
+
+
+SERVICE_SHOW_MESSAGE: Final = "show_message"
+SERVICE_SHOW_CHART: Final = "show_chart"
+SERVICE_START_STREAM: Final = "start_stream"
+SERVICE_STOP_STREAM: Final = "stop_stream"
+SERVICE_SEND_STREAM_DATA: Final = "send_stream_data"

@@ -1,11 +1,17 @@
 """Helper utilities for LaMetric entities."""
 
+from __future__ import annotations
+
 from collections.abc import Callable, Coroutine
 from typing import Any, Concatenate
 
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers import device_registry as dr
 from lametric import LaMetricApiError, LaMetricConnectionError
 
+from .const import DOMAIN
+from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
 
 
@@ -39,3 +45,21 @@ def lametric_api_exception_handler[LaMetricEntityT: LaMetricEntity, **P](
             ) from error
 
     return handle
+
+
+@callback
+def async_get_coordinator_by_device_id(
+    hass: HomeAssistant, device_id: str
+) -> LaMetricCoordinator:
+
+    device_registry = dr.async_get(hass)
+
+    if (device_entry := device_registry.async_get(device_id)) is None:
+        raise ValueError(f"No device found with ID: {device_id}")
+
+    config_entry: LaMetricConfigEntry
+    for config_entry in hass.config_entries.async_loaded_entries(DOMAIN):
+        if config_entry.entry_id in device_entry.config_entries:
+            return config_entry.runtime_data
+
+    raise ValueError(f"No coordinator found for device ID: {device_id}")

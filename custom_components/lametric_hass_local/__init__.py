@@ -13,12 +13,15 @@ from homeassistant.helpers.typing import ConfigType
 
 from .const import DOMAIN, PLATFORMS
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
+from .services import async_setup_services
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 
 async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up the LaMetric integration (config-entry only, no YAML setup)."""
+
+    async_setup_services(hass)
 
     return True
 
