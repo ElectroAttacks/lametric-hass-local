@@ -4,7 +4,7 @@ show_chart:
       required: true
       selector:
         device:
-          integration: lametric
+          integration: lametric_hass_local
     data:
       required: true
       example: "[1,2,3,4,5,4,3,2,1]"
