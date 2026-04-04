@@ -33,6 +33,7 @@ SWITCHES = [
     LaMetricSwitchEntityDescription(
         key="bluetooth_active",
         translation_key="bluetooth_active",
+        icon="mdi:bluetooth",
         available=lambda state: state.bluetooth.active or False,
         get_state=lambda state: state.bluetooth.active or False,
         set_state=lambda device, active: device.set_bluetooth(active=active),
@@ -40,6 +41,7 @@ SWITCHES = [
     LaMetricSwitchEntityDescription(
         key="display_on",
         translation_key="display_on",
+        icon="mdi:monitor",
         available=lambda state: True,
         get_state=lambda state: state.display.on,
         set_state=lambda device, on: device.set_display(on=on),

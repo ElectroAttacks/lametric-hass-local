@@ -29,6 +29,7 @@ SELECTS = [
     LaMetricSelectEntityDescription(
         key="brightness_mode",
         translation_key="brightness_mode",
+        icon="mdi:brightness-auto",
         entity_category=EntityCategory.CONFIG,
         options=[mode.value for mode in BrightnessMode],
         get_current=lambda state: state.display.brightness_mode.value,

@@ -33,6 +33,7 @@ NUMBERS = [
     LaMetricNumberEntityDescription(
         key="brightness",
         translation_key="brightness",
+        icon="mdi:brightness-6",
         entity_category=EntityCategory.CONFIG,
         native_step=1,
         get_range=lambda state: state.display.brightness_limit,
@@ -43,6 +44,7 @@ NUMBERS = [
     LaMetricNumberEntityDescription(
         key="volume",
         translation_key="volume",
+        icon="mdi:volume-high",
         entity_category=EntityCategory.CONFIG,
         native_step=1,
         get_range=lambda state: state.audio.volume_range if state.audio else None,
