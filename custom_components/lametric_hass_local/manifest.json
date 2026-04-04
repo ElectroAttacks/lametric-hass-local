@@ -16,7 +16,7 @@
     "config_flow": true,
     "single_config_entry": false,
     "requirements": [
-        "lametric-py>=1.0.6"
+        "lametric-py>=1.0.7"
     ],
     "loggers": [
         "lametric_hass_local"

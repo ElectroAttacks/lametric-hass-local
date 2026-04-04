@@ -1,5 +1,5 @@
 {
-    "name": "lametric_hass_local",
+    "name": "LaMetric Local",
     "render_readme": true,
     "homeassistant": "2026.1.0"
 }
