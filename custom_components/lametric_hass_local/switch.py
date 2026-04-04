@@ -106,15 +106,11 @@ class LaMetricSwitchEntity(LaMetricEntity, SwitchEntity):
         """Turn the switch on."""
         await self.entity_description.set_state(self.coordinator.device, True)
 
-        await super().async_turn_on(**_kwargs)
-
         await self.coordinator.async_request_refresh()
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
     async def async_turn_off(self, **_kwargs: Any) -> None:
         """Turn the switch off."""
         await self.entity_description.set_state(self.coordinator.device, False)
-
-        await super().async_turn_off(**_kwargs)
 
         await self.coordinator.async_request_refresh()
