@@ -1,35 +1,13 @@
 {
     "domain": "lametric_hass_local",
     "name": "LaMetric Local",
-    "version": "1.8.2",
-    "integration_type": "device",
-    "iot_class": "local_polling",
-    "documentation": "https://github.com/ElectroAttacks/lametric-hass-local",
-    "issue_tracker": "https://github.com/ElectroAttacks/lametric-hass-local/issues",
-    "dependencies": [
-        "application_credentials"
-    ],
     "after_dependencies": [],
     "codeowners": [
         "@ElectroAttacks"
     ],
     "config_flow": true,
-    "single_config_entry": false,
-    "requirements": [
-        "lametric-py>=1.0.7"
-    ],
-    "loggers": [
-        "lametric_hass_local"
-    ],
-    "zeroconf": [
-        {
-            "type": "_lametric-api._tcp.local."
-        }
-    ],
-    "ssdp": [
-        {
-            "deviceType": "urn:schemas-upnp-org:device:LaMetric:1"
-        }
+    "dependencies": [
+        "application_credentials"
     ],
     "dhcp": [
         {
@@ -39,5 +17,27 @@
             "registered_devices": true
         }
     ],
-    "quality_scale": "bronze"
+    "documentation": "https://github.com/ElectroAttacks/lametric-hass-local",
+    "integration_type": "device",
+    "iot_class": "local_polling",
+    "issue_tracker": "https://github.com/ElectroAttacks/lametric-hass-local/issues",
+    "loggers": [
+        "lametric_hass_local"
+    ],
+    "quality_scale": "bronze",
+    "requirements": [
+        "lametric-py>=1.0.7"
+    ],
+    "single_config_entry": false,
+    "ssdp": [
+        {
+            "deviceType": "urn:schemas-upnp-org:device:LaMetric:1"
+        }
+    ],
+    "version": "1.8.2",
+    "zeroconf": [
+        {
+            "type": "_lametric-api._tcp.local."
+        }
+    ]
 }

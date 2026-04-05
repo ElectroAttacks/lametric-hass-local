@@ -134,75 +134,15 @@
                 },
                 "icon_type": {
                     "description": "Icon indicator shown alongside the notification.",
-                    "name": "Icon type",
-                    "state": {
-                        "none": "None",
-                        "info": "Info",
-                        "alert": "Alert"
-                    }
+                    "name": "Icon type"
                 },
                 "priority": {
                     "description": "Notification priority level.",
-                    "name": "Priority",
-                    "state": {
-                        "info": "Info",
-                        "warning": "Warning",
-                        "critical": "Critical"
-                    }
+                    "name": "Priority"
                 },
                 "sound": {
                     "description": "Sound to play with the notification.",
-                    "name": "Sound",
-                    "state": {
-                        "alarm1": "Alarm 1",
-                        "alarm2": "Alarm 2",
-                        "alarm3": "Alarm 3",
-                        "alarm4": "Alarm 4",
-                        "alarm5": "Alarm 5",
-                        "alarm6": "Alarm 6",
-                        "alarm7": "Alarm 7",
-                        "alarm8": "Alarm 8",
-                        "alarm9": "Alarm 9",
-                        "alarm10": "Alarm 10",
-                        "alarm11": "Alarm 11",
-                        "alarm12": "Alarm 12",
-                        "alarm13": "Alarm 13",
-                        "bicycle": "Bicycle",
-                        "car": "Car",
-                        "cash": "Cash",
-                        "cat": "Cat",
-                        "dog": "Dog",
-                        "dog2": "Dog 2",
-                        "energy": "Energy",
-                        "knock-knock": "Knock",
-                        "letter_email": "Letter / Email",
-                        "lose1": "Lose 1",
-                        "lose2": "Lose 2",
-                        "negative1": "Negative 1",
-                        "negative2": "Negative 2",
-                        "negative3": "Negative 3",
-                        "negative4": "Negative 4",
-                        "negative5": "Negative 5",
-                        "notification": "Notification",
-                        "notification2": "Notification 2",
-                        "notification3": "Notification 3",
-                        "notification4": "Notification 4",
-                        "open_door": "Open door",
-                        "positive1": "Positive 1",
-                        "positive2": "Positive 2",
-                        "positive3": "Positive 3",
-                        "positive4": "Positive 4",
-                        "positive5": "Positive 5",
-                        "positive6": "Positive 6",
-                        "statistic": "Statistic",
-                        "thunder": "Thunder",
-                        "water1": "Water 1",
-                        "water2": "Water 2",
-                        "win": "Win",
-                        "win2": "Win 2",
-                        "wind": "Wind",
-                        "wind_short": "Wind (short)"
-                    }
+                    "name": "Sound"
                 }
             },
             "name": "Show chart"
@@ -220,12 +160,7 @@
                 },
                 "icon_type": {
                     "description": "Icon indicator shown alongside the notification.",
-                    "name": "Icon type",
-                    "state": {
-                        "none": "None",
-                        "info": "Info",
-                        "alert": "Alert"
-                    }
+                    "name": "Icon type"
                 },
                 "message": {
                     "description": "The text to display on the device.",
@@ -233,66 +168,11 @@
                 },
                 "priority": {
                     "description": "Notification priority level.",
-                    "name": "Priority",
-                    "state": {
-                        "info": "Info",
-                        "warning": "Warning",
-                        "critical": "Critical"
-                    }
+                    "name": "Priority"
                 },
                 "sound": {
                     "description": "Sound to play with the notification.",
-                    "name": "Sound",
-                    "state": {
-                        "alarm1": "Alarm 1",
-                        "alarm2": "Alarm 2",
-                        "alarm3": "Alarm 3",
-                        "alarm4": "Alarm 4",
-                        "alarm5": "Alarm 5",
-                        "alarm6": "Alarm 6",
-                        "alarm7": "Alarm 7",
-                        "alarm8": "Alarm 8",
-                        "alarm9": "Alarm 9",
-                        "alarm10": "Alarm 10",
-                        "alarm11": "Alarm 11",
-                        "alarm12": "Alarm 12",
-                        "alarm13": "Alarm 13",
-                        "bicycle": "Bicycle",
-                        "car": "Car",
-                        "cash": "Cash",
-                        "cat": "Cat",
-                        "dog": "Dog",
-                        "dog2": "Dog 2",
-                        "energy": "Energy",
-                        "knock-knock": "Knock",
-                        "letter_email": "Letter / Email",
-                        "lose1": "Lose 1",
-                        "lose2": "Lose 2",
-                        "negative1": "Negative 1",
-                        "negative2": "Negative 2",
-                        "negative3": "Negative 3",
-                        "negative4": "Negative 4",
-                        "negative5": "Negative 5",
-                        "notification": "Notification",
-                        "notification2": "Notification 2",
-                        "notification3": "Notification 3",
-                        "notification4": "Notification 4",
-                        "open_door": "Open door",
-                        "positive1": "Positive 1",
-                        "positive2": "Positive 2",
-                        "positive3": "Positive 3",
-                        "positive4": "Positive 4",
-                        "positive5": "Positive 5",
-                        "positive6": "Positive 6",
-                        "statistic": "Statistic",
-                        "thunder": "Thunder",
-                        "water1": "Water 1",
-                        "water2": "Water 2",
-                        "win": "Win",
-                        "win2": "Win 2",
-                        "wind": "Wind",
-                        "wind_short": "Wind (short)"
-                    }
+                    "name": "Sound"
                 }
             },
             "name": "Show message"
@@ -310,6 +190,74 @@
         "stop_stream": {
             "description": "Stop an active pixel-streaming session on a LaMetric SKY device.",
             "name": "Stop stream"
+        }
+    },
+    "selector": {
+        "icon_type": {
+            "options": {
+                "none": "None",
+                "info": "Info",
+                "alert": "Alert"
+            }
+        },
+        "priority": {
+            "options": {
+                "info": "Info",
+                "warning": "Warning",
+                "critical": "Critical"
+            }
+        },
+        "sound": {
+            "options": {
+                "alarm1": "Alarm 1",
+                "alarm2": "Alarm 2",
+                "alarm3": "Alarm 3",
+                "alarm4": "Alarm 4",
+                "alarm5": "Alarm 5",
+                "alarm6": "Alarm 6",
+                "alarm7": "Alarm 7",
+                "alarm8": "Alarm 8",
+                "alarm9": "Alarm 9",
+                "alarm10": "Alarm 10",
+                "alarm11": "Alarm 11",
+                "alarm12": "Alarm 12",
+                "alarm13": "Alarm 13",
+                "bicycle": "Bicycle",
+                "car": "Car",
+                "cash": "Cash",
+                "cat": "Cat",
+                "dog": "Dog",
+                "dog2": "Dog 2",
+                "energy": "Energy",
+                "knock-knock": "Knock",
+                "letter_email": "Letter / Email",
+                "lose1": "Lose 1",
+                "lose2": "Lose 2",
+                "negative1": "Negative 1",
+                "negative2": "Negative 2",
+                "negative3": "Negative 3",
+                "negative4": "Negative 4",
+                "negative5": "Negative 5",
+                "notification": "Notification",
+                "notification2": "Notification 2",
+                "notification3": "Notification 3",
+                "notification4": "Notification 4",
+                "open_door": "Open door",
+                "positive1": "Positive 1",
+                "positive2": "Positive 2",
+                "positive3": "Positive 3",
+                "positive4": "Positive 4",
+                "positive5": "Positive 5",
+                "positive6": "Positive 6",
+                "statistic": "Statistic",
+                "thunder": "Thunder",
+                "water1": "Water 1",
+                "water2": "Water 2",
+                "win": "Win",
+                "win2": "Win 2",
+                "wind": "Wind",
+                "wind_short": "Wind (short)"
+            }
         }
     }
 }
