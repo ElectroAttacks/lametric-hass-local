@@ -83,7 +83,7 @@ class LaMetricSwitchEntity(LaMetricEntity, SwitchEntity):
         super().__init__(coordinator)
 
         self.entity_description = description
-        self._attr_name = f"{coordinator.data.serial_number}-{description.key}"
+        self._attr_unique_id = f"{coordinator.data.serial_number}-{description.key}"
 
     @property
     def available(self) -> bool:
