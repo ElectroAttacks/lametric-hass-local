@@ -38,3 +38,37 @@ data:
 
 The `action_id` values and available `action_parameters` depend on the individual app.
 Refer to the [LaMetric Developer documentation](https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-apps.html) for details.
+
+## Discovering available actions
+
+Every scene entity automatically exposes an **`actions`** state attribute that lists all actions
+the app supports, including their parameter names, types, and whether they are required.
+
+You can inspect this directly in the Home Assistant UI under **Developer Tools → States**, or via a template:
+
+```yaml
+{{ state_attr('scene.lametric_stopwatch', 'actions') }}
+```
+
+Example output for a stopwatch app:
+
+```yaml
+actions:
+  stopwatch.start:
+    value:
+      type: java.lang.Object
+      name: value
+      required: false
+  stopwatch.stop:
+    value:
+      type: java.lang.Object
+      name: value
+      required: false
+  stopwatch.reset:
+    value:
+      type: java.lang.Object
+      name: value
+      required: false
+```
+
+If an app defines no actions, the attribute is absent (empty dict).
