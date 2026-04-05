@@ -33,7 +33,7 @@
     ],
     "dhcp": [
         {
-            "hostname": "LaMetric-*"
+            "hostname": "lametric-*"
         },
         {
             "registered_devices": true
