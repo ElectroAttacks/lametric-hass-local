@@ -93,6 +93,13 @@ class LaMetricNumberEntity(LaMetricEntity, NumberEntity):
         self._attr_unique_id = f"{coordinator.data.serial_number}-{description.key}"
 
     @property
+    def available(self) -> bool:
+        """Return True when the coordinator is available and feature is supported."""
+        return super().available and self.entity_description.available(
+            self.coordinator.data
+        )
+
+    @property
     def native_value(self) -> int | None:
         """Return the current numeric value."""
         return self.entity_description.get_value(self.coordinator.data)

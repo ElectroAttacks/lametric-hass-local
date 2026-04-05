@@ -77,6 +77,13 @@ class LaMetricSelectEntity(LaMetricEntity, SelectEntity):
         self._attr_unique_id = f"{coordinator.data.serial_number}-{description.key}"
 
     @property
+    def available(self) -> bool:
+        """Return True when the coordinator is available and feature is supported."""
+        return super().available and self.entity_description.available(
+            self.coordinator.data
+        )
+
+    @property
     def current_option(self) -> str | None:
         """Return the currently active option."""
         return self.entity_description.get_current(self.coordinator.data)

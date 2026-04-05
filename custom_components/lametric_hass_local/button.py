@@ -28,27 +28,27 @@ class LaMetricButtonEntityDescription(ButtonEntityDescription):
 
 BUTTONS = [
     LaMetricButtonEntityDescription(
+        icon="mdi:skip-next",
         key="next_app",
         translation_key="next_app",
-        icon="mdi:skip-next",
         action=lambda device: device.activate_next_app(),
     ),
     LaMetricButtonEntityDescription(
+        icon="mdi:skip-previous",
         key="previous_app",
         translation_key="previous_app",
-        icon="mdi:skip-previous",
         action=lambda device: device.activate_previous_app(),
     ),
     LaMetricButtonEntityDescription(
+        icon="mdi:bell-off",
         key="dismiss_current_notification",
         translation_key="dismiss_current_notification",
-        icon="mdi:bell-off",
         action=lambda device: device.dismiss_current_notification(),
     ),
     LaMetricButtonEntityDescription(
+        icon="mdi:bell-remove",
         key="dismiss_all_notifications",
         translation_key="dismiss_all_notifications",
-        icon="mdi:bell-remove",
         action=lambda device: device.dismiss_all_notifications(),
     ),
 ]
