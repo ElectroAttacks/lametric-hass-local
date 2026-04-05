@@ -19,4 +19,4 @@ jobs:
         uses: Andrew-Chen-Wang/github-wiki-action@v5
         with:
           path: .github/wiki/
-          token: ${{ secrets.WIKI_TOKEN }}
+          token: ${{ secrets.WRITE_TOKEN }}

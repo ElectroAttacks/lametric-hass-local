@@ -52,6 +52,14 @@ strict = true
 ignore_missing_imports = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_untyped_calls = false
+warn_unused_ignores = false
+disallow_any_generics = false
 
 # ------------------------------------------------------------------------------
 # PYTEST (Testing)
