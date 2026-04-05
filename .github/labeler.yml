@@ -1,0 +1,37 @@
+---
+
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/**"
+          - ".github/dependabot.yml"
+          - ".pre-commit-config.yaml"
+          - ".yamllint.yml"
+          - "pyproject.toml"
+
+dependencies:
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/dependabot.yml"
+          - "pyproject.toml"
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "README.md"
+          - "wiki/**"
+          - "CONTRIBUTING.md"
+          - "SECURITY.md"
+          - "CODE_OF_CONDUCT.md"
+          - ".github/ISSUE_TEMPLATE/**"
+          - ".github/PULL_REQUEST_TEMPLATE.md"
+
+new-feature:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "custom_components/**"
+
+bugfix:
+  - changed-files:
+      - any-glob-to-any-file:
+          - "custom_components/**"
