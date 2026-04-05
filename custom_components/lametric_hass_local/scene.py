@@ -7,6 +7,7 @@ from typing import Any
 from homeassistant.components.scene import Scene as SceneEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from lametric.device_apps import Parameter
 
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
@@ -38,6 +39,7 @@ async def async_setup_entry(
                     app_id=app.id,
                     widget_id=widget_id,
                     app_title=app.title,
+                    actions=app.actions,
                 )
             )
 
@@ -49,6 +51,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
 
     app_id: str
     widget_id: str
+    _actions: dict[str, dict[str, Parameter]] | None
 
     def __init__(
         self,
@@ -56,6 +59,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
         app_id: str,
         widget_id: str,
         app_title: str | None,
+        actions: dict[str, dict[str, Parameter]] | None,
     ) -> None:
         """Initialize metadata for a specific app/widget scene."""
 
@@ -63,8 +67,31 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
 
         self.app_id = app_id
         self.widget_id = widget_id
+        self._actions = actions
         self._attr_unique_id = f"{coordinator.data.serial_number}-{app_id}-{widget_id}"
         self._attr_name = app_title or app_id
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return available actions and their parameters for this widget's app."""
+
+        if not self._actions:
+            return {}
+
+        return {
+            "actions": {
+                action_id: {
+                    param_name: {
+                        "type": param.data_type,
+                        "name": param.name,
+                        "required": param.required,
+                        **({"format": param.format} if param.format else {}),
+                    }
+                    for param_name, param in params.items()
+                }
+                for action_id, params in self._actions.items()
+            }
+        }
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
     async def async_activate(self, **_kwargs: Any) -> None:
