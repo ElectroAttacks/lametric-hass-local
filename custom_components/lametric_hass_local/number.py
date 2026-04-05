@@ -24,6 +24,7 @@ from .helpers import lametric_api_exception_handler
 class LaMetricNumberEntityDescription(NumberEntityDescription):
     """Description for a LaMetric number, including value and range accessors."""
 
+    available: Callable[[DeviceState], bool]
     get_value: Callable[[DeviceState], int | None]
     set_value: Callable[[LaMetricDevice, int], Awaitable[Any]]
     get_range: Callable[[DeviceState], IntRange | None]
@@ -31,24 +32,26 @@ class LaMetricNumberEntityDescription(NumberEntityDescription):
 
 NUMBERS = [
     LaMetricNumberEntityDescription(
+        icon="mdi:brightness-6",
         key="brightness",
         translation_key="brightness",
-        icon="mdi:brightness-6",
-        entity_category=EntityCategory.CONFIG,
         native_step=1,
-        get_range=lambda state: state.display.brightness_limit,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
+        available=lambda state: state.model != DeviceModels.SKY,
+        get_range=lambda state: state.display.brightness_limit,
         get_value=lambda state: state.display.brightness,
         set_value=lambda device, brightness: device.set_display(brightness=brightness),
     ),
     LaMetricNumberEntityDescription(
+        icon="mdi:volume-high",
         key="volume",
         translation_key="volume",
-        icon="mdi:volume-high",
-        entity_category=EntityCategory.CONFIG,
         native_step=1,
-        get_range=lambda state: state.audio.volume_range if state.audio else None,
         native_unit_of_measurement=PERCENTAGE,
+        entity_category=EntityCategory.CONFIG,
+        available=lambda state: state.audio.available,
+        get_range=lambda state: state.audio.volume_range if state.audio else None,
         get_value=lambda state: state.audio.volume if state.audio else 0,
         set_value=lambda device, volume: device.set_audio(volume=volume),
     ),
@@ -63,15 +66,13 @@ async def async_setup_entry(
     """Set up LaMetric number entities for a config entry."""
     coordinator = config_entry.runtime_data
 
-    if coordinator.data.model == DeviceModels.SKY:
-        return
-
     async_add_entities(
         LaMetricNumberEntity(
             coordinator=coordinator,
             description=description,
         )
         for description in NUMBERS
+        if description.available(coordinator.data)
     )
 
 

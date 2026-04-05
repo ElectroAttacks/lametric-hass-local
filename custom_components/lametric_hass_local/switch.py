@@ -10,7 +10,7 @@ from homeassistant.components.switch import SwitchEntity, SwitchEntityDescriptio
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from lametric import DeviceModels, DeviceState, LaMetricDevice
+from lametric import DeviceState, LaMetricDevice
 
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
@@ -32,9 +32,9 @@ class LaMetricSwitchEntityDescription(SwitchEntityDescription):
 
 SWITCHES = [
     LaMetricSwitchEntityDescription(
+        icon="mdi:bluetooth",
         key="bluetooth_active",
         translation_key="bluetooth_active",
-        icon="mdi:bluetooth",
         entity_category=EntityCategory.CONFIG,
         available=lambda state: state.bluetooth.available,
         get_state=lambda state: state.bluetooth.active or False,
@@ -56,15 +56,13 @@ async def async_setup_entry(
 
     coordinator = config_entry.runtime_data
 
-    if coordinator.data.model == DeviceModels.SKY:
-        return
-
     async_add_entities(
         LaMetricSwitchEntity(
             coordinator=coordinator,
             description=description,
         )
         for description in SWITCHES
+        if description.available(coordinator.data)
     )
 
 

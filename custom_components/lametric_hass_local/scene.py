@@ -31,14 +31,13 @@ async def async_setup_entry(
     entities: list[LaMetricSceneEntity] = []
 
     for app in apps.values():
-        for widget_id, widget in app.widgets.items():
+        for widget_id, _widget in app.widgets.items():
             entities.append(
                 LaMetricSceneEntity(
                     coordinator=coordinator,
                     app_id=app.id,
                     widget_id=widget_id,
                     app_title=app.title,
-                    widget_index=widget.index,
                 )
             )
 
@@ -57,7 +56,6 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
         app_id: str,
         widget_id: str,
         app_title: str | None,
-        widget_index: int,
     ) -> None:
         """Initialize metadata for a specific app/widget scene."""
 

@@ -32,12 +32,12 @@ class LaMetricTextEntityDescription(TextEntityDescription):
 
 TEXTS = [
     LaMetricTextEntityDescription(
+        icon="mdi:bluetooth",
         key="bluetooth_name",
         translation_key="bluetooth_name",
-        icon="mdi:bluetooth",
-        mode=TextMode.TEXT,
-        native_max=248,
         native_min=1,
+        native_max=248,
+        mode=TextMode.TEXT,
         entity_category=EntityCategory.CONFIG,
         available=lambda state: state.bluetooth.available,
         get_value=lambda state: state.bluetooth.name or "",
@@ -64,7 +64,7 @@ async def async_setup_entry(
             description=description,
         )
         for description in TEXTS
-        if coordinator.data.bluetooth.available
+        if description.available(coordinator.data)
     )
 
 

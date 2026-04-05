@@ -21,17 +21,19 @@ from .helpers import lametric_api_exception_handler
 class LaMetricSelectEntityDescription(SelectEntityDescription):
     """Description for a LaMetric select, including get/set accessors."""
 
+    available: Callable[[DeviceState], bool]
     get_current: Callable[[DeviceState], str]
     set_current: Callable[[LaMetricDevice, str], Awaitable[Any]]
 
 
 SELECTS = [
     LaMetricSelectEntityDescription(
+        icon="mdi:brightness-auto",
         key="brightness_mode",
         translation_key="brightness_mode",
-        icon="mdi:brightness-auto",
         entity_category=EntityCategory.CONFIG,
         options=[mode.value for mode in BrightnessMode],
+        available=lambda state: state.model != DeviceModels.SKY,
         get_current=lambda state: state.display.brightness_mode.value,
         set_current=lambda device, option: device.set_display(
             brightness_mode=BrightnessMode(option)
@@ -48,15 +50,13 @@ async def async_setup_entry(
     """Set up LaMetric select entities for a config entry."""
     coordinator = config_entry.runtime_data
 
-    if coordinator.data.model == DeviceModels.SKY:
-        return
-
     async_add_entities(
         LaMetricSelectEntity(
             coordinator=coordinator,
             description=description,
         )
         for description in SELECTS
+        if description.available(coordinator.data)
     )
 
 
