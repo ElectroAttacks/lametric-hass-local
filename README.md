@@ -17,6 +17,10 @@ Python dependency (declared in the integration manifest):
 
 ### HACS (recommended)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ElectroAttacks&repository=https%3A%2F%2Fgithub.com%2FElectroAttacks%2Flametric-hass-local&category=Integration)
+
+Click the badge above or follow these steps manually:
+
 1. Open HACS in your Home Assistant instance.
 2. Click the three-dot menu in the top right and select **Custom repositories**.
 3. Enter `https://github.com/ElectroAttacks/lametric-hass-local` as the repository URL and select **Integration** as the category.
@@ -60,11 +64,6 @@ It uses the OAuth 2.0 Authorization Code flow and requires you to register your 
 > credentials. The credentials you create belong to your own developer account and are never
 > shared with anyone else.
 
-The config flow also supports auto-discovery:
-
-- DHCP
-- SSDP (`urn:schemas-upnp-org:device:LaMetric:1`)
-- Zeroconf (`_lametric-api._tcp.local.`)
 
 ## Activating Apps (Scenes)
 
