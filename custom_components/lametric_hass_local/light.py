@@ -64,7 +64,7 @@ async def async_setup_entry(
     async_add_entities(
         LaMetricLightEntity(coordinator, description)
         for description in LIGHTS
-        if coordinator.data.model != DeviceModels.SKY
+        if coordinator.data.model == DeviceModels.SKY
     )
 
 
