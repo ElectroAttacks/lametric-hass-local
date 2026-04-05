@@ -77,12 +77,29 @@ SERVICE_SHOW_CHART_SCHEMA = SERVICE_BASE_SCHEMA.extend(
 )
 
 
+def _normalize_stream_config(data: dict) -> dict:  # type: ignore[type-arg]
+    """Normalize a raw stream config dict before deserialization.
+
+    YAML/JSON parses the bare word ``none`` as Python ``None``.
+    Replace ``None`` values in known string-enum fields with their
+    string equivalents so mashumaro can coerce them correctly.
+    """
+    data = dict(data)
+    post = data.get("post_process")
+    if isinstance(post, dict):
+        post = dict(post)
+        if post.get("type") is None:
+            post["type"] = "none"
+        data["post_process"] = post
+    return data
+
+
 def _coerce_stream_config(value: object) -> StreamConfig:
     """Coerce a plain dict into a StreamConfig dataclass."""
     if isinstance(value, StreamConfig):
         return value
     if isinstance(value, dict):
-        return StreamConfig.from_dict(value)
+        return StreamConfig.from_dict(_normalize_stream_config(value))
     raise vol.Invalid(f"Cannot convert {type(value)} to StreamConfig")
 
 
