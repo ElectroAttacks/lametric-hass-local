@@ -33,7 +33,7 @@ jobs:
         run: uv run pytest --cov=custom_components/lametric_hass_local --cov-report=xml
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v6
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
