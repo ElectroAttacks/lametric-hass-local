@@ -1,3 +1,5 @@
+---
+
 show_chart:
   fields:
     device_id: &device_id
