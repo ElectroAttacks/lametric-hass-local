@@ -17,7 +17,7 @@ Python dependency (declared in the integration manifest):
 
 ### HACS (recommended)
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ElectroAttacks&repository=https%3A%2F%2Fgithub.com%2FElectroAttacks%2Flametric-hass-local&category=Integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=lametric-hass-local&category=Integration&owner=ElectroAttacks)
 
 Click the badge above or follow these steps manually:
 
