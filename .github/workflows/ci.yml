@@ -110,26 +110,7 @@ jobs:
         id: release
         uses: python-semantic-release/python-semantic-release@v10.5.3
         with:
-          github_token: ${{ secrets.WRITE_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           commit: false
-          tag: false
-          push: false
           changelog: false
           build: false
-
-      - name: Update manifest.json version
-        if: steps.release.outputs.released == 'true'
-        run: |
-          jq --arg v "${{ steps.release.outputs.version }}" '.version = $v' \
-            custom_components/lametric_hass_local/manifest.json > tmp.json
-          mv tmp.json custom_components/lametric_hass_local/manifest.json
-
-      - name: Push tag only (no direct push to main)
-        if: steps.release.outputs.released == 'true'
-        env:
-          GITHUB_TOKEN: ${{ secrets.WRITE_TOKEN }}
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag "${{ steps.release.outputs.tag }}"
-          git push origin "${{ steps.release.outputs.tag }}"
