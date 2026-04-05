@@ -229,7 +229,7 @@
                     "name": "Mode"
                 },
                 "mode_params": {
-                    "description": "Time window for time_based mode. Pass {enabled, start_time, end_time} as a mapping.",
+                    "description": "Time window for time_based mode. Provide a mapping with enabled, start_time, and end_time keys.",
                     "name": "Mode parameters"
                 }
             },
