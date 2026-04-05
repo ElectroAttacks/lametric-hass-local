@@ -140,7 +140,7 @@ Send a spike chart notification to a LaMetric device.
 
 The three streaming services allow you to push raw RGB pixel data to the LaMetric SKY's LED matrix.
 For full details on the canvas configuration and available render modes, refer to the
-[LaMetric Developer documentation](https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-display.html).
+[LaMetric Developer documentation](https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-stream.html).
 
 #### `lametric_hass_local.start_stream`
 
