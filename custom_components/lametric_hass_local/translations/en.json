@@ -110,6 +110,10 @@
         "send_stream_data": {
             "description": "Push a frame of RGB pixel data to an active streaming session.",
             "fields": {
+                "device_id": {
+                    "description": "The LaMetric device to send the stream data to.",
+                    "name": "Device"
+                },
                 "rgb_data": {
                     "description": "Raw RGB888 pixel data as a list of [R, G, B] triples.",
                     "name": "RGB data"
@@ -124,6 +128,10 @@
         "show_chart": {
             "description": "Send a spike chart notification to a LaMetric device.",
             "fields": {
+                "device_id": {
+                    "description": "The LaMetric device to send the notification to.",
+                    "name": "Device"
+                },
                 "cycles": {
                     "description": "Number of times the notification loops (0 for infinite).",
                     "name": "Cycles"
@@ -150,6 +158,10 @@
         "show_message": {
             "description": "Send a text notification to a LaMetric device.",
             "fields": {
+                "device_id": {
+                    "description": "The LaMetric device to send the notification to.",
+                    "name": "Device"
+                },
                 "cycles": {
                     "description": "Number of times the notification loops (0 for infinite).",
                     "name": "Cycles"
@@ -180,6 +192,10 @@
         "start_stream": {
             "description": "Start a pixel-streaming session on a LaMetric SKY device.",
             "fields": {
+                "device_id": {
+                    "description": "The LaMetric SKY device to start the stream on.",
+                    "name": "Device"
+                },
                 "config": {
                     "description": "Canvas and render settings for the pixel stream.",
                     "name": "Stream configuration"
@@ -189,6 +205,12 @@
         },
         "stop_stream": {
             "description": "Stop an active pixel-streaming session on a LaMetric SKY device.",
+            "fields": {
+                "device_id": {
+                    "description": "The LaMetric SKY device to stop the stream on.",
+                    "name": "Device"
+                }
+            },
             "name": "Stop stream"
         }
     },
