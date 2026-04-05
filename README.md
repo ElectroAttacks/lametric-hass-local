@@ -5,7 +5,7 @@ Local Home Assistant integration for LaMetric devices using the device API
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
-[![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](LICENSE)
+[![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](.github/LICENSE)
 
 ## Installation
 
