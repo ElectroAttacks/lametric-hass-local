@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "wiki/**"
+      - ".github/wiki/**"
 
 jobs:
   sync:
@@ -18,5 +18,5 @@ jobs:
       - name: Push wiki pages to GitHub Wiki
         uses: Andrew-Chen-Wang/github-wiki-action@v5
         with:
-          path: wiki/
+          path: .github/wiki/
           token: ${{ secrets.WIKI_TOKEN }}
