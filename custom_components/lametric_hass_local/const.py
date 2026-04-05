@@ -18,6 +18,7 @@ PLATFORMS = [
     Platform.SENSOR,
     Platform.SELECT,
     Platform.SWITCH,
+    Platform.TEXT,
     Platform.UPDATE,
 ]
 
