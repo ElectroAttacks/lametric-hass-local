@@ -1,3 +1,5 @@
+---
+
 extends: default
 
 rules:
@@ -9,3 +11,5 @@ rules:
     check-keys: false
   comments:
     min-spaces-from-content: 1
+  hyphens:
+    max-spaces-after: 3  # pre-commit-config uses 3 spaces after -
