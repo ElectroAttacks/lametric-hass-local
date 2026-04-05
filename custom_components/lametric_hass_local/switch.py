@@ -88,9 +88,7 @@ class LaMetricSwitchEntity(LaMetricEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Return True when the coordinator is available and feature is supported."""
-        return super().available and self.entity_description.available(
-            self.coordinator.data
-        )
+        return self.entity_description.available(self.coordinator.data)
 
     @property
     def is_on(self) -> bool:
