@@ -1,0 +1,11 @@
+extends: default
+
+rules:
+  line-length:
+    max: 120
+  truthy:
+    # Allows GitHub Actions `on:` top-level key without warnings
+    allowed-values: ["true", "false"]
+    check-keys: false
+  comments:
+    min-spaces-from-content: 1
