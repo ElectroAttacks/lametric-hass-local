@@ -150,3 +150,25 @@ send_stream_data:
       example: "[[255,0,0],[0,255,0],[0,0,255],...]"
       selector:
         object:
+set_screensaver:
+  fields:
+    device_id: *device_id
+    enabled:
+      required: true
+      selector:
+        boolean:
+    mode:
+      required: false
+      default: "when_dark"
+      selector:
+        select:
+          mode: dropdown
+          options:
+            - "when_dark"
+            - "time_based"
+          translation_key: screensaver_mode
+    mode_params:
+      required: false
+      example: "{enabled: true, start_time: '2000-01-01T22:00:00', end_time: '2000-01-01T08:00:00'}"
+      selector:
+        object:

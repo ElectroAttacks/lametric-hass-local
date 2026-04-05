@@ -24,6 +24,9 @@ from lametric import (
     NotificationData,
     NotificationPriority,
     NotificationSound,
+    ScreensaverConfig,
+    ScreensaverConfigParams,
+    ScreensaverModes,
     SimpleFrame,
     SpikeChartFrame,
     StreamConfig,
@@ -35,12 +38,16 @@ from .const import (
     CONF_ICON_TYPE,
     CONF_MESSAGE,
     CONF_PRIORITY,
+    CONF_SCREENSAVER_ENABLED,
+    CONF_SCREENSAVER_MODE,
+    CONF_SCREENSAVER_MODE_PARAMS,
     CONF_SOUND,
     CONF_STREAM_CONFIG,
     CONF_STREAM_RGB_DATA,
     CONF_STREAM_SESSION_ID,
     DOMAIN,
     SERVICE_SEND_STREAM_DATA,
+    SERVICE_SET_SCREENSAVER,
     SERVICE_SHOW_CHART,
     SERVICE_SHOW_MESSAGE,
     SERVICE_START_STREAM,
@@ -134,6 +141,17 @@ SERVICE_SEND_STREAM_DATA_SCHEMA = vol.Schema(
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_STREAM_SESSION_ID): cv.string,
         vol.Required(CONF_STREAM_RGB_DATA): _coerce_rgb_data,
+    }
+)
+
+SERVICE_SET_SCREENSAVER_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required(CONF_SCREENSAVER_ENABLED): cv.boolean,
+        vol.Optional(
+            CONF_SCREENSAVER_MODE, default=ScreensaverModes.WHEN_DARK
+        ): vol.Coerce(ScreensaverModes),
+        vol.Optional(CONF_SCREENSAVER_MODE_PARAMS): dict,
     }
 )
 
@@ -231,6 +249,34 @@ def async_setup_services(hass: HomeAssistant) -> None:
                 f"Failed to send stream data to LaMetric device at {host}."
             ) from error
 
+    async def _async_service_set_screensaver(call: ServiceCall) -> None:
+        """Handle the set_screensaver service call."""
+        coordinator = async_get_coordinator_by_device_id(
+            hass, call.data[CONF_DEVICE_ID]
+        )
+
+        raw_params = call.data.get(CONF_SCREENSAVER_MODE_PARAMS)
+        mode_params = (
+            ScreensaverConfigParams.from_dict(raw_params)
+            if isinstance(raw_params, dict)
+            else ScreensaverConfigParams(enabled=False)
+        )
+
+        config = ScreensaverConfig(
+            enabled=call.data[CONF_SCREENSAVER_ENABLED],
+            mode=call.data[CONF_SCREENSAVER_MODE],
+            mode_params=mode_params,
+        )
+
+        host = getattr(getattr(coordinator, "device", None), "host", "unknown")
+
+        try:
+            await coordinator.device.set_display(screensaver_config=config)
+        except LaMetricApiError as error:
+            raise HomeAssistantError(
+                f"Failed to configure screensaver on LaMetric device at {host}."
+            ) from error
+
     hass.services.async_register(
         DOMAIN,
         SERVICE_SHOW_CHART,
@@ -266,6 +312,13 @@ def async_setup_services(hass: HomeAssistant) -> None:
         SERVICE_SEND_STREAM_DATA,
         _async_service_send_stream_data,
         schema=SERVICE_SEND_STREAM_DATA_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        SERVICE_SET_SCREENSAVER,
+        _async_service_set_screensaver,
+        schema=SERVICE_SET_SCREENSAVER_SCHEMA,
     )
 
 

@@ -44,12 +44,18 @@ CONF_STREAM_SESSION_ID: Final = "session_id"
 CONF_STREAM_RGB_DATA: Final = "rgb_data"
 
 
+# Screensaver service fields.
+CONF_SCREENSAVER_ENABLED: Final = "enabled"
+CONF_SCREENSAVER_MODE: Final = "mode"
+CONF_SCREENSAVER_MODE_PARAMS: Final = "mode_params"
+
 # Service identifiers – must match the keys in services.yaml.
-SERVICE_SHOW_MESSAGE: Final = "show_message"
+SERVICE_SEND_STREAM_DATA: Final = "send_stream_data"
+SERVICE_SET_SCREENSAVER: Final = "set_screensaver"
 SERVICE_SHOW_CHART: Final = "show_chart"
+SERVICE_SHOW_MESSAGE: Final = "show_message"
 SERVICE_START_STREAM: Final = "start_stream"
 SERVICE_STOP_STREAM: Final = "stop_stream"
-SERVICE_SEND_STREAM_DATA: Final = "send_stream_data"
 
 # URL shown to the user during manual setup so they can look up their API key.
 DEVICES_URL: Final = "https://developer.lametric.com/user/devices"

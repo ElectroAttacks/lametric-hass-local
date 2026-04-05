@@ -212,6 +212,28 @@
                 }
             },
             "name": "Stop stream"
+        },
+        "set_screensaver": {
+            "description": "Enable or disable the screensaver on a LaMetric device and configure its activation mode.",
+            "fields": {
+                "device_id": {
+                    "description": "The LaMetric device to configure.",
+                    "name": "Device"
+                },
+                "enabled": {
+                    "description": "Turn the screensaver on or off.",
+                    "name": "Enabled"
+                },
+                "mode": {
+                    "description": "Activation mode: activates when the room is dark, or during a fixed time window.",
+                    "name": "Mode"
+                },
+                "mode_params": {
+                    "description": "Time window for time_based mode. Pass {enabled, start_time, end_time} as a mapping.",
+                    "name": "Mode parameters"
+                }
+            },
+            "name": "Set screensaver"
         }
     },
     "selector": {
@@ -227,6 +249,12 @@
                 "info": "Info",
                 "warning": "Warning",
                 "critical": "Critical"
+            }
+        },
+        "screensaver_mode": {
+            "options": {
+                "when_dark": "When dark",
+                "time_based": "Time based"
             }
         },
         "sound": {
