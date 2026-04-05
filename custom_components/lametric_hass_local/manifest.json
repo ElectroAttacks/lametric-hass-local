@@ -34,7 +34,7 @@
             "deviceType": "urn:schemas-upnp-org:device:LaMetric:1"
         }
     ],
-    "version": "1.8.2",
+    "version": "1.12.2",
     "zeroconf": [
         {
             "type": "_lametric-api._tcp.local."

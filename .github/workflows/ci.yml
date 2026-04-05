@@ -110,7 +110,7 @@ jobs:
         id: release
         uses: python-semantic-release/python-semantic-release@v10.5.3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.WRITE_TOKEN }}
           commit: false
           tag: false
           push: false
@@ -124,14 +124,12 @@ jobs:
             custom_components/lametric_hass_local/manifest.json > tmp.json
           mv tmp.json custom_components/lametric_hass_local/manifest.json
 
-      - name: Commit, tag & push version bump
+      - name: Push tag only (no direct push to main)
         if: steps.release.outputs.released == 'true'
         env:
           GITHUB_TOKEN: ${{ secrets.WRITE_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add pyproject.toml custom_components/lametric_hass_local/manifest.json
-          git commit -m "chore(release): ${{ steps.release.outputs.tag }} [skip ci]"
           git tag "${{ steps.release.outputs.tag }}"
-          git push origin main --follow-tags
+          git push origin "${{ steps.release.outputs.tag }}"
