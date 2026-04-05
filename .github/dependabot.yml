@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Python dependencies (pip / uv)
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+    open-pull-requests-limit: 5
+    groups:
+      dev-dependencies:
+        patterns:
+          - "pytest*"
+          - "mypy"
+          - "ruff"
+          - "pre-commit"
+          - "commitizen"
+          - "python-semantic-release"
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "chore"
