@@ -76,10 +76,33 @@ SERVICE_SHOW_CHART_SCHEMA = SERVICE_BASE_SCHEMA.extend(
     }
 )
 
+
+def _coerce_stream_config(value: object) -> StreamConfig:
+    """Coerce a plain dict into a StreamConfig dataclass."""
+    if isinstance(value, StreamConfig):
+        return value
+    if isinstance(value, dict):
+        return StreamConfig.from_dict(value)
+    raise vol.Invalid(f"Cannot convert {type(value)} to StreamConfig")
+
+
+def _coerce_rgb_data(value: object) -> bytes:
+    """Flatten a list of [R, G, B] triplets into raw RGB888 bytes."""
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, list):
+        try:
+            flat = [channel for pixel in value for channel in pixel]
+            return bytes(flat)
+        except (TypeError, ValueError) as err:
+            raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets") from err
+    raise vol.Invalid(f"Cannot convert {type(value)} to bytes")
+
+
 SERVICE_START_STREAM_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_DEVICE_ID): cv.string,
-        vol.Required(CONF_STREAM_CONFIG): vol.Coerce(StreamConfig),
+        vol.Required(CONF_STREAM_CONFIG): _coerce_stream_config,
     }
 )
 
@@ -93,7 +116,7 @@ SERVICE_SEND_STREAM_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_DEVICE_ID): cv.string,
         vol.Required(CONF_STREAM_SESSION_ID): cv.string,
-        vol.Required(CONF_STREAM_RGB_DATA): vol.Coerce(bytes),
+        vol.Required(CONF_STREAM_RGB_DATA): _coerce_rgb_data,
     }
 )
 
