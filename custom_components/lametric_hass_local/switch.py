@@ -36,7 +36,7 @@ SWITCHES = [
         translation_key="bluetooth_active",
         icon="mdi:bluetooth",
         entity_category=EntityCategory.CONFIG,
-        available=lambda state: state.bluetooth.active or False,
+        available=lambda state: state.bluetooth.available,
         get_state=lambda state: state.bluetooth.active or False,
         set_state=lambda device, active: device.set_bluetooth(active=active),
     ),
@@ -88,7 +88,9 @@ class LaMetricSwitchEntity(LaMetricEntity, SwitchEntity):
     @property
     def available(self) -> bool:
         """Return True when the coordinator is available and feature is supported."""
-        return self.entity_description.available(self.coordinator.data)
+        return super().available and self.entity_description.available(
+            self.coordinator.data
+        )
 
     @property
     def is_on(self) -> bool:
