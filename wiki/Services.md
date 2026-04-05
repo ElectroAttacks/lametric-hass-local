@@ -52,4 +52,62 @@ data:
 
 ---
 
+## `lametric_hass_local.set_screensaver`
+
+Enable or disable the screensaver on a LaMetric device and configure its activation mode.
+
+| Field | Required | Default | Description |
+|-------|----------|---------|-------------|
+| `device_id` | Yes | — | Target device |
+| `enabled` | Yes | — | `true` to enable, `false` to disable |
+| `mode` | No | `when_dark` | `when_dark` or `time_based` |
+| `mode_params` | No | — | Time window config for `time_based` mode (see below) |
+
+### Modes
+
+- **`when_dark`** — screensaver activates automatically when the ambient light sensor detects a dark environment.
+- **`time_based`** — screensaver activates during a fixed daily time window.
+
+For `time_based` mode, pass `mode_params` as a mapping:
+
+| Key | Description |
+|-----|-------------|
+| `enabled` | Whether the time window is active |
+| `start_time` | Start of the screensaver window (ISO 8601, e.g. `2000-01-01T22:00:00`) |
+| `end_time` | End of the screensaver window (ISO 8601, e.g. `2000-01-01T08:00:00`) |
+
+### Examples
+
+```yaml
+# Enable screensaver in when-dark mode
+action: lametric_hass_local.set_screensaver
+data:
+  device_id: "abc123"
+  enabled: true
+  mode: when_dark
+```
+
+```yaml
+# Enable screensaver between 22:00 and 08:00
+action: lametric_hass_local.set_screensaver
+data:
+  device_id: "abc123"
+  enabled: true
+  mode: time_based
+  mode_params:
+    enabled: true
+    start_time: "2000-01-01T22:00:00"
+    end_time: "2000-01-01T08:00:00"
+```
+
+```yaml
+# Disable screensaver entirely
+action: lametric_hass_local.set_screensaver
+data:
+  device_id: "abc123"
+  enabled: false
+```
+
+---
+
 > For pixel-streaming services (`start_stream`, `send_stream_data`, `stop_stream`) see [Pixel Streaming](Pixel-Streaming).
