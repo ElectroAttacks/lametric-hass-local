@@ -4,6 +4,7 @@ import asyncio
 import math
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 from lametric import DeviceModels
 from lametric.device_states import DeviceState
@@ -46,9 +47,9 @@ def test_brightness_none_when_display_brightness_none(
 ) -> None:
     """brightness property returns None when display.brightness is None."""
     from dataclasses import replace as dc_replace
+    from typing import cast
 
-    # type: ignore[call-arg]
-    display = dc_replace(device_state.display, brightness=None)  # type: ignore[arg-type]
+    display = dc_replace(device_state.display, brightness=cast(int, None))
     coordinator.data = dc_replace(device_state, display=display)
     entity = LaMetricLightEntity(coordinator, _sky_desc())
     assert entity.brightness is None
@@ -106,7 +107,7 @@ def test_light_not_created_for_time_model(device_state: DeviceState) -> None:
 def test_setup_entry_adds_light_for_sky_model() -> None:
     """async_setup_entry creates a light entity for the SKY model."""
     import asyncio
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 
     from lametric import DeviceModels
 
@@ -121,5 +122,100 @@ def test_setup_entry_adds_light_for_sky_model() -> None:
     config_entry.runtime_data = sky_coordinator
 
     collected: list = []
-    asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
+    with patch(
+        "custom_components.lametric_hass_local.light.async_get_current_platform"
+    ):
+        asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     assert len(collected) == len(LIGHTS)
+
+
+# ── stream entity service methods ─────────────────────────────────────────────
+
+
+def test_start_stream_returns_session_id(coordinator: MagicMock) -> None:
+    """_async_start_stream returns success dict with session_id."""
+    from lametric import StreamConfig
+
+    coordinator.device.start_stream = AsyncMock(return_value="sess-abc")
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+    stream_cfg = MagicMock(spec=StreamConfig)
+
+    result = asyncio.run(entity._async_start_stream(stream_cfg))
+
+    assert result == {"success": True, "session_id": "sess-abc"}
+    coordinator.device.start_stream.assert_awaited_once_with(stream_config=stream_cfg)
+
+
+def test_start_stream_returns_failure_when_session_id_none(
+    coordinator: MagicMock,
+) -> None:
+    """_async_start_stream returns failure dict when device returns None."""
+    from lametric import StreamConfig
+
+    coordinator.device.start_stream = AsyncMock(return_value=None)
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    result = asyncio.run(entity._async_start_stream(MagicMock(spec=StreamConfig)))
+
+    assert result["success"] is False
+
+
+def test_start_stream_raises_on_api_error(coordinator: MagicMock) -> None:
+    """_async_start_stream raises HomeAssistantError on LaMetricApiError."""
+    from homeassistant.exceptions import HomeAssistantError
+    from lametric import LaMetricApiError, StreamConfig
+
+    coordinator.device.start_stream = AsyncMock(side_effect=LaMetricApiError("fail"))
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    with pytest.raises(HomeAssistantError):
+        asyncio.run(entity._async_start_stream(MagicMock(spec=StreamConfig)))
+
+
+def test_stop_stream_calls_device(coordinator: MagicMock) -> None:
+    """_async_stop_stream calls device.stop_stream."""
+    coordinator.device.stop_stream = AsyncMock()
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    asyncio.run(entity._async_stop_stream())
+
+    coordinator.device.stop_stream.assert_awaited_once()
+
+
+def test_stop_stream_raises_on_api_error(coordinator: MagicMock) -> None:
+    """_async_stop_stream raises HomeAssistantError on LaMetricApiError."""
+    from homeassistant.exceptions import HomeAssistantError
+    from lametric import LaMetricApiError
+
+    coordinator.device.stop_stream = AsyncMock(side_effect=LaMetricApiError("fail"))
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    with pytest.raises(HomeAssistantError):
+        asyncio.run(entity._async_stop_stream())
+
+
+def test_send_stream_data_calls_device(coordinator: MagicMock) -> None:
+    """_async_send_stream_data calls device.send_stream_data with correct args."""
+    coordinator.device.send_stream_data = AsyncMock()
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    asyncio.run(entity._async_send_stream_data("sess-1", bytes([255, 0, 0])))
+
+    coordinator.device.send_stream_data.assert_awaited_once_with(
+        session_id="sess-1",
+        rgb888_data=bytes([255, 0, 0]),
+    )
+
+
+def test_send_stream_data_raises_on_api_error(coordinator: MagicMock) -> None:
+    """_async_send_stream_data raises HomeAssistantError on LaMetricApiError."""
+    from homeassistant.exceptions import HomeAssistantError
+    from lametric import LaMetricApiError
+
+    coordinator.device.send_stream_data = AsyncMock(
+        side_effect=LaMetricApiError("fail")
+    )
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    with pytest.raises(HomeAssistantError):
+        asyncio.run(entity._async_send_stream_data("sess-1", bytes([0, 0, 0])))

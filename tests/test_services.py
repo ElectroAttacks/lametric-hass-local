@@ -13,51 +13,11 @@ from custom_components.lametric_hass_local.const import (
     CONF_ICON_TYPE,
     CONF_PRIORITY,
 )
-from custom_components.lametric_hass_local.services import (
+from custom_components.lametric_hass_local.light import (
     _coerce_rgb_data,
     _coerce_stream_config,
-    _normalize_stream_config,
-    async_send_notification,
 )
-
-# ── _normalize_stream_config ─────────────────────────────────────────────────
-
-
-def test_normalize_stream_config_replaces_none_post_process_type() -> None:
-    """None post_process.type is replaced with the string 'none'."""
-    data = {"post_process": {"type": None, "other": "value"}}
-    result = _normalize_stream_config(data)
-    assert result["post_process"]["type"] == "none"
-
-
-def test_normalize_stream_config_leaves_set_type_unchanged() -> None:
-    """An already-set post_process.type is left as-is."""
-    data = {"post_process": {"type": "gamma"}}
-    result = _normalize_stream_config(data)
-    assert result["post_process"]["type"] == "gamma"
-
-
-def test_normalize_stream_config_no_post_process_key_unchanged() -> None:
-    """Dicts without post_process are returned unchanged."""
-    data = {"width": 8, "height": 8}
-    result = _normalize_stream_config(data)
-    assert result == data
-
-
-def test_normalize_stream_config_does_not_mutate_input() -> None:
-    """The original dict is not mutated."""
-    inner = {"type": None}
-    data = {"post_process": inner}
-    _normalize_stream_config(data)
-    assert inner["type"] is None  # original untouched
-
-
-def test_normalize_stream_config_non_dict_post_process_unchanged() -> None:
-    """A non-dict post_process value is left untouched."""
-    data = {"post_process": "raw"}
-    result = _normalize_stream_config(data)
-    assert result["post_process"] == "raw"
-
+from custom_components.lametric_hass_local.services import async_send_notification
 
 # ── _coerce_rgb_data ─────────────────────────────────────────────────────────
 
@@ -281,86 +241,6 @@ def test_show_chart_handler_sends_notification(coordinator: MagicMock) -> None:
     coordinator.device.send_notification.assert_awaited_once()
 
 
-def test_stop_stream_handler_calls_stop(coordinator: MagicMock) -> None:
-    """stop_stream service handler calls device.stop_stream."""
-    from unittest.mock import patch
-
-    from custom_components.lametric_hass_local.const import SERVICE_STOP_STREAM
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.stop_stream = AsyncMock()
-
-    call = MagicMock()
-    call.data = {"device_id": "device-1"}
-
-    with patch(
-        "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-        return_value=coordinator,
-    ):
-        asyncio.run(handlers[SERVICE_STOP_STREAM](call))
-
-    coordinator.device.stop_stream.assert_awaited_once()
-
-
-def test_stop_stream_handler_raises_on_api_error(coordinator: MagicMock) -> None:
-    """stop_stream surfaces LaMetricApiError as HomeAssistantError."""
-    from unittest.mock import patch
-
-    from lametric import LaMetricApiError
-
-    from custom_components.lametric_hass_local.const import SERVICE_STOP_STREAM
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.stop_stream = AsyncMock(side_effect=LaMetricApiError("fail"))
-
-    call = MagicMock()
-    call.data = {"device_id": "device-1"}
-
-    with (
-        patch(
-            "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-            return_value=coordinator,
-        ),
-        pytest.raises(HomeAssistantError),
-    ):
-        asyncio.run(handlers[SERVICE_STOP_STREAM](call))
-
-
-def test_send_stream_data_handler_calls_device(coordinator: MagicMock) -> None:
-    """send_stream_data service handler calls device.send_stream_data."""
-    from unittest.mock import patch
-
-    from custom_components.lametric_hass_local.const import (
-        CONF_STREAM_RGB_DATA,
-        CONF_STREAM_SESSION_ID,
-        SERVICE_SEND_STREAM_DATA,
-    )
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.send_stream_data = AsyncMock()
-
-    call = MagicMock()
-    call.data = {
-        "device_id": "device-1",
-        CONF_STREAM_SESSION_ID: "sess-123",
-        CONF_STREAM_RGB_DATA: bytes([255, 0, 0]),
-    }
-
-    with patch(
-        "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-        return_value=coordinator,
-    ):
-        asyncio.run(handlers[SERVICE_SEND_STREAM_DATA](call))
-
-    coordinator.device.send_stream_data.assert_awaited_once_with(
-        session_id="sess-123",
-        rgb888_data=bytes([255, 0, 0]),
-    )
-
-
 def test_set_screensaver_handler_calls_set_display(coordinator: MagicMock) -> None:
     """set_screensaver service handler calls device.set_display."""
     from unittest.mock import patch
@@ -392,130 +272,6 @@ def test_set_screensaver_handler_calls_set_display(coordinator: MagicMock) -> No
         asyncio.run(handlers[SERVICE_SET_SCREENSAVER](call))
 
     coordinator.device.set_display.assert_awaited_once()
-
-
-def test_start_stream_handler_returns_session_id(coordinator: MagicMock) -> None:
-    """start_stream returns success dict with session_id on success."""
-    from unittest.mock import patch
-
-    from lametric import StreamConfig
-
-    from custom_components.lametric_hass_local.const import (
-        CONF_STREAM_CONFIG,
-        SERVICE_START_STREAM,
-    )
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.start_stream = AsyncMock(return_value="stream-abc")
-
-    stream_cfg = MagicMock(spec=StreamConfig)
-    call = MagicMock()
-    call.data = {"device_id": "device-1", CONF_STREAM_CONFIG: stream_cfg}
-
-    with patch(
-        "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-        return_value=coordinator,
-    ):
-        result = asyncio.run(handlers[SERVICE_START_STREAM](call))
-
-    assert result == {"success": True, "session_id": "stream-abc"}
-
-
-def test_start_stream_handler_returns_failure_when_session_id_none(
-    coordinator: MagicMock,
-) -> None:
-    """start_stream returns failure dict when device returns no session_id."""
-    from unittest.mock import patch
-
-    from lametric import StreamConfig
-
-    from custom_components.lametric_hass_local.const import (
-        CONF_STREAM_CONFIG,
-        SERVICE_START_STREAM,
-    )
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.start_stream = AsyncMock(return_value=None)
-
-    call = MagicMock()
-    call.data = {
-        "device_id": "device-1",
-        CONF_STREAM_CONFIG: MagicMock(spec=StreamConfig),
-    }
-
-    with patch(
-        "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-        return_value=coordinator,
-    ):
-        result = asyncio.run(handlers[SERVICE_START_STREAM](call))
-
-    assert result["success"] is False
-
-
-def test_start_stream_handler_raises_on_api_error(coordinator: MagicMock) -> None:
-    """start_stream raises HomeAssistantError on LaMetricApiError."""
-    from unittest.mock import patch
-
-    from lametric import LaMetricApiError, StreamConfig
-
-    from custom_components.lametric_hass_local.const import (
-        CONF_STREAM_CONFIG,
-        SERVICE_START_STREAM,
-    )
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.start_stream = AsyncMock(side_effect=LaMetricApiError("fail"))
-
-    call = MagicMock()
-    call.data = {
-        "device_id": "device-1",
-        CONF_STREAM_CONFIG: MagicMock(spec=StreamConfig),
-    }
-
-    with (
-        patch(
-            "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-            return_value=coordinator,
-        ),
-        pytest.raises(HomeAssistantError),
-    ):
-        asyncio.run(handlers[SERVICE_START_STREAM](call))
-
-
-def test_send_stream_data_handler_raises_on_api_error(coordinator: MagicMock) -> None:
-    """send_stream_data raises HomeAssistantError on LaMetricApiError."""
-    from unittest.mock import patch
-
-    from lametric import LaMetricApiError
-
-    from custom_components.lametric_hass_local.const import (
-        CONF_STREAM_RGB_DATA,
-        CONF_STREAM_SESSION_ID,
-        SERVICE_SEND_STREAM_DATA,
-    )
-
-    hass = MagicMock()
-    handlers = _register_services(hass)
-    coordinator.device.send_stream_data = AsyncMock(side_effect=LaMetricApiError("bad"))
-
-    call = MagicMock()
-    call.data = {
-        "device_id": "device-1",
-        CONF_STREAM_SESSION_ID: "s1",
-        CONF_STREAM_RGB_DATA: bytes([0, 0, 0]),
-    }
-
-    with (
-        patch(
-            "custom_components.lametric_hass_local.services.async_get_coordinator_by_device_id",
-            return_value=coordinator,
-        ),
-        pytest.raises(HomeAssistantError),
-    ):
-        asyncio.run(handlers[SERVICE_SEND_STREAM_DATA](call))
 
 
 def test_set_screensaver_handler_raises_on_api_error(coordinator: MagicMock) -> None:
@@ -556,7 +312,7 @@ def test_coerce_stream_config_from_dict_path() -> None:
     from unittest.mock import MagicMock, patch
 
     with patch(
-        "custom_components.lametric_hass_local.services.StreamConfig.from_dict",
+        "custom_components.lametric_hass_local.light.StreamConfig.from_dict",
         return_value=MagicMock(),
     ) as mock_from_dict:
         _coerce_stream_config({"width": 8, "height": 8})

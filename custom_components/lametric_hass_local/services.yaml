@@ -132,8 +132,11 @@ show_message:
     icon_type: *icon_type
     priority: *priority
 start_stream:
+  target:
+    entity:
+      integration: lametric_hass_local
+      domain: light
   fields:
-    device_id: *device_id
     config:
       required: true
       example: "
@@ -158,11 +161,16 @@ start_stream:
       selector:
         object:
 stop_stream:
-  fields:
-    device_id: *device_id
+  target:
+    entity:
+      integration: lametric_hass_local
+      domain: light
 send_stream_data:
+  target:
+    entity:
+      integration: lametric_hass_local
+      domain: light
   fields:
-    device_id: *device_id
     session_id:
       required: true
       selector:

@@ -7,22 +7,37 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from typing import Any
 
+import voluptuous as vol
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     LightEntity,
     LightEntityDescription,
 )
 from homeassistant.components.light.const import ColorMode
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.core import HomeAssistant, SupportsResponse
+from homeassistant.exceptions import HomeAssistantError
+from homeassistant.helpers.entity_platform import (
+    AddConfigEntryEntitiesCallback,
+    async_get_current_platform,
+)
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 from lametric import (
     DeviceModels,
     DeviceState,
+    LaMetricApiError,
     LaMetricDevice,
+    StreamConfig,
     StreamState,
 )
 
+from .const import (
+    CONF_STREAM_CONFIG,
+    CONF_STREAM_RGB_DATA,
+    CONF_STREAM_SESSION_ID,
+    SERVICE_SEND_STREAM_DATA,
+    SERVICE_START_STREAM,
+    SERVICE_STOP_STREAM,
+)
 from .coordinator import (
     LaMetricConfigEntry,
     LaMetricCoordinator,
@@ -31,6 +46,36 @@ from .entity import LaMetricEntity
 from .helpers import lametric_api_exception_handler
 
 BRIGHTNESS_SCALE = (1, 100)
+
+
+def _coerce_stream_config(value: object) -> StreamConfig:
+    """Coerce a plain dict into a StreamConfig dataclass."""
+    if isinstance(value, StreamConfig):
+        return value
+    if isinstance(value, dict):
+        # YAML/JSON may parse bare ``none`` as Python None; fix known enum fields.
+        data = dict(value)
+        post = data.get("post_process")
+        if isinstance(post, dict):
+            post = dict(post)
+            if post.get("type") is None:
+                post["type"] = "none"
+            data["post_process"] = post
+        return StreamConfig.from_dict(data)
+    raise vol.Invalid(f"Cannot convert {type(value)} to StreamConfig")
+
+
+def _coerce_rgb_data(value: object) -> bytes:
+    """Flatten a list of [R, G, B] triplets into raw RGB888 bytes."""
+    if isinstance(value, bytes):
+        return value
+    if isinstance(value, list):
+        try:
+            flat = [channel for pixel in value for channel in pixel]
+            return bytes(flat)
+        except (TypeError, ValueError) as err:
+            raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets") from err
+    raise vol.Invalid(f"Cannot convert {type(value)} to bytes")
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -70,6 +115,30 @@ async def async_setup_entry(
         LaMetricLightEntity(coordinator, description)
         for description in LIGHTS
         if coordinator.data.model == DeviceModels.SKY
+    )
+
+    platform = async_get_current_platform()
+
+    platform.async_register_entity_service(
+        SERVICE_START_STREAM,
+        {vol.Required(CONF_STREAM_CONFIG): _coerce_stream_config},
+        "_async_start_stream",
+        supports_response=SupportsResponse.OPTIONAL,
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_STOP_STREAM,
+        {},
+        "_async_stop_stream",
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_SEND_STREAM_DATA,
+        {
+            vol.Required(CONF_STREAM_SESSION_ID): str,
+            vol.Required(CONF_STREAM_RGB_DATA): _coerce_rgb_data,
+        },
+        "_async_send_stream_data",
     )
 
 
@@ -119,8 +188,14 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
 
         return {
             "stream_status": stream.status,
-            "pxiel": stream.canvas.pixel,
-            "triangle": stream.canvas.triangle,
+            "canvas_pixel": {
+                "height": stream.canvas.pixel.size.height,
+                "width": stream.canvas.pixel.size.width,
+            },
+            "canvas_triangle": {
+                "height": stream.canvas.triangle.size.height,
+                "width": stream.canvas.triangle.size.width,
+            },
         }
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
@@ -147,3 +222,48 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         await self.entity_description.state_set(self.coordinator.device, False)
 
         await self.coordinator.async_request_refresh()
+
+    async def _async_start_stream(self, config: StreamConfig) -> dict[str, Any]:
+        """Start a pixel-streaming session (SKY only)."""
+        try:
+            session_id = await self.coordinator.device.start_stream(
+                stream_config=config
+            )
+        except LaMetricApiError as error:
+            raise HomeAssistantError(
+                f"Failed to start stream on LaMetric device at "
+                f"{self.coordinator.device.host}."
+            ) from error
+
+        if session_id is None:
+            return {
+                "success": False,
+                "message": (
+                    f"Failed to start stream on LaMetric device at "
+                    f"{self.coordinator.device.host}."
+                ),
+            }
+        return {"success": True, "session_id": session_id}
+
+    async def _async_stop_stream(self) -> None:
+        """Stop an active pixel-streaming session (SKY only)."""
+        try:
+            await self.coordinator.device.stop_stream()
+        except LaMetricApiError as error:
+            raise HomeAssistantError(
+                f"Failed to stop stream on LaMetric device at "
+                f"{self.coordinator.device.host}."
+            ) from error
+
+    async def _async_send_stream_data(self, session_id: str, rgb_data: bytes) -> None:
+        """Send RGB pixel data to an active streaming session (SKY only)."""
+        try:
+            await self.coordinator.device.send_stream_data(
+                session_id=session_id,
+                rgb888_data=rgb_data,
+            )
+        except LaMetricApiError as error:
+            raise HomeAssistantError(
+                f"Failed to send stream data to LaMetric device at "
+                f"{self.coordinator.device.host}."
+            ) from error
