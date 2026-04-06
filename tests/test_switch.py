@@ -50,7 +50,8 @@ def test_switch_available_when_bluetooth_hardware_present(
 def test_switch_not_created_when_bluetooth_unavailable(
     device_state: DeviceState,
 ) -> None:
-    """Switch setup skips devices where bluetooth.available is False."""
+    """Bluetooth switch is unavailable when bluetooth.available is False."""
+    desc = _bluetooth_description()
     unavailable_state = DeviceState(
         cloud_id=1,
         name="LaMetric TIME",
@@ -83,11 +84,47 @@ def test_switch_not_created_when_bluetooth_unavailable(
         ),
     )
 
-    for desc in SWITCHES:
-        assert not desc.available(unavailable_state), (
-            f"Switch '{desc.key}' should not be created "
-            "for a device without the hardware"
-        )
+    assert not desc.available(unavailable_state)
+
+
+def test_display_on_switch_unavailable_when_display_on_is_none(
+    device_state: DeviceState,
+) -> None:
+    """display_on switch is unavailable when display.on is None."""
+    desc = next(s for s in SWITCHES if s.key == "display_on")
+    none_display_state = DeviceState(
+        cloud_id=1,
+        name="LaMetric TIME",
+        serial_number="SA0000000001",
+        os_version=AwesomeVersion("2.3.0"),
+        model=DeviceModels.TIME,
+        mode=DeviceModes.AUTO,
+        audio=DeviceAudioState(available=True, volume=50),
+        bluetooth=DeviceBluetoothState(available=True),
+        display=DeviceDisplayState(
+            on=None,
+            width=37,
+            height=8,
+            type=DisplayType.MONOCHROME,
+            brightness=50,
+            brightness_mode=BrightnessMode.AUTO,
+            brightness_range=IntRange(min=0, max=100),
+            brightness_limit=IntRange(min=0, max=100),
+        ),
+        wifi=DeviceWiFiState(
+            available=True,
+            active=True,
+            encryption="WPA2",
+            netmask=IPv4Address("255.255.255.0"),
+            ip_address_mode="dhcp",
+            ipv4=IPv4Address("192.168.1.100"),
+            mac="11:22:33:44:55:66",
+            signal_strength=75,
+            ssid="TestNet",
+        ),
+    )
+
+    assert not desc.available(none_display_state)
 
 
 def test_turn_on_calls_set_bluetooth_true(coordinator: MagicMock) -> None:

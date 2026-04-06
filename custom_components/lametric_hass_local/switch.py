@@ -32,6 +32,15 @@ class LaMetricSwitchEntityDescription(SwitchEntityDescription):
 
 SWITCHES = [
     LaMetricSwitchEntityDescription(
+        icon="mdi:monitor-eye",
+        key="display_on",
+        translation_key="display_on",
+        entity_category=EntityCategory.CONFIG,
+        available=lambda state: state.display.on is not None,
+        get_state=lambda state: bool(state.display.on),
+        set_state=lambda device, on: device.set_display(on=on),
+    ),
+    LaMetricSwitchEntityDescription(
         icon="mdi:bluetooth",
         key="bluetooth_active",
         translation_key="bluetooth_active",
