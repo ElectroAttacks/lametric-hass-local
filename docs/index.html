@@ -298,19 +298,23 @@
             <ul>
                 <li><a href="#show-message">show_message</a></li>
                 <li><a href="#show-chart">show_chart</a></li>
+            </ul>
+
+            <div class="section-label">Entity Services</div>
+            <ul>
                 <li><a href="#screensaver">set_screensaver</a></li>
+                <li><a href="#scenes">activate_action</a></li>
+                <li><a href="#start-stream">start_stream (SKY)</a></li>
+                <li><a href="#send-frames">send_stream_data (SKY)</a></li>
             </ul>
 
             <div class="section-label">Streaming (SKY)</div>
             <ul>
                 <li><a href="#streaming">Overview</a></li>
-                <li><a href="#start-stream">Start a Stream</a></li>
-                <li><a href="#send-frames">Send Frames</a></li>
             </ul>
 
             <div class="section-label">Entities</div>
             <ul>
-                <li><a href="#scenes">Scenes</a></li>
                 <li><a href="#entities">All Entities</a></li>
             </ul>
 
@@ -345,7 +349,9 @@
                     </div>
                     <div class="card">
                         <h4>Services</h4>
-                        <p><code>show_message</code>, <code>show_chart</code>, screensaver, and pixel streaming (SKY).</p>
+                        <p><code>show_message</code>, <code>show_chart</code>, and pixel streaming (SKY). Screensaver
+                            control via entity service.</p>
+                        </p>
                     </div>
                     <div class="card">
                         <h4>Discovery</h4>
@@ -370,26 +376,31 @@
                     <li>Restart Home Assistant.</li>
                 </ol>
                 <p>Alternatively, copy <code>custom_components/lametric_hass_local/</code> manually into your HA
-                    <code>custom_components/</code> folder and restart.</p>
+                    <code>custom_components/</code> folder and restart.
+                </p>
             </section>
 
             <!-- Configuration -->
             <section id="configuration">
                 <h2>Configuration</h2>
                 <p>Go to <strong>Settings → Devices &amp; Services → Add Integration</strong> and search for
-                    <strong>LaMetric Local</strong>.</p>
+                    <strong>LaMetric Local</strong>.
+                </p>
 
                 <h3>Manual setup</h3>
                 <p>Enter the device IP address and the API key shown under <em>Settings → Wi-Fi</em> and
-                    <em>Settings → Developer → API Key</em> in the LaMetric app.</p>
+                    <em>Settings → Developer → API Key</em> in the LaMetric app.
+                </p>
 
                 <h3>Cloud-assisted OAuth</h3>
                 <p>You can let the integration fetch available devices from
                     <a href="https://developer.lametric.com">developer.lametric.com</a> using OAuth. A developer
-                    account is required. The device is still controlled locally after setup.</p>
+                    account is required. The device is still controlled locally after setup.
+                </p>
 
                 <div class="note">
-                    Discovery via Zeroconf, SSDP, or DHCP will pre-fill the IP for you. Just confirm and enter the API key.
+                    Discovery via Zeroconf, SSDP, or DHCP will pre-fill the IP for you. Just confirm and enter the API
+                    key.
                 </div>
             </section>
 
@@ -424,7 +435,8 @@
                             <td><code>icon</code></td>
                             <td>no</td>
                             <td>—</td>
-                            <td>Icon ID from <a href="https://developer.lametric.com/icons">developer.lametric.com/icons</a></td>
+                            <td>Icon ID from <a
+                                    href="https://developer.lametric.com/icons">developer.lametric.com/icons</a></td>
                         </tr>
                         <tr>
                             <td><code>sound</code></td>
@@ -529,8 +541,13 @@ data:
 
             <!-- set_screensaver -->
             <section id="screensaver">
-                <h2>Service: set_screensaver</h2>
-                <p>Enables or disables the screensaver and optionally configures its mode.</p>
+                <h2>Entity Service: set_screensaver</h2>
+                <p>Enables or disables the screensaver and optionally configures its mode. This is an <strong>entity
+                        service</strong> — target the <code>brightness_mode</code> select entity of the device.</p>
+
+                <div class="note">
+                    <code>mode_params</code> is only evaluated when <code>mode</code> is set to <code>time_based</code>.
+                </div>
 
                 <table>
                     <thead>
@@ -542,12 +559,6 @@ data:
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><code>device_id</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>Target LaMetric device</td>
-                        </tr>
                         <tr>
                             <td><code>enabled</code></td>
                             <td>yes</td>
@@ -564,14 +575,17 @@ data:
                             <td><code>mode_params</code></td>
                             <td>no</td>
                             <td>—</td>
-                            <td>Time-based params: <code>enabled</code>, <code>start_time</code>, <code>end_time</code></td>
+                            <td>Only used with <code>time_based</code>: <code>enabled</code>, <code>start_time</code>,
+                                <code>end_time</code>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
 
                 <pre><code>service: lametric_hass_local.set_screensaver
+target:
+  entity_id: select.lametric_brightness_mode
 data:
-  device_id: "your-device-id"
   enabled: true
   mode: time_based
   mode_params:
@@ -598,13 +612,16 @@ data:
 
             <!-- start_stream -->
             <section id="start-stream">
-                <h2>Service: start_stream</h2>
-                <p>Starts an LMSP stream session. Returns a <code>session_id</code> that must be passed to
-                    <code>send_stream_data</code>.</p>
+                <h2>Entity Service: start_stream</h2>
+                <p>Starts an LMSP stream session on the SKY light entity. Returns a <code>session_id</code> that must be
+                    passed to
+                    <code>send_stream_data</code>.
+                </p>
 
                 <pre><code>service: lametric_hass_local.start_stream
+target:
+  entity_id: light.lametric_sky_light
 data:
-  device_id: "your-device-id"
   config:
     canvas:
       fill_type: scale        # scale | tile
@@ -614,8 +631,9 @@ data:
 
                 <h3>With fading pixels effect</h3>
                 <pre><code>service: lametric_hass_local.start_stream
+target:
+  entity_id: light.lametric_sky_light
 data:
-  device_id: "your-device-id"
   config:
     canvas:
       fill_type: scale
@@ -633,7 +651,7 @@ data:
 
             <!-- send_stream_data -->
             <section id="send-frames">
-                <h2>Service: send_stream_data</h2>
+                <h2>Entity Service: send_stream_data</h2>
                 <p>Sends one RGB888 frame to an active LMSP stream session.</p>
 
                 <table>
@@ -645,11 +663,6 @@ data:
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td><code>device_id</code></td>
-                            <td>yes</td>
-                            <td>Target LaMetric SKY device</td>
-                        </tr>
                         <tr>
                             <td><code>session_id</code></td>
                             <td>yes</td>
@@ -664,28 +677,62 @@ data:
                 </table>
 
                 <pre><code>service: lametric_hass_local.send_stream_data
+target:
+  entity_id: light.lametric_sky_light
 data:
-  device_id: "your-device-id"
   session_id: "{{ session_id }}"
   rgb_data: "[[255,0,0],[255,0,0],[0,255,0],...]"</code></pre>
 
                 <p>Use <code>stop_stream</code> to end the session:</p>
                 <pre><code>service: lametric_hass_local.stop_stream
-data:
-  device_id: "your-device-id"</code></pre>
+target:
+  entity_id: light.lametric_sky_light</code></pre>
             </section>
 
             <!-- Scenes -->
             <section id="scenes">
                 <h2>Scenes</h2>
                 <p>Each installed LaMetric app widget is exposed as a Home Assistant scene entity. Activating a scene
-                    brings the corresponding widget to the foreground.</p>
+                    brings the corresponding widget to the foreground. The <code>is_active</code> attribute reflects
+                    whether the widget is currently visible on the device.</p>
 
-                <h3>Activate with an action</h3>
-                <p>Scene entities expose available widget actions via <code>extra_state_attributes</code>. You can
-                    trigger them with additional service data:</p>
+                <h3>Entity Service: activate_action</h3>
+                <p>To trigger a specific widget action, use the <code>activate_action</code> entity service instead of
+                    <code>scene.turn_on</code>:
+                </p>
 
-                <pre><code>service: scene.turn_on
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>action_id</code></td>
+                            <td>yes</td>
+                            <td>—</td>
+                            <td>ID of the widget action to trigger</td>
+                        </tr>
+                        <tr>
+                            <td><code>action_parameters</code></td>
+                            <td>no</td>
+                            <td>—</td>
+                            <td>Key/value map of parameters required by the action</td>
+                        </tr>
+                        <tr>
+                            <td><code>visible</code></td>
+                            <td>no</td>
+                            <td><code>true</code></td>
+                            <td>Bring the widget to the foreground after triggering</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <pre><code>service: lametric_hass_local.activate_action
 target:
   entity_id: scene.lametric_weather
 data:
@@ -695,7 +742,7 @@ data:
   visible: true</code></pre>
 
                 <div class="note">
-                    If <code>action_id</code> is omitted the widget is simply activated without triggering any action.
+                    Calling <code>scene.turn_on</code> activates the widget without triggering any action.
                 </div>
             </section>
 
@@ -712,7 +759,8 @@ data:
                     <tbody>
                         <tr>
                             <td><strong>Button</strong></td>
-                            <td>Dismissed all notifications on the device</td>
+                            <td>Navigate to the next or previous app, dismiss the current notification, or dismiss all
+                                notifications</td>
                         </tr>
                         <tr>
                             <td><strong>Light</strong></td>
@@ -720,7 +768,8 @@ data:
                         </tr>
                         <tr>
                             <td><strong>Number</strong></td>
-                            <td>Sets the audio volume (0–100)</td>
+                            <td>Sets display brightness (non-SKY, %) and audio volume (%); ranges are reported by the
+                                device</td>
                         </tr>
                         <tr>
                             <td><strong>Scene</strong></td>
@@ -728,15 +777,16 @@ data:
                         </tr>
                         <tr>
                             <td><strong>Select</strong></td>
-                            <td>Selects the active app / next / previous</td>
+                            <td>Controls the brightness mode (<code>auto</code> / <code>manual</code>) of the display
+                                (non-SKY)</td>
                         </tr>
                         <tr>
                             <td><strong>Sensor</strong></td>
-                            <td>Device model, firmware version, serial number, and Wi-Fi RSSI</td>
+                            <td>Wi-Fi signal strength (%) — diagnostic, disabled by default</td>
                         </tr>
                         <tr>
                             <td><strong>Switch</strong></td>
-                            <td>Toggles Bluetooth on/off</td>
+                            <td>Toggles display on/off and Bluetooth on/off</td>
                         </tr>
                         <tr>
                             <td><strong>Text</strong></td>
@@ -744,7 +794,7 @@ data:
                         </tr>
                         <tr>
                             <td><strong>Update</strong></td>
-                            <td>Shows available firmware updates and triggers an OTA install</td>
+                            <td>Tracks installed and latest firmware version; available on OS 2.3.0 and later</td>
                         </tr>
                     </tbody>
                 </table>
@@ -753,7 +803,8 @@ data:
             <!-- Contributing -->
             <section id="contributing">
                 <h2>Contributing</h2>
-                <p>See <a href="https://github.com/ElectroAttacks/lametric-hass-local/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+                <p>See <a
+                        href="https://github.com/ElectroAttacks/lametric-hass-local/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
                     for guidelines on pull requests, code style, and tests.</p>
 
                 <h3>Run the test suite</h3>
@@ -766,7 +817,8 @@ uv run ruff format .
 uv run mypy .</code></pre>
 
                 <p>If this integration is useful to you, consider
-                    <a href="https://github.com/sponsors/ElectroAttacks">sponsoring the project</a>. ❤️</p>
+                    <a href="https://github.com/sponsors/ElectroAttacks">sponsoring the project</a>. ❤️
+                </p>
             </section>
 
         </main>
