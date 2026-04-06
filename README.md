@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
 [![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-electroattacks.github.io-blue)](https://electroattacks.github.io/lametric-hass-local/)
-[![Contributing](https://img.shields.io/badge/contributing-guide-brightgreen)](CONTRIBUTING.md)
+[![Contributing](https://img.shields.io/badge/contributing-guide-brightgreen)](.github/CONTRIBUTING.md)
 
 Local Home Assistant integration for LaMetric devices using the device API
 (`lametric-py`) with Zeroconf / SSDP / DHCP discovery and a config flow.
@@ -40,13 +40,16 @@ Full instructions: [electroattacks.github.io/lametric-hass-local/configuration](
 
 ## Documentation
 
-- [`docs/services.md`](https://electroattacks.github.io/lametric-hass-local/services) — `show_message`, `show_chart`, and pixel streaming
-- [`docs/scenes.md`](https://electroattacks.github.io/lametric-hass-local/scenes) — built-in and custom scene activation
-- [`docs/pixel-streaming.md`](https://electroattacks.github.io/lametric-hass-local/pixel-streaming) — LMSP frame streaming for SKY devices
+Full documentation is available at **[electroattacks.github.io/lametric-hass-local](https://electroattacks.github.io/lametric-hass-local/)**.
+
+- [Services](https://electroattacks.github.io/lametric-hass-local/#show-message) — `show_message`, `show_chart`
+- [Scenes & activate_action](https://electroattacks.github.io/lametric-hass-local/#scenes) — widget activation and actions
+- [Pixel Streaming (SKY)](https://electroattacks.github.io/lametric-hass-local/#streaming) — LMSP frame streaming
+- [All Entities](https://electroattacks.github.io/lametric-hass-local/#entities) — overview of every entity platform
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) or [electroattacks.github.io/lametric-hass-local/contributing](https://electroattacks.github.io/lametric-hass-local/contributing).
+See [CONTRIBUTING.md](.github/CONTRIBUTING.md) or [electroattacks.github.io/lametric-hass-local/#contributing](https://electroattacks.github.io/lametric-hass-local/#contributing).
 
 ## Support
 
