@@ -16,7 +16,12 @@ from homeassistant.components.light.const import ColorMode
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.util.color import brightness_to_value, value_to_brightness
-from lametric import DeviceModels, DeviceState, LaMetricDevice, StreamState
+from lametric import (
+    DeviceModels,
+    DeviceState,
+    LaMetricDevice,
+    StreamState,
+)
 
 from .coordinator import (
     LaMetricConfigEntry,
@@ -108,13 +113,14 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return stream state as extra attributes."""
         stream: StreamState | None = self.coordinator.stream_state
+
         if stream is None:
             return {}
+
         return {
             "stream_status": stream.status,
-            "stream_port": stream.port,
-            "stream_protocol": stream.protocol,
-            "stream_version": str(stream.version),
+            "pxiel": stream.canvas.pixel,
+            "triangle": stream.canvas.triangle,
         }
 
     @lametric_api_exception_handler  # type: ignore[arg-type]

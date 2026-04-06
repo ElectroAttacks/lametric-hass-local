@@ -14,6 +14,7 @@ from lametric import (
     LaMetricApiError,
     LaMetricAuthenticationError,
     LaMetricDevice,
+    LaMetricUnsupportedError,
     StreamState,
 )
 
@@ -55,15 +56,11 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
         UpdateFailed so the coordinator can retry on the next poll interval.
         """
         try:
-            device_state, stream_state, apps = await asyncio.gather(
+            device_state, apps = await asyncio.gather(
                 self.device.state,
-                self.device.stream_state,
                 self.device.installed_apps,
             )
-            self.stream_state = stream_state
             self.apps = apps
-            return device_state
-
         except LaMetricAuthenticationError as error:
             # Invalid or revoked API key - trigger a re-auth flow
             raise ConfigEntryAuthFailed from error
@@ -73,3 +70,11 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
             raise UpdateFailed(
                 f"Failed to fetch data from LaMetric device at {self.device.host}"
             ) from error
+
+        try:
+            self.stream_state = await self.device.stream_state
+        except LaMetricUnsupportedError:
+            # Device does not support streaming (e.g. LaMetric TIME)
+            self.stream_state = None
+
+        return device_state
