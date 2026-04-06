@@ -181,8 +181,11 @@ send_stream_data:
       selector:
         object:
 set_screensaver:
+  target:
+    entity:
+      integration: lametric_hass_local
+      domain: select
   fields:
-    device_id: *device_id
     enabled:
       required: true
       selector:

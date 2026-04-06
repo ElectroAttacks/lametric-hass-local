@@ -84,7 +84,7 @@ def test_available_false_for_sky_model(
 def test_setup_entry_adds_entities(coordinator: MagicMock) -> None:
     """async_setup_entry adds select entities for available descriptions."""
     import asyncio
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 
     from custom_components.lametric_hass_local.select import async_setup_entry
 
@@ -92,5 +92,58 @@ def test_setup_entry_adds_entities(coordinator: MagicMock) -> None:
     config_entry.runtime_data = coordinator
 
     collected: list = []
-    asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
+    with patch(
+        "custom_components.lametric_hass_local.select.async_get_current_platform"
+    ):
+        asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     assert len(collected) >= 1
+
+
+def test_set_screensaver_calls_set_display(coordinator: MagicMock) -> None:
+    """_async_set_screensaver calls device.set_display with a ScreensaverConfig."""
+    import asyncio
+    from unittest.mock import AsyncMock
+
+    from lametric import ScreensaverModes
+
+    from custom_components.lametric_hass_local.select import (
+        SELECTS,
+        LaMetricSelectEntity,
+    )
+
+    coordinator.device.set_display = AsyncMock()
+    coordinator.async_request_refresh = AsyncMock()
+
+    entity = LaMetricSelectEntity(coordinator=coordinator, description=SELECTS[0])
+
+    asyncio.run(
+        entity._async_set_screensaver(enabled=True, mode=ScreensaverModes.WHEN_DARK)
+    )
+
+    coordinator.device.set_display.assert_awaited_once()
+
+
+def test_set_screensaver_raises_on_api_error(coordinator: MagicMock) -> None:
+    """_async_set_screensaver raises HomeAssistantError on LaMetricApiError."""
+    import asyncio
+    from unittest.mock import AsyncMock
+
+    import pytest
+    from homeassistant.exceptions import HomeAssistantError
+    from lametric import LaMetricApiError, ScreensaverModes
+
+    from custom_components.lametric_hass_local.select import (
+        SELECTS,
+        LaMetricSelectEntity,
+    )
+
+    coordinator.device.set_display = AsyncMock(side_effect=LaMetricApiError("fail"))
+
+    entity = LaMetricSelectEntity(coordinator=coordinator, description=SELECTS[0])
+
+    with pytest.raises(HomeAssistantError):
+        asyncio.run(
+            entity._async_set_screensaver(
+                enabled=False, mode=ScreensaverModes.WHEN_DARK
+            )
+        )
