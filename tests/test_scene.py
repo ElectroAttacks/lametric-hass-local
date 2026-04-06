@@ -4,9 +4,6 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
 from custom_components.lametric_hass_local.scene import (
-    ATTR_ACTION_ID,
-    ATTR_ACTION_PARAMETERS,
-    ATTR_ACTION_VISIBLE,
     LaMetricSceneEntity,
 )
 
@@ -34,11 +31,12 @@ def _make_scene(
 ) -> LaMetricSceneEntity:
     app = _make_app(app_id=app_id, app_title=app_title, actions=actions)
     widget = MagicMock()
+    app.widgets = {widget_id: widget}
+    coordinator.apps[app_id] = app
     return LaMetricSceneEntity(
         coordinator=coordinator,
         app=app,
         widget_id=widget_id,
-        widget=widget,
     )
 
 
@@ -62,11 +60,12 @@ def test_name_is_app_title(coordinator: MagicMock) -> None:
 def test_name_falls_back_to_app_id(coordinator: MagicMock) -> None:
     """Entity name falls back to app_id when app_title is None."""
     app = _make_app(app_id="com.lametric.weather", app_title=None)  # type: ignore[arg-type]
+    app.widgets = {"widget1": MagicMock()}
+    coordinator.apps["com.lametric.weather"] = app
     entity = LaMetricSceneEntity(
         coordinator=coordinator,
         app=app,
         widget_id="widget1",
-        widget=MagicMock(),
     )
     assert entity.name == "com.lametric.weather"
 
@@ -77,42 +76,20 @@ def test_name_falls_back_to_app_id(coordinator: MagicMock) -> None:
 def test_extra_state_attributes_base_fields_always_present(
     coordinator: MagicMock,
 ) -> None:
-    """extra_state_attributes always contains vendor/version/triggers/visible."""
+    """extra_state_attributes only contains is_active."""
     entity = _make_scene(coordinator, actions=None)
     attrs = entity.extra_state_attributes
-    assert "vendor" in attrs
-    assert "version" in attrs
-    assert "triggers" in attrs
-    assert "visible" in attrs
+    assert "is_active" in attrs
     assert "actions" not in attrs
-
-
-def test_extra_state_attributes_contains_action_metadata(
-    coordinator: MagicMock,
-) -> None:
-    """extra_state_attributes exposes action parameters."""
-    param = MagicMock()
-    param.data_type = "string"
-    param.name = "text"
-    param.required = True
-    param.format = None
-
-    actions = {"activate": {"text": param}}
-    entity = _make_scene(coordinator, actions=actions)
-    attrs = entity.extra_state_attributes
-
-    assert "actions" in attrs
-    assert "activate" in attrs["actions"]
-    assert attrs["actions"]["activate"]["text"]["type"] == "string"
 
 
 # ── async_activate ────────────────────────────────────────────────────────────
 
 
-def test_activate_without_action_calls_activate_widget(
+def test_activate_calls_activate_widget(
     coordinator: MagicMock, mock_hass: MagicMock
 ) -> None:
-    """Activation without action_id calls activate_widget."""
+    """scene.turn_on calls activate_widget to bring widget to foreground."""
     coordinator.device.activate_widget = AsyncMock()
     entity = _make_scene(coordinator)
     entity.hass = mock_hass
@@ -125,21 +102,24 @@ def test_activate_without_action_calls_activate_widget(
     )
 
 
-def test_activate_with_action_calls_activate_action(
+# ── _async_activate_action (platform entity service) ──────────────────────────
+
+
+def test_activate_action_service_calls_device(
     coordinator: MagicMock, mock_hass: MagicMock
 ) -> None:
-    """Activation with action_id calls activate_action."""
+    """_async_activate_action passes all parameters to the device client."""
     coordinator.device.activate_action = AsyncMock()
-    entity = _make_scene(coordinator)
+    param = MagicMock()
+    param.required = False
+    entity = _make_scene(coordinator, actions={"toggle": {"on": param}})
     entity.hass = mock_hass
 
     asyncio.run(
-        entity.async_activate(
-            **{
-                ATTR_ACTION_ID: "toggle",
-                ATTR_ACTION_PARAMETERS: {"on": True},
-                ATTR_ACTION_VISIBLE: False,
-            }
+        entity._async_activate_action(
+            action_id="toggle",
+            action_parameters={"on": True},
+            visible=False,
         )
     )
 
@@ -152,10 +132,62 @@ def test_activate_with_action_calls_activate_action(
     )
 
 
+def test_activate_action_service_defaults_visible_true(
+    coordinator: MagicMock, mock_hass: MagicMock
+) -> None:
+    """visible defaults to True when omitted."""
+    coordinator.device.activate_action = AsyncMock()
+    entity = _make_scene(coordinator, actions={"start": {}})
+    entity.hass = mock_hass
+
+    asyncio.run(entity._async_activate_action(action_id="start"))
+
+    coordinator.device.activate_action.assert_awaited_once_with(
+        app_id="com.lametric.clock",
+        widget_id="widget1",
+        action_id="start",
+        action_parameters=None,
+        visible=True,
+    )
+
+
+def test_activate_action_raises_for_unknown_action(
+    coordinator: MagicMock, mock_hass: MagicMock
+) -> None:
+    """ValueError is raised when action_id is not in the app's actions."""
+    entity = _make_scene(coordinator, actions={"start": {}})
+    entity.hass = mock_hass
+
+    try:
+        asyncio.run(entity._async_activate_action(action_id="unknown"))
+        raise AssertionError("Expected ValueError")
+    except ValueError as exc:
+        assert "unknown" in str(exc)
+        assert "start" in str(exc)
+
+
+def test_activate_action_raises_for_missing_required_param(
+    coordinator: MagicMock, mock_hass: MagicMock
+) -> None:
+    """ValueError is raised when a required parameter is missing."""
+    param = MagicMock()
+    param.required = True
+    entity = _make_scene(coordinator, actions={"configure": {"duration": param}})
+    entity.hass = mock_hass
+
+    try:
+        asyncio.run(
+            entity._async_activate_action(action_id="configure", action_parameters={})
+        )
+        raise AssertionError("Expected ValueError")
+    except ValueError as exc:
+        assert "duration" in str(exc)
+
+
 def test_setup_entry_creates_one_entity_per_widget(coordinator: MagicMock) -> None:
     """async_setup_entry builds a scene entity for every app/widget combination."""
     import asyncio
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 
     from custom_components.lametric_hass_local.scene import async_setup_entry
 
@@ -171,7 +203,10 @@ def test_setup_entry_creates_one_entity_per_widget(coordinator: MagicMock) -> No
     config_entry.runtime_data = coordinator
 
     collected: list = []
-    asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
+    with patch(
+        "custom_components.lametric_hass_local.scene.async_get_current_platform"
+    ):
+        asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     assert len(collected) == 2  # one entity per widget
 
 
@@ -180,7 +215,7 @@ def test_setup_entry_adds_new_entities_on_coordinator_update(
 ) -> None:
     """Coordinator listener picks up widgets installed after initial setup."""
     import asyncio
-    from unittest.mock import MagicMock
+    from unittest.mock import MagicMock, patch
 
     from custom_components.lametric_hass_local.scene import async_setup_entry
 
@@ -198,7 +233,10 @@ def test_setup_entry_adds_new_entities_on_coordinator_update(
     config_entry.async_on_unload.side_effect = lambda fn: listener_callbacks.append(fn)
 
     collected: list = []
-    asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
+    with patch(
+        "custom_components.lametric_hass_local.scene.async_get_current_platform"
+    ):
+        asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     assert len(collected) == 1
 
     # Simulate a new app being installed and the coordinator firing an update

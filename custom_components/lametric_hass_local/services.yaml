@@ -1,5 +1,25 @@
 ---
 
+activate_action:
+  target:
+    entity:
+      integration: lametric_hass_local
+      domain: scene
+  fields:
+    action_id:
+      required: true
+      selector:
+        text:
+    action_parameters:
+      required: false
+      selector:
+        object:
+    visible:
+      required: false
+      default: true
+      selector:
+        boolean:
+
 show_chart:
   fields:
     device_id: &device_id

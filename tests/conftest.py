@@ -83,6 +83,7 @@ def coordinator(device_state: DeviceState) -> MagicMock:
     """Return a mocked LaMetricCoordinator pre-populated with device_state."""
     mock = MagicMock()
     mock.data = device_state
+    mock.apps = {}
     mock.device.host = "192.168.1.100"
     mock.async_request_refresh = AsyncMock()
     return mock
