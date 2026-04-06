@@ -81,3 +81,14 @@ exclude_commit_patterns = ["chore", "ci"]
 
 [tool.semantic_release.branches.main]
 match = "main"
+
+# ------------------------------------------------------------------------------
+# UV (Dependency Resolver)
+# ------------------------------------------------------------------------------
+[tool.uv]
+# aiohttp 3.13.x has conflicting markers for Python >= 3.14.2 which makes uv's
+# resolver fail when homeassistant pins an exact aiohttp version. Override to
+# allow any compatible 3.13.x release so resolution succeeds on Python 3.14.2+.
+override-dependencies = [
+    "aiohttp>=3.13.5",
+]
