@@ -7,7 +7,7 @@ from typing import Any
 from homeassistant.components.scene import Scene as SceneEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from lametric.device_apps import Parameter
+from lametric.device_apps import App, Parameter, Widget
 
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
@@ -30,20 +30,19 @@ async def async_setup_entry(
 
     @callback
     def _async_add_new_entities() -> None:
-        """Add scene entities for any newly discovered app widgets."""
+        """Add scene entities for any app widgets not yet tracked."""
         new_entities: list[LaMetricSceneEntity] = []
         for app in coordinator.apps.values():
-            for widget_id in app.widgets:
+            for widget_id, widget in app.widgets.items():
                 unique_id = f"{coordinator.data.serial_number}-{app.id}-{widget_id}"
                 if unique_id not in known_widget_ids:
                     known_widget_ids.add(unique_id)
                     new_entities.append(
                         LaMetricSceneEntity(
                             coordinator=coordinator,
-                            app_id=app.id,
+                            app=app,
                             widget_id=widget_id,
-                            app_title=app.title,
-                            actions=app.actions,
+                            widget=widget,
                         )
                     )
         if new_entities:
@@ -59,36 +58,45 @@ async def async_setup_entry(
 class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
     """Scene entity that targets one fixed app/widget pair."""
 
-    app_id: str
-    widget_id: str
+    _app: App
+    _widget: Widget
+    _widget_id: str
     _actions: dict[str, dict[str, Parameter]] | None
 
     def __init__(
         self,
         coordinator: LaMetricCoordinator,
-        app_id: str,
+        app: App,
         widget_id: str,
-        app_title: str | None,
-        actions: dict[str, dict[str, Parameter]] | None,
+        widget: Widget,
     ) -> None:
         """Initialize metadata for a specific app/widget scene."""
 
         super().__init__(coordinator)
 
-        self.app_id = app_id
-        self.widget_id = widget_id
-        self._actions = actions
-        self._attr_unique_id = f"{coordinator.data.serial_number}-{app_id}-{widget_id}"
-        self._attr_name = app_title or app_id
+        self._app = app
+        self._widget = widget
+        self._widget_id = widget_id
+        self._actions = app.actions
+        self._attr_unique_id = f"{coordinator.data.serial_number}-{app.id}"
+        self._attr_name = app.title or app.id
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
         """Return available actions and their parameters for this widget's app."""
 
+        attributes: dict[str, Any] = {
+            "vendor": self._app.vendor,
+            "version": self._app.version,
+            "triggers": self._app.triggers,
+            "visible": self._widget.visible,
+        }
+
         if not self._actions:
-            return {}
+            return attributes
 
         return {
+            **attributes,
             "actions": {
                 action_id: {
                     param_name: {
@@ -100,7 +108,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
                     for param_name, param in params.items()
                 }
                 for action_id, params in self._actions.items()
-            }
+            },
         }
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
@@ -115,18 +123,16 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
 
         if (action_id := _kwargs.get(ATTR_ACTION_ID)) is not None:
             await self.coordinator.device.activate_action(
-                app_id=self.app_id,
-                widget_id=self.widget_id,
+                app_id=self._app.id,
+                widget_id=self._widget_id,
                 action_id=action_id,
                 action_parameters=_kwargs.get(ATTR_ACTION_PARAMETERS),
                 visible=_kwargs.get(ATTR_ACTION_VISIBLE, True),
             )
         else:
             await self.coordinator.device.activate_widget(
-                app_id=self.app_id,
-                widget_id=self.widget_id,
+                app_id=self._app.id,
+                widget_id=self._widget_id,
             )
-
-        await super().async_activate(**_kwargs)
 
         await self.coordinator.async_request_refresh()

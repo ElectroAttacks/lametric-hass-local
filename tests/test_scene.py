@@ -11,6 +11,19 @@ from custom_components.lametric_hass_local.scene import (
 )
 
 
+def _make_app(
+    *,
+    app_id: str = "com.lametric.clock",
+    app_title: str = "Clock",
+    actions: dict | None = None,
+) -> MagicMock:
+    app = MagicMock()
+    app.id = app_id
+    app.title = app_title
+    app.actions = actions
+    return app
+
+
 def _make_scene(
     coordinator: MagicMock,
     *,
@@ -19,26 +32,25 @@ def _make_scene(
     app_title: str = "Clock",
     actions: dict | None = None,
 ) -> LaMetricSceneEntity:
+    app = _make_app(app_id=app_id, app_title=app_title, actions=actions)
+    widget = MagicMock()
     return LaMetricSceneEntity(
         coordinator=coordinator,
-        app_id=app_id,
+        app=app,
         widget_id=widget_id,
-        app_title=app_title,
-        actions=actions,
+        widget=widget,
     )
 
 
 # ── metadata ─────────────────────────────────────────────────────────────────
 
 
-def test_unique_id_contains_serial_app_and_widget(
+def test_unique_id_contains_serial_and_app(
     coordinator: MagicMock,
 ) -> None:
-    """Unique ID is serial_number + app_id + widget_id."""
+    """Unique ID is serial_number + app_id."""
     entity = _make_scene(coordinator)
-    assert entity.unique_id == (
-        f"{coordinator.data.serial_number}-com.lametric.clock-widget1"
-    )
+    assert entity.unique_id == (f"{coordinator.data.serial_number}-com.lametric.clock")
 
 
 def test_name_is_app_title(coordinator: MagicMock) -> None:
@@ -49,10 +61,12 @@ def test_name_is_app_title(coordinator: MagicMock) -> None:
 
 def test_name_falls_back_to_app_id(coordinator: MagicMock) -> None:
     """Entity name falls back to app_id when app_title is None."""
-    entity = _make_scene(
-        coordinator,
-        app_title=None,  # type: ignore[arg-type]
-        app_id="com.lametric.weather",
+    app = _make_app(app_id="com.lametric.weather", app_title=None)  # type: ignore[arg-type]
+    entity = LaMetricSceneEntity(
+        coordinator=coordinator,
+        app=app,
+        widget_id="widget1",
+        widget=MagicMock(),
     )
     assert entity.name == "com.lametric.weather"
 
@@ -60,12 +74,17 @@ def test_name_falls_back_to_app_id(coordinator: MagicMock) -> None:
 # ── extra_state_attributes ────────────────────────────────────────────────────
 
 
-def test_extra_state_attributes_empty_without_actions(
+def test_extra_state_attributes_base_fields_always_present(
     coordinator: MagicMock,
 ) -> None:
-    """extra_state_attributes returns {} when no actions are defined."""
+    """extra_state_attributes always contains vendor/version/triggers/visible."""
     entity = _make_scene(coordinator, actions=None)
-    assert entity.extra_state_attributes == {}
+    attrs = entity.extra_state_attributes
+    assert "vendor" in attrs
+    assert "version" in attrs
+    assert "triggers" in attrs
+    assert "visible" in attrs
+    assert "actions" not in attrs
 
 
 def test_extra_state_attributes_contains_action_metadata(
