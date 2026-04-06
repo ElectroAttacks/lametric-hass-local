@@ -154,3 +154,48 @@ def test_setup_entry_creates_one_entity_per_widget(coordinator: MagicMock) -> No
     collected: list = []
     asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     assert len(collected) == 2  # one entity per widget
+
+
+def test_setup_entry_adds_new_entities_on_coordinator_update(
+    coordinator: MagicMock,
+) -> None:
+    """Coordinator listener picks up widgets installed after initial setup."""
+    import asyncio
+    from unittest.mock import MagicMock
+
+    from custom_components.lametric_hass_local.scene import async_setup_entry
+
+    widget = MagicMock()
+    app = MagicMock()
+    app.id = "com.lametric.clock"
+    app.widgets = {"w1": widget}
+    app.title = "Clock"
+    app.actions = None
+
+    coordinator.apps = {"clock": app}
+    listener_callbacks: list = []
+    config_entry = MagicMock()
+    config_entry.runtime_data = coordinator
+    config_entry.async_on_unload.side_effect = lambda fn: listener_callbacks.append(fn)
+
+    collected: list = []
+    asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
+    assert len(collected) == 1
+
+    # Simulate a new app being installed and the coordinator firing an update
+    new_app = MagicMock()
+    new_app.id = "com.lametric.weather"
+    new_app.widgets = {"w2": widget}
+    new_app.title = "Weather"
+    new_app.actions = None
+    coordinator.apps["weather"] = new_app
+
+    # The listener registered via async_on_unload should add the new entity
+    assert listener_callbacks, "No listener was registered"
+    # coordinator.async_add_listener returns a callable; simulate its invocation
+    coordinator.async_add_listener.call_args[0][0]()
+    assert len(collected) == 2
+
+    # A second update with the same apps must not produce duplicates
+    coordinator.async_add_listener.call_args[0][0]()
+    assert len(collected) == 2

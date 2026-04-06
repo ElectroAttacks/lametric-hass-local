@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.scene import Scene as SceneEntity
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from lametric.device_apps import Parameter
 
@@ -26,22 +26,34 @@ async def async_setup_entry(
     """Set up one scene entity per installed LaMetric app widget."""
 
     coordinator = config_entry.runtime_data
+    known_widget_ids: set[str] = set()
 
-    entities: list[LaMetricSceneEntity] = []
+    @callback
+    def _async_add_new_entities() -> None:
+        """Add scene entities for any newly discovered app widgets."""
+        new_entities: list[LaMetricSceneEntity] = []
+        for app in coordinator.apps.values():
+            for widget_id in app.widgets:
+                unique_id = f"{coordinator.data.serial_number}-{app.id}-{widget_id}"
+                if unique_id not in known_widget_ids:
+                    known_widget_ids.add(unique_id)
+                    new_entities.append(
+                        LaMetricSceneEntity(
+                            coordinator=coordinator,
+                            app_id=app.id,
+                            widget_id=widget_id,
+                            app_title=app.title,
+                            actions=app.actions,
+                        )
+                    )
+        if new_entities:
+            async_add_entities(new_entities)
 
-    for app in coordinator.apps.values():
-        for widget_id, _widget in app.widgets.items():
-            entities.append(
-                LaMetricSceneEntity(
-                    coordinator=coordinator,
-                    app_id=app.id,
-                    widget_id=widget_id,
-                    app_title=app.title,
-                    actions=app.actions,
-                )
-            )
+    _async_add_new_entities()
 
-    async_add_entities(entities)
+    config_entry.async_on_unload(
+        coordinator.async_add_listener(_async_add_new_entities)
+    )
 
 
 class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
