@@ -18,7 +18,11 @@ def _make_coord_with_device(state_coro_factory: Any) -> MagicMock:  # noqa: ANN0
     """Return a minimal LaMetricCoordinator mock; device.state calls factory."""
     coord = MagicMock()
     coord.device.host = "192.168.1.100"
+    coord.stream_state = None
+    coord.apps = {}
     type(coord.device).state = property(lambda self: state_coro_factory())
+    type(coord.device).stream_state = property(lambda self: state_coro_factory())
+    type(coord.device).installed_apps = property(lambda self: state_coro_factory())
     return coord
 
 

@@ -147,10 +147,7 @@ def test_setup_entry_creates_one_entity_per_widget(coordinator: MagicMock) -> No
     app.title = "Weather"
     app.actions = None
 
-    async def get_apps():
-        return {"weather": app}
-
-    type(coordinator.device).installed_apps = property(lambda self: get_apps())
+    coordinator.apps = {"weather": app}
     config_entry = MagicMock()
     config_entry.runtime_data = coordinator
 

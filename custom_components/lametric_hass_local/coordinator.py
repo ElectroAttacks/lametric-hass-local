@@ -1,5 +1,7 @@
 """Coordinator logic for LaMetric device state updates."""
 
+import asyncio
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import CONF_API_KEY, CONF_HOST
 from homeassistant.core import HomeAssistant
@@ -7,10 +9,12 @@ from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from lametric import (
+    App,
     DeviceState,
     LaMetricApiError,
     LaMetricAuthenticationError,
     LaMetricDevice,
+    StreamState,
 )
 
 from .const import DOMAIN, LOGGER, UPDATE_INTERVAL
@@ -22,6 +26,8 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
     """Coordinator for polling a LaMetric device."""
 
     config_entry: LaMetricConfigEntry
+    stream_state: StreamState | None
+    apps: dict[str, App]
 
     def __init__(self, hass: HomeAssistant, config_entry: LaMetricConfigEntry) -> None:
         """Set up the LaMetric device client and coordinator."""
@@ -30,6 +36,8 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
             api_key=config_entry.data[CONF_API_KEY],
             session=async_get_clientsession(hass),
         )
+        self.stream_state = None
+        self.apps = {}
 
         super().__init__(
             hass,
@@ -47,7 +55,14 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
         UpdateFailed so the coordinator can retry on the next poll interval.
         """
         try:
-            return await self.device.state
+            device_state, stream_state, apps = await asyncio.gather(
+                self.device.state,
+                self.device.stream_state,
+                self.device.installed_apps,
+            )
+            self.stream_state = stream_state
+            self.apps = apps
+            return device_state
 
         except LaMetricAuthenticationError as error:
             # Invalid or revoked API key - trigger a re-auth flow

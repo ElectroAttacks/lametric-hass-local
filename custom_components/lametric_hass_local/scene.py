@@ -27,11 +27,9 @@ async def async_setup_entry(
 
     coordinator = config_entry.runtime_data
 
-    apps = await coordinator.device.installed_apps
-
     entities: list[LaMetricSceneEntity] = []
 
-    for app in apps.values():
+    for app in coordinator.apps.values():
         for widget_id, _widget in app.widgets.items():
             entities.append(
                 LaMetricSceneEntity(
