@@ -16,10 +16,10 @@ target:
 ## Trigger a widget action
 
 Some LaMetric apps support actions (e.g. start/stop a stopwatch, set a countdown timer).
-Pass `action_id` and optionally `action_parameters` as extra data:
+Use the dedicated `lametric_hass_local.activate_action` service:
 
 ```yaml
-action: scene.turn_on
+action: lametric_hass_local.activate_action
 target:
   entity_id: scene.lametric_stopwatch
 data:
@@ -27,7 +27,7 @@ data:
 ```
 
 ```yaml
-action: scene.turn_on
+action: lametric_hass_local.activate_action
 target:
   entity_id: scene.lametric_countdown
 data:
@@ -37,46 +37,15 @@ data:
   visible: true   # bring the widget to the foreground (default: true)
 ```
 
-The `action_id` values and available `action_parameters` depend on the individual app.
+The service validates the call before sending it to the device:
+- If `action_id` is not supported by the app, a `ValueError` is raised listing the available actions.
+- If a required parameter is missing from `action_parameters`, a `ValueError` is raised naming the missing fields.
+
+The `action_id` values and required `action_parameters` depend on the individual app.
 Refer to the [LaMetric Developer documentation](https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-apps.html) for details.
 
-## Discovering available actions
-
-Every scene entity exposes several **state attributes** that describe the app and its widget:
+## State attributes
 
 | Attribute | Description |
 |-----------|-------------|
-| `vendor` | App vendor/author |
-| `version` | Installed app version |
-| `triggers` | Trigger list reported by the app |
-| `visible` | Whether this widget is currently visible on the device |
-| `actions` | Available actions and their parameters (omitted if the app defines none) |
-
-You can inspect these directly in the Home Assistant UI under **Developer Tools → States**, or via a template:
-
-```yaml
-{{ state_attr('scene.lametric_stopwatch', 'actions') }}
-```
-
-Example output for a stopwatch app:
-
-```yaml
-actions:
-  stopwatch.start:
-    value:
-      type: java.lang.Object
-      name: value
-      required: false
-  stopwatch.stop:
-    value:
-      type: java.lang.Object
-      name: value
-      required: false
-  stopwatch.reset:
-    value:
-      type: java.lang.Object
-      name: value
-      required: false
-```
-
-If an app defines no actions, the `actions` key is absent from the attributes.
+| `is_active` | Whether this widget is currently visible on the device |
