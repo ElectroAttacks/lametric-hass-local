@@ -1419,7 +1419,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "homeassistant", specifier = ">=2026.1.0" },
-    { name = "lametric-py", specifier = ">=1.3.1" },
+    { name = "lametric-py", specifier = ">=1.3.2" },
 ]
 
 [package.metadata.requires-dev]
@@ -1435,7 +1435,7 @@ dev = [
 
 [[package]]
 name = "lametric-py"
-version = "1.3.1"
+version = "1.3.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1445,9 +1445,9 @@ dependencies = [
     { name = "orjson" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b1/f1/6aa9f7ee767ce697e9af53fd5bc19cd5dd9ad85960008fdc4cd6dcc8a7ea/lametric_py-1.3.1.tar.gz", hash = "sha256:742d80991e905fddeae9f7cc2a469989d9979763ef65fbcb1b6d3ed1f150a8ce", size = 88655, upload-time = "2026-04-06T11:13:53.801Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d9/fa/653b4aba7c0760cb75f3e12656bab6c8ecf320485f45f04099feb24ce7b7/lametric_py-1.3.2.tar.gz", hash = "sha256:2d46f8b9e44e60a07d5653b8ff86215d51b2012537a66c17c2a48d568bc9f84c", size = 88658, upload-time = "2026-04-06T15:17:39.76Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f8/bf/541f2bff97e510474c2ab004ba569f9dc04dca59cc1c2ac3d9f1fc9a9181/lametric_py-1.3.1-py3-none-any.whl", hash = "sha256:d86f72f868be1c699c41841fc3b92273b373865f2733aec07901fcd2dc9b38ab", size = 15980, upload-time = "2026-04-06T11:13:52.433Z" },
+    { url = "https://files.pythonhosted.org/packages/cc/76/3efe52e1a07c90e78f0cfbb15599d82a5a9e781ada9fd7b7fa03a0b43b65/lametric_py-1.3.2-py3-none-any.whl", hash = "sha256:a5a90ee9339c5426dc783d95436e0ff7417a8d9471898f486069365f7f74efe6", size = 15983, upload-time = "2026-04-06T15:17:38.226Z" },
 ]
 
 [[package]]

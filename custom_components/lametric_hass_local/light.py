@@ -96,7 +96,7 @@ LIGHTS = [
         brightness_set=lambda device, brightness: device.set_display(
             brightness=brightness
         ),
-        state_get=lambda state: state.display.on,
+        state_get=lambda state: bool(state.display.on),
         state_set=lambda device, state: device.set_display(on=state),
     )
 ]
