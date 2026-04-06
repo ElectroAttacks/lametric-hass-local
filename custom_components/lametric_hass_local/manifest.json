@@ -26,7 +26,7 @@
     ],
     "quality_scale": "bronze",
     "requirements": [
-        "lametric-py>=1.0.7"
+        "lametric-py>=1.3.0"
     ],
     "single_config_entry": false,
     "ssdp": [
