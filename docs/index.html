@@ -292,6 +292,8 @@
                 <li><a href="#overview">Overview</a></li>
                 <li><a href="#installation">Installation</a></li>
                 <li><a href="#configuration">Configuration</a></li>
+                <li><a href="#configuration" style="padding-left:1.4rem">Manual</a></li>
+                <li><a href="#configuration" style="padding-left:1.4rem">Cloud OAuth</a></li>
             </ul>
 
             <div class="section-label">Services</div>
@@ -387,21 +389,51 @@
                     <strong>LaMetric Local</strong>.
                 </p>
 
-                <h3>Manual setup</h3>
-                <p>Enter the device IP address and the API key shown under <em>Settings → Wi-Fi</em> and
-                    <em>Settings → Developer → API Key</em> in the LaMetric app.
+                <h3>Option 1 — Manual setup</h3>
+                <p>Enter the device IP address and the API key. You can find the API key in the LaMetric app under
+                    <em>Settings → Wi-Fi</em> and <em>Settings → Developer → API Key</em>.
                 </p>
 
-                <h3>Cloud-assisted OAuth</h3>
-                <p>You can let the integration fetch available devices from
-                    <a href="https://developer.lametric.com">developer.lametric.com</a> using OAuth. A developer
-                    account is required. The device is still controlled locally after setup.
-                </p>
+                <h3>Option 2 — Cloud-assisted OAuth (recommended)</h3>
+                <p>The integration can retrieve your device IP and API key automatically via the LaMetric Cloud OAuth
+                    2.0 flow. The device is still controlled <strong>locally</strong> after setup — the cloud is only
+                    used once to discover credentials.</p>
+
+                <ol>
+                    <li>Sign in at <a href="https://developer.lametric.com">developer.lametric.com</a> and press
+                        <strong>Create new app</strong>. Choose type <em>Notification Source</em> (or <em>Personal</em>
+                        is sufficient for private use).
+                    </li>
+                    <li>Set the <strong>OAuth2 Redirect URI</strong> to your Home Assistant callback URL:<br>
+                        <code>https://&lt;your-ha-url&gt;/auth/external/callback</code>
+                    </li>
+                    <li>Copy the <strong>Client ID</strong> and <strong>Client Secret</strong> from the app settings.
+                    </li>
+                    <li>In Home Assistant go to <strong>Settings → Devices &amp; Services → Application
+                            Credentials</strong>, click <strong>Add Application Credential</strong>, select
+                        <strong>LaMetric Local</strong>, and paste the Client ID and Client Secret.
+                    </li>
+                    <li>Start the integration setup and choose <strong>Import from LaMetric Cloud</strong>. You will be
+                        redirected to the LaMetric authorization URL:<br>
+                        <code>https://developer.lametric.com/api/v2/oauth2/authorize?client_id=…&amp;redirect_uri=…&amp;response_type=code&amp;scope=basic+devices_read</code>
+                    </li>
+                    <li>After granting access, LaMetric redirects back to Home Assistant with an authorization code.
+                        The integration exchanges it for an access token at:<br>
+                        <code>https://developer.lametric.com/api/v2/oauth2/token</code>
+                    </li>
+                    <li>The integration uses the token to list your devices and automatically fills in the device IP
+                        and API key. From this point on no cloud connection is needed.</li>
+                </ol>
 
                 <div class="note">
-                    Discovery via Zeroconf, SSDP, or DHCP will pre-fill the IP for you. Just confirm and enter the API
-                    key.
+                    The scopes requested are <code>basic</code> and <code>devices_read</code>. Credentials belong to
+                    your own developer account and are never shared. HACS custom integrations cannot ship bundled OAuth
+                    credentials.
                 </div>
+
+                <h3>Discovery</h3>
+                <p>Discovery via Zeroconf, SSDP, or DHCP will pre-fill the device IP automatically. You only need to
+                    confirm and enter the API key (or proceed with OAuth).</p>
             </section>
 
             <!-- show_message -->
@@ -804,7 +836,7 @@ data:
             <section id="contributing">
                 <h2>Contributing</h2>
                 <p>See <a
-                        href="https://github.com/ElectroAttacks/lametric-hass-local/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a>
+                        href="https://github.com/ElectroAttacks/lametric-hass-local/blob/main/.github/CONTRIBUTING.md">CONTRIBUTING.md</a>
                     for guidelines on pull requests, code style, and tests.</p>
 
                 <h3>Run the test suite</h3>
