@@ -107,13 +107,27 @@
         }
     },
     "services": {
+        "activate_action": {
+            "description": "L\u00f6st eine Aktion an einem LaMetric-Widget aus.",
+            "fields": {
+                "action_id": {
+                    "description": "Die auszul\u00f6sende Aktion (z. B. stopwatch.start).",
+                    "name": "Aktions-ID"
+                },
+                "action_parameters": {
+                    "description": "Optionale Parameter, die von der Aktion ben\u00f6tigt werden.",
+                    "name": "Aktionsparameter"
+                },
+                "visible": {
+                    "description": "Widget nach dem Ausl\u00f6sen der Aktion in den Vordergrund bringen.",
+                    "name": "Sichtbar"
+                }
+            },
+            "name": "Aktion ausl\u00f6sen"
+        },
         "send_stream_data": {
             "description": "Sendet einen RGB-Pixel-Datenframe an eine aktive Streaming-Sitzung.",
             "fields": {
-                "device_id": {
-                    "description": "Das LaMetric-Ger\u00e4t, an das die Stream-Daten gesendet werden sollen.",
-                    "name": "Ger\u00e4t"
-                },
                 "rgb_data": {
                     "description": "Rohe RGB888-Pixeldaten als Liste von [R, G, B]-Tripeln.",
                     "name": "RGB-Daten"
@@ -192,10 +206,6 @@
         "start_stream": {
             "description": "Startet eine Pixel-Streaming-Sitzung auf einem LaMetric SKY-Ger\u00e4t.",
             "fields": {
-                "device_id": {
-                    "description": "Das LaMetric SKY-Ger\u00e4t, auf dem der Stream gestartet werden soll.",
-                    "name": "Ger\u00e4t"
-                },
                 "config": {
                     "description": "Canvas- und Rendereinstellungen f\u00fcr den Pixel-Stream.",
                     "name": "Stream-Konfiguration"
@@ -205,12 +215,7 @@
         },
         "stop_stream": {
             "description": "Stoppt eine aktive Pixel-Streaming-Sitzung auf einem LaMetric SKY-Ger\u00e4t.",
-            "fields": {
-                "device_id": {
-                    "description": "Das LaMetric SKY-Ger\u00e4t, auf dem der Stream gestoppt werden soll.",
-                    "name": "Ger\u00e4t"
-                }
-            },
+            "fields": {},
             "name": "Stream stoppen"
         },
         "set_screensaver": {

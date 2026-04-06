@@ -107,13 +107,27 @@
         }
     },
     "services": {
+        "activate_action": {
+            "description": "Trigger an action on a LaMetric widget.",
+            "fields": {
+                "action_id": {
+                    "description": "The action to trigger (e.g. stopwatch.start).",
+                    "name": "Action ID"
+                },
+                "action_parameters": {
+                    "description": "Optional parameters required by the action.",
+                    "name": "Action parameters"
+                },
+                "visible": {
+                    "description": "Bring the widget to the foreground after triggering the action.",
+                    "name": "Visible"
+                }
+            },
+            "name": "Activate action"
+        },
         "send_stream_data": {
             "description": "Push a frame of RGB pixel data to an active streaming session.",
             "fields": {
-                "device_id": {
-                    "description": "The LaMetric device to send the stream data to.",
-                    "name": "Device"
-                },
                 "rgb_data": {
                     "description": "Raw RGB888 pixel data as a list of [R, G, B] triples.",
                     "name": "RGB data"
@@ -192,10 +206,6 @@
         "start_stream": {
             "description": "Start a pixel-streaming session on a LaMetric SKY device.",
             "fields": {
-                "device_id": {
-                    "description": "The LaMetric SKY device to start the stream on.",
-                    "name": "Device"
-                },
                 "config": {
                     "description": "Canvas and render settings for the pixel stream.",
                     "name": "Stream configuration"
@@ -205,12 +215,7 @@
         },
         "stop_stream": {
             "description": "Stop an active pixel-streaming session on a LaMetric SKY device.",
-            "fields": {
-                "device_id": {
-                    "description": "The LaMetric SKY device to stop the stream on.",
-                    "name": "Device"
-                }
-            },
+            "fields": {},
             "name": "Stop stream"
         },
         "set_screensaver": {
