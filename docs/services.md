@@ -110,4 +110,4 @@ data:
 
 ---
 
-> For pixel-streaming services (`start_stream`, `send_stream_data`, `stop_stream`) see [Pixel Streaming](Pixel-Streaming).
+> For pixel-streaming services (`start_stream`, `send_stream_data`, `stop_stream`) see [Pixel Streaming](pixel-streaming.md).
