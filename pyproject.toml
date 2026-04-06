@@ -6,7 +6,7 @@ authors = [
     { name = "Caspar Weber" }
 ]
 dependencies = [
-    "lametric-py>=1.3.0",
+    "lametric-py>=1.3.1",
     "homeassistant>=2026.1.0",
 ]
 requires-python = ">=3.14"
@@ -86,9 +86,11 @@ match = "main"
 # UV (Dependency Resolver)
 # ------------------------------------------------------------------------------
 [tool.uv]
-# aiohttp 3.13.x has conflicting markers for Python >= 3.14.2 which makes uv's
-# resolver fail when homeassistant pins an exact aiohttp version. Override to
-# allow any compatible 3.13.x release so resolution succeeds on Python 3.14.2+.
+# homeassistant pins exact versions of aiohttp, yarl and orjson that conflict
+# with lametric-py's minimum requirements on Python >= 3.14.2. Override all
+# three to allow the latest compatible releases so resolution succeeds.
 override-dependencies = [
     "aiohttp>=3.13.5",
+    "yarl>=1.23.0",
+    "orjson>=3.11.8",
 ]
