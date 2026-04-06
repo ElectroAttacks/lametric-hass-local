@@ -111,3 +111,4 @@ data:
 ---
 
 > For pixel-streaming services (`start_stream`, `send_stream_data`, `stop_stream`) see [Pixel Streaming](pixel-streaming.md).
+> These are **platform entity services** targeting the SKY light entity, not device_id-based.
