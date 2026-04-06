@@ -7,7 +7,7 @@ from unittest.mock import MagicMock
 import pytest
 from homeassistant.exceptions import ConfigEntryAuthFailed
 from homeassistant.helpers.update_coordinator import UpdateFailed
-from lametric import LaMetricApiError, LaMetricAuthenticationError
+from lametric import DeviceModels, LaMetricApiError, LaMetricAuthenticationError
 from lametric.device_states import DeviceState
 
 from custom_components.lametric_hass_local.coordinator import LaMetricCoordinator
@@ -108,3 +108,51 @@ def test_coordinator_init_creates_device_with_correct_host() -> None:
     call_kwargs = mock_device.call_args.kwargs
     assert call_kwargs["host"] == "10.0.0.1"
     assert call_kwargs["api_key"] == "secret-key"
+
+
+def test_stream_state_not_fetched_for_time_device(device_state: DeviceState) -> None:
+    """stream_state is set to None without an API call for non-SKY devices."""
+    assert device_state.model != DeviceModels.SKY
+
+    stream_calls = 0
+
+    async def run() -> None:
+        nonlocal stream_calls
+
+        async def ok():
+            return device_state
+
+        async def stream_ok():
+            nonlocal stream_calls
+            stream_calls += 1
+            return MagicMock()
+
+        coord = _make_coord_with_device(ok)
+        type(coord.device).stream_state = property(lambda self: stream_ok())
+        await LaMetricCoordinator._async_update_data(coord)
+        assert coord.stream_state is None
+
+    asyncio.run(run())
+    assert stream_calls == 0
+
+
+def test_stream_state_fetched_for_sky_device() -> None:
+    """stream_state is fetched from the API for SKY devices."""
+    from tests.conftest import _build_device_state
+
+    sky_state = _build_device_state(model=DeviceModels.SKY)
+    fake_stream = MagicMock()
+
+    async def run() -> None:
+        async def ok():
+            return sky_state
+
+        async def stream_ok():
+            return fake_stream
+
+        coord = _make_coord_with_device(ok)
+        type(coord.device).stream_state = property(lambda self: stream_ok())
+        await LaMetricCoordinator._async_update_data(coord)
+        assert coord.stream_state is fake_stream
+
+    asyncio.run(run())

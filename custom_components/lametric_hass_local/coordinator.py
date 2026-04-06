@@ -10,11 +10,11 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from lametric import (
     App,
+    DeviceModels,
     DeviceState,
     LaMetricApiError,
     LaMetricAuthenticationError,
     LaMetricDevice,
-    LaMetricUnsupportedError,
     StreamState,
 )
 
@@ -71,10 +71,9 @@ class LaMetricCoordinator(DataUpdateCoordinator[DeviceState]):
                 f"Failed to fetch data from LaMetric device at {self.device.host}"
             ) from error
 
-        try:
+        if device_state.model == DeviceModels.SKY:
             self.stream_state = await self.device.stream_state
-        except LaMetricUnsupportedError:
-            # Device does not support streaming (e.g. LaMetric TIME)
+        else:
             self.stream_state = None
 
         return device_state
