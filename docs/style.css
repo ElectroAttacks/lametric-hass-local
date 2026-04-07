@@ -102,15 +102,24 @@ nav ul li a {
     text-decoration: none;
 }
 
-nav ul li a:hover,
-nav ul li a.active {
-    background: var(--accent-dim);
+nav ul li a:hover {
+    background: rgba(79, 142, 247, 0.12);
     color: var(--text);
 }
 
+/* in-page section currently in view */
+nav ul li a.active {
+    background: rgba(79, 142, 247, 0.18);
+    color: var(--text);
+}
+
+/* current page */
 nav ul li a.page-active {
+    background: var(--accent-dim);
     color: var(--accent);
     font-weight: 600;
+    border-left: 2px solid var(--accent);
+    padding-left: calc(0.6rem - 2px);
 }
 
 nav .section-label {

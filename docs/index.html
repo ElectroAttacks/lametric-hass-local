@@ -80,7 +80,8 @@
                     <div class="card">
                         <h4>Services</h4>
                         <p><code>show_message</code> and <code>show_chart</code> send notifications directly to
-                            <code>POST /api/v2/device/notifications</code>.</p>
+                            <code>POST /api/v2/device/notifications</code>.
+                        </p>
                     </div>
                     <div class="card">
                         <h4>Entity Services</h4>
@@ -111,9 +112,10 @@
 
                 <h3>Via HACS (recommended)</h3>
                 <ol class="steps">
-                    <li>Open <strong>HACS</strong> in Home Assistant and navigate to <strong>Integrations</strong>.</li>
+                    <li>Open <strong>HACS</strong> in Home Assistant.</li>
                     <li>Click the three-dot menu &#8594; <strong>Custom repositories</strong>.</li>
-                    <li>Add <code>ElectroAttacks/lametric-hass-local</code> with category <em>Integration</em>.</li>
+                    <li>Enter <code>https://github.com/ElectroAttacks/lametric-hass-local</code>, select category
+                        <strong>Integration</strong>, and click <strong>Add</strong>.</li>
                     <li>Search for <strong>LaMetric Local</strong> and click <strong>Download</strong>.</li>
                     <li>Restart Home Assistant.</li>
                 </ol>
@@ -121,7 +123,8 @@
                 <h3>Manual installation</h3>
                 <p>Copy the <code>custom_components/lametric_hass_local/</code> folder into your Home Assistant
                     <code>custom_components/</code> directory and restart. The folder name must be exactly
-                    <code>lametric_hass_local</code>.</p>
+                    <code>lametric_hass_local</code>.
+                </p>
 
                 <div class="note">
                     <strong>Requirement</strong>
@@ -134,13 +137,15 @@
             <section id="configuration">
                 <h2>Configuration</h2>
                 <p>Go to <strong>Settings &#8594; Devices &amp; Services &#8594; Add Integration</strong> and search for
-                    <strong>LaMetric Local</strong>. Two setup paths are available.</p>
+                    <strong>LaMetric Local</strong>. Two setup paths are available.
+                </p>
 
                 <h3>Option 1 &#8212; Manual (IP + API key)</h3>
                 <p>Enter the device's IP address and API key directly. The API key is available in the LaMetric
                     mobile app under <em>Device &#8594; Settings &#8594; Wi-Fi</em>, or in the developer portal at
                     <a href="https://developer.lametric.com/user/devices" target="_blank"
-                        rel="noopener">developer.lametric.com/user/devices</a>.</p>
+                        rel="noopener">developer.lametric.com/user/devices</a>.
+                </p>
 
                 <div class="note">
                     <strong>Authentication</strong>
