@@ -9,8 +9,16 @@
     const currentFile =
         window.location.pathname.split("/").pop() || "index.html";
 
+    // Only the links that point to sections on the current page are managed
+    // by scroll tracking. Links to other pages (e.g. project sub-pages with
+    // a static class="active") are left untouched so they cannot be wiped.
+    const localLinks = navLinks.filter(function (link) {
+        var h = link.getAttribute("href");
+        return h.startsWith("#") || h.startsWith(currentFile + "#");
+    });
+
     function setActive(id) {
-        navLinks.forEach(function (link) {
+        localLinks.forEach(function (link) {
             const href = link.getAttribute("href");
             const matches =
                 href === "#" + id || href === currentFile + "#" + id;
