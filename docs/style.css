@@ -109,8 +109,14 @@ nav ul li a:hover {
 
 /* in-page section currently in view */
 nav ul li a.active {
+    background: rgba(79, 142, 247, 0.1);
     color: var(--accent);
-    box-shadow: inset 2px 0 0 rgba(79, 142, 247, 0.5);
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+nav ul li a.active:hover {
+    background: rgba(79, 142, 247, 0.18);
+    color: var(--accent);
 }
 
 /* current page */
@@ -135,6 +141,14 @@ nav .section-label-active {
     color: var(--accent);
 }
 
+/* Non-link active label (e.g. Project on project pages) */
+nav .section-label-active:not(.section-label-link) {
+    background: var(--accent-dim);
+    border-left: 2px solid var(--accent);
+    padding-left: calc(0.6rem - 2px);
+    border-radius: 5px;
+}
+
 nav .section-label-link {
     padding: 0;
 }
@@ -142,12 +156,15 @@ nav .section-label-link {
 nav .section-label-link > a {
     display: block;
     padding: 1rem 0.6rem 0.3rem;
+    border-radius: 5px;
     color: var(--muted);
     text-decoration: none;
     font: inherit;
+    transition: background 0.15s, color 0.15s;
 }
 
 nav .section-label-link > a:hover {
+    background: rgba(79, 142, 247, 0.12);
     color: var(--text);
 }
 
