@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const sections = Array.from(document.querySelectorAll("main [id]"));
+    const sections = Array.from(document.querySelectorAll("main section[id]"));
     const navLinks = Array.from(document.querySelectorAll("nav a[href]"));
 
     if (!sections.length || !navLinks.length) return;
@@ -22,8 +22,8 @@
         // At the bottom of the page always activate the last section,
         // because short final sections may never cross the scroll threshold.
         if (
-            window.scrollY + window.innerHeight >=
-            document.documentElement.scrollHeight - 20
+            Math.ceil(window.scrollY + window.innerHeight) >=
+            document.documentElement.scrollHeight
         ) {
             setActive(sections[sections.length - 1].id);
             return;
