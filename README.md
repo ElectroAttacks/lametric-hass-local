@@ -12,7 +12,7 @@ Local Home Assistant integration for LaMetric devices using the device API
 
 - Home Assistant 2026.1.0 or later
 - A LaMetric device on the local network
-- A LaMetric developer account for cloud-assisted OAuth setup (optional)
+- `lametric-py ≥ 1.3.5` (installed automatically as a dependency)
 
 ## Installation
 
