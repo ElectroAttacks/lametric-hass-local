@@ -135,6 +135,30 @@ nav .section-label-active {
     color: var(--accent);
 }
 
+nav .section-label-link {
+    padding: 0;
+}
+
+nav .section-label-link > a {
+    display: block;
+    padding: 1rem 0.6rem 0.3rem;
+    color: var(--muted);
+    text-decoration: none;
+    font: inherit;
+}
+
+nav .section-label-link > a:hover {
+    color: var(--text);
+}
+
+nav .section-label-active.section-label-link > a {
+    color: var(--accent);
+}
+
+nav .section-label-active.section-label-link > a:hover {
+    color: var(--accent);
+}
+
 /* ── Main Content ── */
 main {
     flex: 1;

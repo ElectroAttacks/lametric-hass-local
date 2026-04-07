@@ -150,93 +150,6 @@ data:
   icon_type: info
   priority: info</code></pre>
             </section>
-
-            <!-- show_chart -->
-            <section id="show-chart">
-                <h2>show_chart</h2>
-
-                <div class="api-ref">
-                    <span class="api-method post">POST</span>
-                    <span class="api-path">/api/v2/device/notifications</span>
-                    <span class="api-version">API 2.0.0+</span>
-                </div>
-
-                <p>Sends a spike chart notification built from a list of numeric values. Internally this uses the
-                    <em>chart frame</em> type of the Notification model — the values are mapped to
-                    <code>chartData</code> and displayed as a bar graph that scrolls over the LED matrix.</p>
-
-                <h3>Fields</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>device_id</code></td>
-                            <td>yes</td>
-                            <td>&#8212;</td>
-                            <td>Home Assistant device ID of the target LaMetric device</td>
-                        </tr>
-                        <tr>
-                            <td><code>data</code></td>
-                            <td>yes</td>
-                            <td>&#8212;</td>
-                            <td>List of integers to plot, e.g.&nbsp;<code>[1, 2, 3, 4, 5, 4, 3, 2, 1]</code>. All
-                                values are auto-scaled to the 8-pixel display height.</td>
-                        </tr>
-                        <tr>
-                            <td><code>sound</code></td>
-                            <td>no</td>
-                            <td>&#8212;</td>
-                            <td>Built-in sound ID. See <a href="#sound-ids">Sound IDs</a>.</td>
-                        </tr>
-                        <tr>
-                            <td><code>cycles</code></td>
-                            <td>no</td>
-                            <td><code>1</code></td>
-                            <td>Repeat count. <code>0</code>&nbsp;=&nbsp;infinite.</td>
-                        </tr>
-                        <tr>
-                            <td><code>icon_type</code></td>
-                            <td>no</td>
-                            <td><code>none</code></td>
-                            <td>
-                                <div class="val-list">
-                                    <span class="val default">none</span>
-                                    <span class="val">info</span>
-                                    <span class="val">alert</span>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><code>priority</code></td>
-                            <td>no</td>
-                            <td><code>info</code></td>
-                            <td>
-                                <div class="val-list">
-                                    <span class="val default">info</span>
-                                    <span class="val">warning</span>
-                                    <span class="val">critical</span>
-                                </div>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>YAML example</h3>
-                <pre><code>service: lametric_hass_local.show_chart
-data:
-  device_id: "your_device_id"
-  data: [1, 3, 5, 7, 9, 7, 5, 3, 1]
-  sound: "statistic"
-  cycles: 2</code></pre>
-            </section>
-
             <!-- Notification model -->
             <section id="notification-model">
                 <h2>Notification model reference</h2>
@@ -330,7 +243,6 @@ data:
                     </tbody>
                 </table>
             </section>
-
             <!-- Sound IDs -->
             <section id="sound-ids">
                 <h2>Sound IDs</h2>
@@ -414,7 +326,6 @@ data:
                         target="_blank" rel="noopener">Notifications API reference</a>.
                 </div>
             </section>
-
             <!-- Icon format -->
             <section id="icon-format">
                 <h2>Icon format</h2>
@@ -448,7 +359,6 @@ data:
                     images. Larger images are displayed but may be cropped or scaled.
                 </div>
             </section>
-
             <!-- Legacy notify -->
             <section id="legacy-notify">
                 <h2>Legacy notify platform</h2>
@@ -473,7 +383,91 @@ data:
                     for new automations.
                 </div>
             </section>
+            <!-- show_chart -->
+            <section id="show-chart">
+                <h2>show_chart</h2>
 
+                <div class="api-ref">
+                    <span class="api-method post">POST</span>
+                    <span class="api-path">/api/v2/device/notifications</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Sends a spike chart notification built from a list of numeric values. Internally this uses the
+                    <em>chart frame</em> type of the Notification model — the values are mapped to
+                    <code>chartData</code> and displayed as a bar graph that scrolls over the LED matrix.</p>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>device_id</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>Home Assistant device ID of the target LaMetric device</td>
+                        </tr>
+                        <tr>
+                            <td><code>data</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>List of integers to plot, e.g.&nbsp;<code>[1, 2, 3, 4, 5, 4, 3, 2, 1]</code>. All
+                                values are auto-scaled to the 8-pixel display height.</td>
+                        </tr>
+                        <tr>
+                            <td><code>sound</code></td>
+                            <td>no</td>
+                            <td>&#8212;</td>
+                            <td>Built-in sound ID. See <a href="#sound-ids">Sound IDs</a>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>cycles</code></td>
+                            <td>no</td>
+                            <td><code>1</code></td>
+                            <td>Repeat count. <code>0</code>&nbsp;=&nbsp;infinite.</td>
+                        </tr>
+                        <tr>
+                            <td><code>icon_type</code></td>
+                            <td>no</td>
+                            <td><code>none</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">none</span>
+                                    <span class="val">info</span>
+                                    <span class="val">alert</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>priority</code></td>
+                            <td>no</td>
+                            <td><code>info</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">info</span>
+                                    <span class="val">warning</span>
+                                    <span class="val">critical</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>YAML example</h3>
+                <pre><code>service: lametric_hass_local.show_chart
+data:
+  device_id: "your_device_id"
+  data: [1, 3, 5, 7, 9, 7, 5, 3, 1]
+  sound: "statistic"
+  cycles: 2</code></pre>
+            </section>
             <!-- set_screensaver -->
             <section id="set-screensaver">
                 <h2>set_screensaver</h2>
@@ -629,7 +623,106 @@ data:
                         target="_blank" rel="noopener">Display API</a>.
                 </p>
             </section>
+            <!-- activate_action -->
+            <section id="activate-action">
+                <h2>activate_action</h2>
 
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/apps/:package/widgets/:id/activate</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method post">POST</span>
+                    <span class="api-path">/api/v2/device/apps/:package/widgets/:id/actions</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+
+                <p>Triggers a widget-specific action on a LaMetric app. This service targets a
+                    <strong>scene entity</strong> (one per installed app widget). It combines two API calls:</p>
+                <ol>
+                    <li>If <code>visible</code>&nbsp;=&nbsp;<code>true</code> (the default): activate the widget via
+                        <code>PUT &hellip;/activate</code>.</li>
+                    <li>Send the action payload via <code>POST &hellip;/actions</code>.</li>
+                </ol>
+
+                <div class="note">
+                    <strong>Comparison with scene.turn_on</strong>
+                    Calling the standard <code>scene.turn_on</code> service on a LaMetric scene entity only brings
+                    the widget to the foreground (step&nbsp;1). <code>activate_action</code> additionally fires a
+                    widget-specific action (step&nbsp;2), which is required for apps that respond to input commands
+                    (e.g.&nbsp;countdown timer, weather location change).
+                </div>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>action_id</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>string</td>
+                            <td>ID of the action to trigger. The available action IDs are app-specific and
+                                documented by the app developer. Common examples: <code>next</code>,
+                                <code>prev</code>, <code>start</code>, <code>reset</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>action_parameters</code></td>
+                            <td>no</td>
+                            <td>&#8212;</td>
+                            <td>object (key-value map)</td>
+                            <td>Optional parameters required by the action. The shape is app-specific.</td>
+                        </tr>
+                        <tr>
+                            <td><code>visible</code></td>
+                            <td>no</td>
+                            <td><code>true</code></td>
+                            <td>boolean</td>
+                            <td>If <code>true</code>, bring the widget to the foreground before triggering the
+                                action.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Device API body</h3>
+                <pre><code>POST /api/v2/device/apps/:package/widgets/:widget_id/actions
+
+{
+  "id": "&lt;action_id&gt;",
+  "params": { ...action_parameters },
+  "activate": true       // set to visible field value
+}</code></pre>
+
+                <h3>Example: trigger a countdown timer start</h3>
+                <pre><code>service: lametric_hass_local.activate_action
+target:
+  entity_id: scene.lametric_countdown
+data:
+  action_id: "start"
+  visible: true</code></pre>
+
+                <h3>Example: navigate a news feed widget</h3>
+                <pre><code>service: lametric_hass_local.activate_action
+target:
+  entity_id: scene.lametric_news
+data:
+  action_id: "next"
+  visible: true</code></pre>
+
+                <p>Full API reference:
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-apps.html"
+                        target="_blank" rel="noopener">Apps API</a>.
+                </p>
+            </section>
         </main>
     </div>
     <script src="nav.js"></script>
