@@ -111,7 +111,6 @@ nav ul li a:hover {
 nav ul li a.active {
     background: rgba(79, 142, 247, 0.1);
     color: var(--accent);
-    box-shadow: inset 3px 0 0 var(--accent);
 }
 
 nav ul li a.active:hover {
@@ -141,13 +140,6 @@ nav .section-label-active {
     color: var(--accent);
 }
 
-/* Non-link active label (e.g. Project on project pages) */
-nav .section-label-active:not(.section-label-link) {
-    background: var(--accent-dim);
-    border-left: 2px solid var(--accent);
-    padding-left: calc(0.6rem - 2px);
-    border-radius: 5px;
-}
 
 nav .section-label-link {
     padding: 0;

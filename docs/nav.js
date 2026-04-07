@@ -39,6 +39,19 @@
             }
         }
 
+        // Fallback: nothing crossed threshold yet — use the first section
+        // that actually has a corresponding nav link (e.g. at page top).
+        if (!current) {
+            for (var j = 0; j < sections.length; j++) {
+                var fid = sections[j].id;
+                var hasLink = navLinks.some(function (l) {
+                    var h = l.getAttribute("href");
+                    return h === "#" + fid || h === currentFile + "#" + fid;
+                });
+                if (hasLink) { current = sections[j]; break; }
+            }
+        }
+
         if (current) {
             setActive(current.id);
         }
