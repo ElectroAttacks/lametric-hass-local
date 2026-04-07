@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lametric-hass-local — Contributing</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <nav>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
+            </ul>
+            <div class="section-label">Entities</div>
+            <ul><li><a href="entities.html">All Entities</a></li></ul>
+            <div class="section-label">Services</div>
+            <ul>
+                <li><a href="services.html">show_message</a></li>
+                <li><a href="services.html#show-chart">show_chart</a></li>
+            </ul>
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+            <div class="section-label">Streaming (SKY)</div>
+            <ul><li><a href="streaming.html">Overview &amp; LMSP</a></li></ul>
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html" class="page-active">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html">Security</a></li>
+            </ul>
+        </nav>
+
+        <main>
+
+            <div class="hero" id="contributing">
+                <h1>Contributing</h1>
+                <p>Thank you for taking the time to contribute to lametric-hass-local! This page describes how to
+                    set up your development environment, run quality gates, and submit a pull request.</p>
+            </div>
+
+            <section id="getting-started">
+                <h2>Getting started</h2>
+                <pre><code>git clone https://github.com/ElectroAttacks/lametric-hass-local.git
+cd lametric-hass-local
+uv sync --dev
+pre-commit install</code></pre>
+                <p><a href="https://docs.astral.sh/uv/" target="_blank" rel="noopener">uv</a> is used as the project
+                    manager. It creates an isolated virtual environment and installs all dependencies including
+                    development extras.</p>
+            </section>
+
+            <section id="quality-gates">
+                <h2>Quality gates</h2>
+                <p>All of the following must pass before a pull request can be merged.</p>
+
+                <h3>Linting &amp; formatting (Ruff)</h3>
+                <pre><code>uv run ruff check .
+uv run ruff format .</code></pre>
+                <p><a href="https://docs.astral.sh/ruff/" target="_blank" rel="noopener">Ruff</a> enforces PEP 8
+                    style and import ordering. Run <code>ruff format .</code> to auto-format before committing.</p>
+
+                <h3>Type checking (Mypy)</h3>
+                <pre><code>uv run mypy .</code></pre>
+                <p>Mypy is configured in strict mode. All public functions and methods must be fully annotated.
+                    Avoid <code>Any</code> unless necessary.</p>
+
+                <h3>Test suite (Pytest)</h3>
+                <pre><code>uv run pytest
+uv run pytest --cov=custom_components --cov-report=term-missing</code></pre>
+                <p>Tests live in the <code>tests/</code> directory. When adding new functionality, add or update
+                    tests to cover it. The CI pipeline requires all existing tests to pass.</p>
+            </section>
+
+            <section id="pull-requests">
+                <h2>Submitting a pull request</h2>
+                <ol class="steps">
+                    <li>Fork the repository and create a branch from <code>main</code>.</li>
+                    <li>Make your changes. Run all quality gates locally (see above).</li>
+                    <li>Commit using <a href="https://www.conventionalcommits.org/" target="_blank"
+                            rel="noopener">Conventional Commits</a>. See the commit prefix table below.</li>
+                    <li>Open a pull request against <code>main</code> and fill in the pull request template.</li>
+                </ol>
+
+                <h3>Commit prefix reference</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Prefix</th>
+                            <th>When to use</th>
+                            <th>Version bump</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>feat:</code></td>
+                            <td>New public API or user-facing capability</td>
+                            <td>minor</td>
+                        </tr>
+                        <tr>
+                            <td><code>fix:</code></td>
+                            <td>Bug fix</td>
+                            <td>patch</td>
+                        </tr>
+                        <tr>
+                            <td><code>perf:</code></td>
+                            <td>Performance improvement with no behaviour change</td>
+                            <td>patch</td>
+                        </tr>
+                        <tr>
+                            <td><code>refactor:</code></td>
+                            <td>Internal restructuring, no observable behaviour change</td>
+                            <td>patch</td>
+                        </tr>
+                        <tr>
+                            <td><code>docs:</code></td>
+                            <td>Documentation only</td>
+                            <td>&#8212;</td>
+                        </tr>
+                        <tr>
+                            <td><code>ci:</code></td>
+                            <td>Workflow or tooling changes</td>
+                            <td>&#8212;</td>
+                        </tr>
+                        <tr>
+                            <td><code>chore:</code></td>
+                            <td>Maintenance tasks, dependency bumps</td>
+                            <td>&#8212;</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note">
+                    <strong>Breaking changes</strong>
+                    Add <code>BREAKING CHANGE:</code> in the commit footer to trigger a major version bump.
+                </div>
+            </section>
+
+            <section id="reporting">
+                <h2>Reporting issues</h2>
+                <p>Before opening an issue, search
+                    <a href="https://github.com/ElectroAttacks/lametric-hass-local/issues" target="_blank"
+                        rel="noopener">existing issues</a> to avoid duplicates. Use the appropriate template:</p>
+                <ul>
+                    <li><strong>Bug report</strong> &#8212; something does not work as documented.</li>
+                    <li><strong>Feature request</strong> &#8212; propose a new capability or improvement.</li>
+                </ul>
+                <p>For security vulnerabilities, do <strong>not</strong> open a public issue. See the
+                    <a href="security.html">Security</a> page.</p>
+            </section>
+
+            <section id="translations">
+                <h2>Translations</h2>
+                <p>Translation strings are stored in
+                    <code>custom_components/lametric_hass_local/translations/</code>.
+                    If you add new UI strings, update <code>en.json</code> first. Additional language files are
+                    welcome; use the
+                    <a href="https://developers.home-assistant.io/docs/internationalization/custom_integration/"
+                        target="_blank" rel="noopener">Home Assistant translation format</a>.</p>
+            </section>
+
+            <section id="sponsor">
+                <h2>Support the project</h2>
+                <p>If this integration is useful to you, consider
+                    <a href="https://github.com/sponsors/ElectroAttacks" target="_blank"
+                        rel="noopener">sponsoring the project on GitHub</a>. It helps allocate time for
+                    maintenance and new features. Thank you!</p>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>

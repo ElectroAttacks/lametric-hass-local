@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lametric-hass-local — Security</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <nav>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
+            </ul>
+            <div class="section-label">Entities</div>
+            <ul><li><a href="entities.html">All Entities</a></li></ul>
+            <div class="section-label">Services</div>
+            <ul>
+                <li><a href="services.html">show_message</a></li>
+                <li><a href="services.html#show-chart">show_chart</a></li>
+            </ul>
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+            <div class="section-label">Streaming (SKY)</div>
+            <ul><li><a href="streaming.html">Overview &amp; LMSP</a></li></ul>
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html" class="page-active">Security</a></li>
+            </ul>
+        </nav>
+
+        <main>
+
+            <div class="hero" id="security">
+                <h1>Security</h1>
+                <p>This page describes which versions receive security fixes and how to disclose
+                    a vulnerability privately.</p>
+            </div>
+
+            <section id="supported-versions">
+                <h2>Supported versions</h2>
+                <p>Security fixes are backported only to the <strong>latest release</strong>.
+                    Older versions are not supported.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Version</th>
+                            <th>Security fixes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Latest release</td>
+                            <td>&#x2705; Yes</td>
+                        </tr>
+                        <tr>
+                            <td>Older releases</td>
+                            <td>&#x274C; No</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="note">
+                    Keep this integration up to date by checking for updates in HACS or by following
+                    the <a href="https://github.com/ElectroAttacks/lametric-hass-local/releases"
+                        target="_blank" rel="noopener">GitHub Releases</a> page.
+                </div>
+            </section>
+
+            <section id="reporting">
+                <h2>Reporting a vulnerability</h2>
+                <div class="warning">
+                    <strong>Do not open a public GitHub issue for security vulnerabilities.</strong>
+                    Public disclosure before a fix is available can put other users at risk.
+                </div>
+                <p>Please use
+                    <a href="https://github.com/ElectroAttacks/lametric-hass-local/security/advisories/new"
+                        target="_blank" rel="noopener">GitHub Security Advisories</a>
+                    to report a vulnerability privately. This ensures the report is visible only to you
+                    and the project maintainers until a coordinated fix and disclosure can be prepared.</p>
+
+                <h3>What to include</h3>
+                <ul>
+                    <li>A clear description of the vulnerability and its impact.</li>
+                    <li>Step-by-step reproduction instructions, including any required configuration.</li>
+                    <li>Any mitigations or workarounds you have identified.</li>
+                    <li>The version of the integration you tested against.</li>
+                </ul>
+
+                <h3>Response timeline</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Target time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Initial acknowledgement</td>
+                            <td>72 hours</td>
+                        </tr>
+                        <tr>
+                            <td>Fix &amp; coordinated disclosure</td>
+                            <td>Best effort — depends on complexity</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>You will be credited in the security advisory unless you prefer to remain anonymous.</p>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lametric-hass-local — Entities</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <!-- ── Sidebar ── -->
+        <nav>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
+            </ul>
+
+            <div class="section-label">Entities</div>
+            <ul>
+                <li><a href="entities.html" class="page-active">All Entities</a></li>
+                <li><a href="entities.html#button" style="padding-left:1.4rem">Button</a></li>
+                <li><a href="entities.html#light" style="padding-left:1.4rem">Light (SKY)</a></li>
+                <li><a href="entities.html#number" style="padding-left:1.4rem">Number</a></li>
+                <li><a href="entities.html#scene" style="padding-left:1.4rem">Scene</a></li>
+                <li><a href="entities.html#select" style="padding-left:1.4rem">Select</a></li>
+                <li><a href="entities.html#sensor" style="padding-left:1.4rem">Sensor</a></li>
+                <li><a href="entities.html#switch" style="padding-left:1.4rem">Switch</a></li>
+                <li><a href="entities.html#text" style="padding-left:1.4rem">Text</a></li>
+                <li><a href="entities.html#update" style="padding-left:1.4rem">Update</a></li>
+            </ul>
+
+            <div class="section-label">Services</div>
+            <ul>
+                <li><a href="services.html">show_message</a></li>
+                <li><a href="services.html#show-chart">show_chart</a></li>
+            </ul>
+
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+
+            <div class="section-label">Streaming (SKY)</div>
+            <ul>
+                <li><a href="streaming.html">Overview &amp; LMSP</a></li>
+            </ul>
+
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html">Security</a></li>
+            </ul>
+        </nav>
+
+        <!-- ── Content ── -->
+        <main>
+
+            <div class="hero" id="entities">
+                <h1>Entities</h1>
+                <p>The integration exposes nine entity platforms. Most entities are backed by
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/lametric-time-reference.html"
+                        target="_blank" rel="noopener">Device API v2</a> endpoints polled every 30&nbsp;seconds.
+                    The table below gives a quick overview; each platform is described in detail below.</p>
+            </div>
+
+            <!-- Overview table -->
+            <section>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Entity key(s)</th>
+                            <th>Model</th>
+                            <th>API endpoint(s)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="#button">Button</a></td>
+                            <td><code>next_app</code>, <code>previous_app</code>, <code>dismiss_current_notification</code>, <code>dismiss_all_notifications</code></td>
+                            <td>All</td>
+                            <td><code>PUT /apps/next</code>, <code>/apps/prev</code>, <code>DELETE /notifications/current</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#light">Light</a></td>
+                            <td><code>sky_light</code></td>
+                            <td>SKY only</td>
+                            <td><code>GET/PUT /api/v2/device/display</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#number">Number</a></td>
+                            <td><code>brightness</code>, <code>volume</code></td>
+                            <td>non-SKY / All</td>
+                            <td><code>PUT /api/v2/device/display</code>, <code>PUT /api/v2/device/audio</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#scene">Scene</a></td>
+                            <td>one per widget</td>
+                            <td>All</td>
+                            <td><code>PUT /api/v2/device/apps/:id/widgets/:wid/activate</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#select">Select</a></td>
+                            <td><code>brightness_mode</code></td>
+                            <td>non-SKY</td>
+                            <td><code>PUT /api/v2/device/display</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#sensor">Sensor</a></td>
+                            <td><code>rssi</code></td>
+                            <td>All</td>
+                            <td><code>GET /api/v2/device</code> (polled)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="#switch">Switch</a></td>
+                            <td><code>display_on</code>, <code>bluetooth_active</code></td>
+                            <td>All (availability-gated)</td>
+                            <td><code>PUT /api/v2/device/display</code>, <code>PUT /api/v2/device/bluetooth</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#text">Text</a></td>
+                            <td><code>bluetooth_name</code></td>
+                            <td>All (Bluetooth gated)</td>
+                            <td><code>PUT /api/v2/device/bluetooth</code></td>
+                        </tr>
+                        <tr>
+                            <td><a href="#update">Update</a></td>
+                            <td><code>firmware</code></td>
+                            <td>All (OS &ge; 2.3.0)</td>
+                            <td><code>GET /api/v2/device</code> (polled)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- ── Button ── -->
+            <section id="button">
+                <h2>Button</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/apps/next</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/apps/prev</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method delete">DELETE</span>
+                    <span class="api-path">/api/v2/device/notifications/current</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Four stateless button entities are created per device. Pressing a button fires a single API call
+                    and does not have a persistent state.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Icon</th>
+                            <th>Action</th>
+                            <th>API call</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>next_app</code></td>
+                            <td><code>mdi:skip-next</code></td>
+                            <td>Advance to the next installed app</td>
+                            <td><code>PUT /api/v2/device/apps/next</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>previous_app</code></td>
+                            <td><code>mdi:skip-previous</code></td>
+                            <td>Return to the previous installed app</td>
+                            <td><code>PUT /api/v2/device/apps/prev</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>dismiss_current_notification</code></td>
+                            <td><code>mdi:bell-off</code></td>
+                            <td>Dismiss the notification currently shown on screen</td>
+                            <td><code>DELETE /api/v2/device/notifications/current</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>dismiss_all_notifications</code></td>
+                            <td><code>mdi:bell-remove</code></td>
+                            <td>Clear the entire notification queue</td>
+                            <td><code>DELETE /api/v2/device/notifications</code> (all)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>Unique IDs follow the pattern <code>&lt;serial&gt;-&lt;key&gt;</code>
+                    (e.g.&nbsp;<code>SA2301234567-next_app</code>).</p>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-apps.html"
+                        target="_blank" rel="noopener">Apps</a> and
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-notifications.html"
+                        target="_blank" rel="noopener">Notifications</a> API references for endpoint details.
+                </p>
+            </section>
+
+            <!-- ── Light ── -->
+            <section id="light">
+                <h2>Light <span class="platform-badge">SKY only</span></h2>
+
+                <div class="api-ref">
+                    <span class="api-method get">GET</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>One light entity is created for every LaMetric SKY device. It represents the full LED matrix
+                    display and exposes on/off control and brightness adjustment in a single entity. Non-SKY devices
+                    (e.g.&nbsp;LaMetric Time) do <strong>not</strong> get a light entity; their brightness is
+                    controlled through the <a href="#number">Number</a> and <a href="#select">Select</a>
+                    entities instead.</p>
+
+                <h3>Supported features</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Color mode</td>
+                            <td><code>BRIGHTNESS</code> &#8212; single white channel, 0&#8211;255 mapped to the device's
+                                brightness range (reported by <code>brightness_limit</code>)</td>
+                        </tr>
+                        <tr>
+                            <td>On / Off</td>
+                            <td>Sends <code>{"on": true/false}</code> to <code>PUT /api/v2/device/display</code></td>
+                        </tr>
+                        <tr>
+                            <td>Brightness</td>
+                            <td>HA 0&#8211;255 scale is mapped to the device's <code>brightness_range</code>
+                                (<code>min</code> to <code>max</code> %) via a linear scale. The effective cap is
+                                given by <code>brightness_limit.max</code> (may be lower than the range max when
+                                powered via USB).
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="note">
+                    <strong>Streaming host</strong>
+                    The Light entity is also the target for the pixel streaming entity services
+                    (<code>start_stream</code>, <code>send_stream_data</code>, <code>stop_stream</code>). See the
+                    <a href="streaming.html">Pixel Streaming</a> page for full details.
+                </div>
+
+                <p>Unique ID: <code>&lt;serial&gt;-sky_light</code>. See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-display.html"
+                        target="_blank" rel="noopener">Display</a> API reference.
+                </p>
+            </section>
+
+            <!-- ── Number ── -->
+            <section id="number">
+                <h2>Number</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/audio</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Up to two number entities are created per device, subject to hardware availability reported by
+                    the device state.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Unit</th>
+                            <th>Range</th>
+                            <th>Model</th>
+                            <th>API field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>brightness</code></td>
+                            <td>%</td>
+                            <td>Reported by <code>brightness_limit</code> (<code>min</code>&#8211;<code>max</code>)</td>
+                            <td>non-SKY only</td>
+                            <td><code>display.brightness</code> &#8594; <code>PUT /display</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>volume</code></td>
+                            <td>%</td>
+                            <td>Reported by <code>volume_range</code> (typically 0&#8211;100)</td>
+                            <td>All (if audio available)</td>
+                            <td><code>audio.volume</code> &#8594; <code>PUT /audio</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>Both entities are placed in the <strong>Configuration</strong> entity category. The step size is
+                    fixed at 1. The range is not hard-coded: it is read from the device state on each coordinator
+                    refresh, so it automatically reflects any hardware limits (e.g., USB power cap on brightness).
+                </p>
+
+                <div class="note">
+                    <strong>brightness vs. brightness_mode</strong>
+                    Setting <code>brightness</code> while <code>brightness_mode</code> is <code>auto</code> is
+                    accepted by the API but has no visible effect until brightness_mode is switched to
+                    <code>manual</code>. Refer to the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-display.html"
+                        target="_blank" rel="noopener">Display</a> API reference.
+                </div>
+
+                <p>See also the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-audio.html"
+                        target="_blank" rel="noopener">Audio</a> API reference.
+                </p>
+            </section>
+
+            <!-- ── Scene ── -->
+            <section id="scene">
+                <h2>Scene</h2>
+
+                <div class="api-ref">
+                    <span class="api-method get">GET</span>
+                    <span class="api-path">/api/v2/device/apps</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/apps/:package/widgets/:id/activate</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method post">POST</span>
+                    <span class="api-path">/api/v2/device/apps/:package/widgets/:id/actions</span>
+                    <span class="api-version">API 2.1.0+</span>
+                </div>
+
+                <p>One scene entity is created for <strong>every installed app widget</strong> on the device. The
+                    list of apps is fetched from <code>GET /api/v2/device/apps</code> and updated on each
+                    coordinator refresh. New widgets (e.g., added via the LaMetric app) are picked up automatically
+                    without a restart.</p>
+
+                <h3>Activating a scene</h3>
+                <p>Calling <code>scene.turn_on</code> issues
+                    <code>PUT /api/v2/device/apps/:package/widgets/:id/activate</code>, which brings the target
+                    widget to the foreground. No action is triggered.</p>
+
+                <h3>activate_action entity service</h3>
+                <p>Use the <code>activate_action</code> entity service to additionally trigger a widget-specific
+                    action. This calls
+                    <code>POST /api/v2/device/apps/:package/widgets/:id/actions</code>.
+                    See the full reference on the <a href="entity-services.html#activate-action">Entity Services</a>
+                    page.</p>
+
+                <h3>Entity metadata</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Attribute</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Unique ID</td>
+                            <td><code>&lt;serial&gt;-&lt;package&gt;-&lt;widget_id&gt;</code></td>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>App title as reported by the device</td>
+                        </tr>
+                        <tr>
+                            <td><code>is_active</code> attribute</td>
+                            <td><code>true</code> when this widget is currently in the foreground</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-apps.html"
+                        target="_blank" rel="noopener">Apps</a> API reference for endpoint details.
+                </p>
+            </section>
+
+            <!-- ── Select ── -->
+            <section id="select">
+                <h2>Select <span class="platform-badge">non-SKY</span></h2>
+
+                <div class="api-ref">
+                    <span class="api-method get">GET</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>One select entity controls the display brightness mode on non-SKY devices. SKY devices do not
+                    expose a <code>brightness_mode</code> field.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Options</th>
+                            <th>API field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>brightness_mode</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val">auto</span>
+                                    <span class="val">manual</span>
+                                </div>
+                            </td>
+                            <td><code>display.brightness_mode</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <ul>
+                    <li><strong><code>auto</code></strong> &#8212; The device adjusts brightness based on its ambient
+                        light sensor. Setting the <code>brightness</code> number entity while in this mode is
+                        accepted by the API but takes effect only when the mode is switched to
+                        <code>manual</code>.</li>
+                    <li><strong><code>manual</code></strong> &#8212; Brightness is fixed to the value in the
+                        <code>brightness</code> number entity.</li>
+                </ul>
+
+                <div class="note">
+                    <strong>Screensaver target</strong>
+                    The <code>brightness_mode</code> select entity is also the target entity for the
+                    <code>set_screensaver</code> entity service. See the
+                    <a href="entity-services.html">Entity Services</a> page.
+                </div>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-display.html"
+                        target="_blank" rel="noopener">Display</a> API reference.
+                </p>
+            </section>
+
+            <!-- ── Sensor ── -->
+            <section id="sensor">
+                <h2>Sensor</h2>
+
+                <div class="api-ref">
+                    <span class="api-method get">GET</span>
+                    <span class="api-path">/api/v2/device</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>One diagnostic sensor entity, disabled by default, exposes the Wi-Fi signal strength.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Unit</th>
+                            <th>State class</th>
+                            <th>Category</th>
+                            <th>Default</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>rssi</code></td>
+                            <td>%</td>
+                            <td><code>measurement</code></td>
+                            <td>Diagnostic</td>
+                            <td>Disabled</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>The value is read from <code>wifi.signal_strength</code> in the device state object returned by
+                    <code>GET /api/v2/device</code>. It is expressed as a percentage (0&#8211;100) rather than dBm.
+                    Enable the entity in the entity registry if you want to include it in dashboards or automations.
+                </p>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-state.html"
+                        target="_blank" rel="noopener">Device State</a> API reference.
+                </p>
+            </section>
+
+            <!-- ── Switch ── -->
+            <section id="switch">
+                <h2>Switch</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/display</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/bluetooth</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Up to two switch entities are created per device, conditional on the capabilities reported by the
+                    device state.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Controls</th>
+                            <th>Availability gate</th>
+                            <th>API field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>display_on</code></td>
+                            <td>Turn the display on or off</td>
+                            <td><code>display.on</code> is not <code>None</code></td>
+                            <td><code>PUT /api/v2/device/display</code> &#8594; <code>{"on": bool}</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>bluetooth_active</code></td>
+                            <td>Enable or disable Bluetooth</td>
+                            <td><code>bluetooth.available</code> is <code>true</code></td>
+                            <td><code>PUT /api/v2/device/bluetooth</code> &#8594; <code>{"active": bool}</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>Both entities are placed in the <strong>Configuration</strong> entity category.</p>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-display.html"
+                        target="_blank" rel="noopener">Display</a> and
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-bluetooth.html"
+                        target="_blank" rel="noopener">Bluetooth</a> API references.
+                </p>
+            </section>
+
+            <!-- ── Text ── -->
+            <section id="text">
+                <h2>Text</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/bluetooth</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>One text entity is created when Bluetooth is reported as available. It sets the Bluetooth
+                    broadcast name of the device.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Entity key</th>
+                            <th>Min length</th>
+                            <th>Max length</th>
+                            <th>Mode</th>
+                            <th>API field</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>bluetooth_name</code></td>
+                            <td>1</td>
+                            <td>248</td>
+                            <td><code>text</code></td>
+                            <td><code>bluetooth.name</code> &#8594; <code>PUT /api/v2/device/bluetooth</code> &#8594; <code>{"name": "…"}</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>The entity is placed in the <strong>Configuration</strong> category. The name change is broadcast
+                    immediately via Bluetooth. See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-bluetooth.html"
+                        target="_blank" rel="noopener">Bluetooth</a> API reference.
+                </p>
+            </section>
+
+            <!-- ── Update ── -->
+            <section id="update">
+                <h2>Update</h2>
+
+                <div class="api-ref">
+                    <span class="api-method get">GET</span>
+                    <span class="api-path">/api/v2/device</span>
+                    <span class="api-version">API 2.3.0+</span>
+                </div>
+
+                <p>One firmware update tracking entity is registered for devices running OS 2.3.0 or later (the
+                    first version that exposes update information via the local API). Devices on older firmware do
+                    not get this entity.</p>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Property</th>
+                            <th>Source</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>installed_version</code></td>
+                            <td><code>device_state.os_version</code></td>
+                            <td>Current OS version string, e.g. <code>2.3.0</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>latest_version</code></td>
+                            <td><code>device_state.update.version</code></td>
+                            <td>Newest available version; equals <code>installed_version</code> when up to date</td>
+                        </tr>
+                        <tr>
+                            <td>Device class</td>
+                            <td>&#8212;</td>
+                            <td><code>FIRMWARE</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="note">
+                    <strong>Install action</strong>
+                    The entity reports available updates but does not initiate firmware installation &#8212; firmware
+                    updates are managed through the LaMetric mobile app. The entity is informational only.
+                </div>
+
+                <p>See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-state.html"
+                        target="_blank" rel="noopener">Device State</a> API reference.
+                </p>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>

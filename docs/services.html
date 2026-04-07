@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lametric-hass-local — Services</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <!-- ── Sidebar ── -->
+        <nav>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
+            </ul>
+
+            <div class="section-label">Entities</div>
+            <ul>
+                <li><a href="entities.html">All Entities</a></li>
+            </ul>
+
+            <div class="section-label">Services</div>
+            <ul>
+                <li><a href="services.html" class="page-active">show_message</a></li>
+                <li><a href="services.html#show-chart" style="padding-left:1.4rem">show_chart</a></li>
+                <li><a href="services.html#notification-model" style="padding-left:1.4rem">Notification model</a></li>
+                <li><a href="services.html#sound-ids" style="padding-left:1.4rem">Sound IDs</a></li>
+                <li><a href="services.html#icon-format" style="padding-left:1.4rem">Icon format</a></li>
+                <li><a href="services.html#legacy-notify" style="padding-left:1.4rem">notify platform</a></li>
+            </ul>
+
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+
+            <div class="section-label">Streaming (SKY)</div>
+            <ul>
+                <li><a href="streaming.html">Overview &amp; LMSP</a></li>
+            </ul>
+
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html">Security</a></li>
+            </ul>
+        </nav>
+
+        <!-- ── Content ── -->
+        <main>
+
+            <div class="hero" id="services">
+                <h1>Services</h1>
+                <p>Two device-level services send notifications to a LaMetric device via
+                    <code>POST /api/v2/device/notifications</code>. Both are registered under the
+                    <code>lametric_hass_local</code> domain and accept a <code>device_id</code> as their target.</p>
+            </div>
+
+            <!-- show_message -->
+            <section id="show-message">
+                <h2>show_message</h2>
+
+                <div class="api-ref">
+                    <span class="api-method post">POST</span>
+                    <span class="api-path">/api/v2/device/notifications</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Sends a text notification with an optional icon and sound to a LaMetric device. Internally this
+                    builds a Notification object with a single <em>simple frame</em> and posts it to the Device API.
+                </p>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>device_id</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>Home Assistant device ID of the target LaMetric device</td>
+                        </tr>
+                        <tr>
+                            <td><code>message</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>Text to display. Scrolls if longer than the display width (37&nbsp;px on LaMetric Time).</td>
+                        </tr>
+                        <tr>
+                            <td><code>icon</code></td>
+                            <td>no</td>
+                            <td>&#8212;</td>
+                            <td>Icon ID string (e.g.&nbsp;<code>i1234</code>, <code>a5678</code>) or a Base64-encoded
+                                PNG/GIF data URI. See <a href="#icon-format">Icon format</a>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>sound</code></td>
+                            <td>no</td>
+                            <td>&#8212;</td>
+                            <td>Built-in sound ID (e.g.&nbsp;<code>positive1</code>, <code>alarm3</code>). See
+                                <a href="#sound-ids">Sound IDs</a> for the full list.</td>
+                        </tr>
+                        <tr>
+                            <td><code>cycles</code></td>
+                            <td>no</td>
+                            <td><code>1</code></td>
+                            <td>Number of times to repeat the notification. <code>0</code>&nbsp;=&nbsp;loop until
+                                manually dismissed or deleted via the API.</td>
+                        </tr>
+                        <tr>
+                            <td><code>icon_type</code></td>
+                            <td>no</td>
+                            <td><code>none</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">none</span>
+                                    <span class="val">info</span>
+                                    <span class="val">alert</span>
+                                </div>
+                                Controls the indicator icon shown before the content. <code>info</code> shows an
+                                &ldquo;i&rdquo;, <code>alert</code> shows &ldquo;!!!&rdquo;.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>priority</code></td>
+                            <td>no</td>
+                            <td><code>info</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">info</span>
+                                    <span class="val">warning</span>
+                                    <span class="val">critical</span>
+                                </div>
+                                See <a href="#priority">Priority levels</a> below.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>YAML example</h3>
+                <pre><code>service: lametric_hass_local.show_message
+data:
+  device_id: "your_device_id"
+  message: "Deploy finished ✓"
+  icon: "i7956"
+  sound: "positive1"
+  cycles: 1
+  icon_type: info
+  priority: info</code></pre>
+            </section>
+
+            <!-- show_chart -->
+            <section id="show-chart">
+                <h2>show_chart</h2>
+
+                <div class="api-ref">
+                    <span class="api-method post">POST</span>
+                    <span class="api-path">/api/v2/device/notifications</span>
+                    <span class="api-version">API 2.0.0+</span>
+                </div>
+
+                <p>Sends a spike chart notification built from a list of numeric values. Internally this uses the
+                    <em>chart frame</em> type of the Notification model — the values are mapped to
+                    <code>chartData</code> and displayed as a bar graph that scrolls over the LED matrix.</p>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Default</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>device_id</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>Home Assistant device ID of the target LaMetric device</td>
+                        </tr>
+                        <tr>
+                            <td><code>data</code></td>
+                            <td>yes</td>
+                            <td>&#8212;</td>
+                            <td>List of integers to plot, e.g.&nbsp;<code>[1, 2, 3, 4, 5, 4, 3, 2, 1]</code>. All
+                                values are auto-scaled to the 8-pixel display height.</td>
+                        </tr>
+                        <tr>
+                            <td><code>sound</code></td>
+                            <td>no</td>
+                            <td>&#8212;</td>
+                            <td>Built-in sound ID. See <a href="#sound-ids">Sound IDs</a>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>cycles</code></td>
+                            <td>no</td>
+                            <td><code>1</code></td>
+                            <td>Repeat count. <code>0</code>&nbsp;=&nbsp;infinite.</td>
+                        </tr>
+                        <tr>
+                            <td><code>icon_type</code></td>
+                            <td>no</td>
+                            <td><code>none</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">none</span>
+                                    <span class="val">info</span>
+                                    <span class="val">alert</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>priority</code></td>
+                            <td>no</td>
+                            <td><code>info</code></td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">info</span>
+                                    <span class="val">warning</span>
+                                    <span class="val">critical</span>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>YAML example</h3>
+                <pre><code>service: lametric_hass_local.show_chart
+data:
+  device_id: "your_device_id"
+  data: [1, 3, 5, 7, 9, 7, 5, 3, 1]
+  sound: "statistic"
+  cycles: 2</code></pre>
+            </section>
+
+            <!-- Notification model -->
+            <section id="notification-model">
+                <h2>Notification model reference</h2>
+                <p>Both services construct a Notification object and send it to
+                    <code>POST /api/v2/device/notifications</code>. The following table maps service fields to API
+                    fields. Full reference:
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-notifications.html"
+                        target="_blank" rel="noopener">LaMetric Notifications API</a>.
+                </p>
+
+                <pre><code>{
+  "priority": "&lt;info|warning|critical&gt;",
+  "icon_type": "&lt;none|info|alert&gt;",
+  "model": {
+    "cycles": &lt;integer&gt;,
+    "frames": [
+      // show_message — simple frame:
+      {
+        "icon": "&lt;icon-id or data URI&gt;",
+        "text": "&lt;message&gt;"
+      },
+      // show_chart — chart frame:
+      {
+        "chartData": [1, 2, 3, 4, 5]
+      }
+    ],
+    "sound": {
+      "category": "&lt;notifications|alarms&gt;",
+      "id": "&lt;sound-id&gt;",
+      "repeat": 1
+    }
+  }
+}</code></pre>
+
+                <h3 id="priority">Priority levels</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Value</th>
+                            <th>Behaviour</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>info</code></td>
+                            <td>Placed in the normal notification queue alongside app-generated notifications.
+                                <strong>Not shown</strong> when the screensaver is active.</td>
+                        </tr>
+                        <tr>
+                            <td><code>warning</code></td>
+                            <td>Interrupts notifications with <code>info</code> priority. Suitable for events like&nbsp;&ldquo;someone
+                                arrived home&rdquo;. Still blocked by the screensaver.</td>
+                        </tr>
+                        <tr>
+                            <td><code>critical</code></td>
+                            <td>Interrupts all other notifications <strong>and</strong> wakes the device from the
+                                screensaver. Use only for truly urgent events (smoke detector, water leak, etc.).
+                                May display in the middle of the night.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Frame types</h3>
+                <p>The Device API supports three frame types within a single notification. This integration uses one
+                    frame type per service:</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Frame type</th>
+                            <th>Used by</th>
+                            <th>Fields</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Simple</td>
+                            <td><code>show_message</code></td>
+                            <td><code>icon</code> (optional), <code>text</code></td>
+                        </tr>
+                        <tr>
+                            <td>Chart</td>
+                            <td><code>show_chart</code></td>
+                            <td><code>chartData</code> — integer array</td>
+                        </tr>
+                        <tr>
+                            <td>Goal</td>
+                            <td>&#8212; (not yet exposed)</td>
+                            <td><code>icon</code>, <code>goalData</code> with <code>start</code>,
+                                <code>current</code>, <code>end</code>, <code>unit</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Sound IDs -->
+            <section id="sound-ids">
+                <h2>Sound IDs</h2>
+                <p>The <code>sound</code> field accepts one of the following built-in sound identifiers. Sounds are
+                    played once by default; the Device API <code>repeat</code> field is always set to
+                    <code>1</code> when using these services. Full reference:
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-notifications.html"
+                        target="_blank" rel="noopener">LaMetric Notifications API</a>.
+                </p>
+
+                <h3>Notifications category</h3>
+                <div class="val-list" style="flex-wrap:wrap; gap:0.35rem 0.4rem; margin-bottom:1rem">
+                    <span class="val">bicycle</span>
+                    <span class="val">car</span>
+                    <span class="val">cash</span>
+                    <span class="val">cat</span>
+                    <span class="val">dog</span>
+                    <span class="val">dog2</span>
+                    <span class="val">energy</span>
+                    <span class="val">knock-knock</span>
+                    <span class="val">letter_email</span>
+                    <span class="val">lose1</span>
+                    <span class="val">lose2</span>
+                    <span class="val">negative1</span>
+                    <span class="val">negative2</span>
+                    <span class="val">negative3</span>
+                    <span class="val">negative4</span>
+                    <span class="val">negative5</span>
+                    <span class="val">notification</span>
+                    <span class="val">notification2</span>
+                    <span class="val">notification3</span>
+                    <span class="val">notification4</span>
+                    <span class="val">open_door</span>
+                    <span class="val">positive1</span>
+                    <span class="val">positive2</span>
+                    <span class="val">positive3</span>
+                    <span class="val">positive4</span>
+                    <span class="val">positive5</span>
+                    <span class="val">positive6</span>
+                    <span class="val">statistic</span>
+                    <span class="val">thunder</span>
+                    <span class="val">water1</span>
+                    <span class="val">water2</span>
+                    <span class="val">win</span>
+                    <span class="val">win2</span>
+                    <span class="val">wind</span>
+                    <span class="val">wind_short</span>
+                </div>
+
+                <h3>Alarms category</h3>
+                <div class="val-list" style="flex-wrap:wrap; gap:0.35rem 0.4rem; margin-bottom:1rem">
+                    <span class="val">alarm1</span>
+                    <span class="val">alarm2</span>
+                    <span class="val">alarm3</span>
+                    <span class="val">alarm4</span>
+                    <span class="val">alarm5</span>
+                    <span class="val">alarm6</span>
+                    <span class="val">alarm7</span>
+                    <span class="val">alarm8</span>
+                    <span class="val">alarm9</span>
+                    <span class="val">alarm10</span>
+                    <span class="val">alarm11</span>
+                    <span class="val">alarm12</span>
+                    <span class="val">alarm13</span>
+                </div>
+
+                <div class="note">
+                    <strong>Category detection</strong>
+                    The integration automatically determines the <code>category</code> field
+                    (<code>notifications</code> or <code>alarms</code>) from the sound ID prefix. IDs starting with
+                    <code>alarm</code> are sent with <code>category: alarms</code>; all others use
+                    <code>category: notifications</code>.
+                </div>
+
+                <div class="note">
+                    <strong>Custom sounds (API 2.3.0+)</strong>
+                    Since API version 2.3.0, the Device API also supports custom sounds via a URL to an MP3 file
+                    (sample rates: 8000&#8211;44100&nbsp;Hz, mono/stereo, 16-bit). This is not yet exposed as a
+                    service field but can be sent directly to the Device API if needed. See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-notifications.html"
+                        target="_blank" rel="noopener">Notifications API reference</a>.
+                </div>
+            </section>
+
+            <!-- Icon format -->
+            <section id="icon-format">
+                <h2>Icon format</h2>
+                <p>The <code>icon</code> field in <code>show_message</code> accepts one of two formats:</p>
+
+                <h3>Icon ID</h3>
+                <p>A string of the form <code>&lt;prefix&gt;&lt;number&gt;</code> where:</p>
+                <ul>
+                    <li><code>i</code>&nbsp;prefix &#8212; static icon (PNG). Example: <code>i1234</code></li>
+                    <li><code>a</code>&nbsp;prefix &#8212; animated icon (GIF). Example: <code>a5678</code></li>
+                </ul>
+                <p>Browse available icons at
+                    <a href="https://developer.lametric.com/icons" target="_blank"
+                        rel="noopener">developer.lametric.com/icons</a>.
+                    You can also search via the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/cloud-icons.html"
+                        target="_blank" rel="noopener">Cloud Icons API</a>.
+                </p>
+
+                <h3>Base64 data URI (custom icon)</h3>
+                <p>A PNG or GIF image encoded as a Base64 data URI:</p>
+                <pre><code># PNG (8x8 pixels recommended)
+"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAYAAADED76L..."
+
+# GIF (animated)
+"data:image/gif;base64,R0lGODlhCAAIAP..."</code></pre>
+
+                <div class="tip">
+                    <strong>Tip</strong>
+                    LaMetric Time has an 8&times;8 pixel icon area. For best results, use exactly 8&times;8 PNG
+                    images. Larger images are displayed but may be cropped or scaled.
+                </div>
+            </section>
+
+            <!-- Legacy notify -->
+            <section id="legacy-notify">
+                <h2>Legacy notify platform</h2>
+                <p>The integration also registers a legacy <code>notify</code> platform service under the name
+                    <code>notify.lametric_&lt;device-name&gt;</code>. This is provided for backwards compatibility
+                    with automations that used the old platform-based notify service.</p>
+
+                <pre><code>service: notify.lametric_my_device
+data:
+  message: "Hello from notify"
+  data:
+    icon: "i1234"
+    sound: "cat"
+    cycles: 1
+    priority: info</code></pre>
+
+                <div class="note">
+                    <strong>Note</strong>
+                    The extra fields (<code>icon</code>, <code>sound</code>, <code>cycles</code>,
+                    <code>priority</code>, <code>icon_type</code>) must be nested under the <code>data:</code> key
+                    when using the <code>notify</code> platform. The <code>show_message</code> service is preferred
+                    for new automations.
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>lametric-hass-local — Pixel Streaming</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+    <div class="layout">
+
+        <!-- ── Sidebar ── -->
+        <nav>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
+            <ul>
+                <li><a href="index.html">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
+            </ul>
+
+            <div class="section-label">Entities</div>
+            <ul>
+                <li><a href="entities.html">All Entities</a></li>
+            </ul>
+
+            <div class="section-label">Services</div>
+            <ul>
+                <li><a href="services.html">show_message</a></li>
+                <li><a href="services.html#show-chart">show_chart</a></li>
+            </ul>
+
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+
+            <div class="section-label">Streaming (SKY)</div>
+            <ul>
+                <li><a href="streaming.html" class="page-active">Overview &amp; LMSP</a></li>
+                <li><a href="streaming.html#start-stream" style="padding-left:1.4rem">start_stream</a></li>
+                <li><a href="streaming.html#send-frames" style="padding-left:1.4rem">send_stream_data</a></li>
+                <li><a href="streaming.html#stop-stream" style="padding-left:1.4rem">stop_stream</a></li>
+                <li><a href="streaming.html#lmsp" style="padding-left:1.4rem">LMSP protocol</a></li>
+            </ul>
+
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html">Security</a></li>
+            </ul>
+        </nav>
+
+        <!-- ── Content ── -->
+        <main>
+
+            <div class="hero" id="streaming">
+                <h1>Pixel Streaming <span class="platform-badge">SKY only</span></h1>
+                <p>LaMetric SKY devices support the <strong>LaMetric Streaming Protocol (LMSP)</strong> for pushing
+                    real-time RGB888 frames over UDP at up to 30&nbsp;FPS. All three streaming services target the
+                    <a href="entities.html#light">Light entity</a> of a SKY device.</p>
+                <div class="badges">
+                    <span class="badge">SKY only</span>
+                    <span class="badge">UDP</span>
+                    <span class="badge">RGB888</span>
+                    <span class="badge">API v2.3.0</span>
+                </div>
+            </div>
+
+            <!-- Overview -->
+            <section id="overview">
+                <h2>How it works</h2>
+                <p>The exact flow documented in the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-stream.html"
+                        target="_blank" rel="noopener">LaMetric Streaming API reference</a>:</p>
+
+                <ol class="steps">
+                    <li>
+                        <strong>Query stream status</strong> &#8212; call
+                        <code>GET /api/v2/device/stream</code> to retrieve the canvas dimensions (pixel and triangle
+                        mode) and the UDP port (usually <code>9999</code>).
+                    </li>
+                    <li>
+                        <strong>Start a stream</strong> &#8212; call <code>start_stream</code> (which sends
+                        <code>PUT /api/v2/device/stream/start</code>). The response contains a unique
+                        <code>session_id</code> and the UDP port. The device enters <code>receiving</code> state.
+                    </li>
+                    <li>
+                        <strong>Send frames</strong> &#8212; call <code>send_stream_data</code> repeatedly, up to
+                        30&nbsp;FPS, passing the <code>session_id</code> and raw RGB888 pixel data. The integration
+                        assembles the LMSP UDP packet and sends it to the device's UDP port.
+                    </li>
+                    <li>
+                        <strong>Stop the stream</strong> &#8212; call <code>stop_stream</code> (which sends
+                        <code>PUT /api/v2/device/stream/stop</code>). The device returns to normal operation.
+                    </li>
+                </ol>
+
+                <div class="warning">
+                    <strong>SKY only</strong>
+                    All three services return an error when called on non-SKY devices. The Light entity is only
+                    created for SKY models in the first place — see <a href="entities.html#light">Light entity</a>.
+                </div>
+            </section>
+
+            <!-- start_stream -->
+            <section id="start-stream">
+                <h2>start_stream</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/stream/start</span>
+                    <span class="api-version">API 2.3.0+</span>
+                </div>
+
+                <p>Starts an LMSP streaming session and configures the canvas rendering parameters. Returns a
+                    <code>session_id</code> which must be passed to every subsequent <code>send_stream_data</code>
+                    call.</p>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>config</code></td>
+                            <td>yes</td>
+                            <td>object</td>
+                            <td>Canvas configuration object. See the <a href="#canvas-config">canvas config</a>
+                                table below.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="canvas-config">canvas config object</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Values</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>canvas.fill_type</code></td>
+                            <td>yes</td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val">scale</span>
+                                    <span class="val">tile</span>
+                                </div>
+                            </td>
+                            <td>
+                                How to fill the physical display when content is smaller than the screen:
+                                <ul>
+                                    <li><strong><code>scale</code></strong> &#8212; stretch the canvas to fill the display.</li>
+                                    <li><strong><code>tile</code></strong> &#8212; tile the canvas to fill the display.</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>canvas.render_mode</code></td>
+                            <td>yes</td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val">pixel</span>
+                                    <span class="val">triangle</span>
+                                </div>
+                            </td>
+                            <td>
+                                Determines the addressable pixel unit:
+                                <ul>
+                                    <li><strong><code>pixel</code></strong> &#8212; each logical pixel maps to one square LED.
+                                        Best for images and text.</li>
+                                    <li><strong><code>triangle</code></strong> &#8212; each logical pixel maps to one
+                                        triangular LED (addressing individual triangles). Best for abstract effects.
+                                        The canvas is larger in this mode (roughly 2&#215; in each dimension).</li>
+                                </ul>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><code>canvas.post_process.type</code></td>
+                            <td>no</td>
+                            <td>
+                                <div class="val-list">
+                                    <span class="val default">none</span>
+                                    <span class="val">effect</span>
+                                </div>
+                            </td>
+                            <td>Post-processing applied on top of the streamed content. <code>none</code> displays
+                                content as-is.</td>
+                        </tr>
+                        <tr>
+                            <td><code>canvas.post_process.params</code></td>
+                            <td>no</td>
+                            <td>object</td>
+                            <td>Effect parameters. Only used when <code>type</code>&nbsp;=&nbsp;<code>effect</code>.
+                                See <a href="#fading-pixels">fading_pixels effect</a>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="fading-pixels">fading_pixels effect</h3>
+                <p>Currently the only available post-process effect. It adds a fade-in/fade-out animation on top of
+                    the raw pixel content.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Range</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>effect_params.smooth</code></td>
+                            <td>boolean</td>
+                            <td>&#8212;</td>
+                            <td><code>true</code> &#8212; pixels appear gradually; <code>false</code> &#8212; pixels appear
+                                instantly.</td>
+                        </tr>
+                        <tr>
+                            <td><code>effect_params.pixel_fill</code></td>
+                            <td>float</td>
+                            <td>0.0 &#8211; 1.0</td>
+                            <td>Fill area percentage. <code>1.0</code>&nbsp;=&nbsp;pixels fill 100&nbsp;% of the
+                                LED area.</td>
+                        </tr>
+                        <tr>
+                            <td><code>effect_params.fade_speed</code></td>
+                            <td>float</td>
+                            <td>0.0 &#8211; 1.0</td>
+                            <td>Brightness delta added per render cycle. Larger value = faster fade.</td>
+                        </tr>
+                        <tr>
+                            <td><code>effect_params.pixel_base</code></td>
+                            <td>float</td>
+                            <td>0.0 &#8211; 1.0</td>
+                            <td>Base (minimum) pixel brightness. <code>0.0</code>&nbsp;=&nbsp;fully off;
+                                <code>1.0</code>&nbsp;=&nbsp;full brightness.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>API response</h3>
+                <pre><code>{
+  "success": {
+    "data": {
+      "canvas": {
+        "fill_type": "scale",
+        "render_mode": "pixel"
+      },
+      "port": 9999,
+      "session_id": "a2891aa891ab4f8e8a1a16eb319b00f3",
+      "status": "receiving"
+    },
+    "path": "/api/v2/device/stream/start"
+  }
+}</code></pre>
+                <p>Save the returned <code>session_id</code> and <code>port</code> — you need both for
+                    <code>send_stream_data</code>.</p>
+
+                <h3>Example: basic pixel mode</h3>
+                <pre><code>service: lametric_hass_local.start_stream
+target:
+  entity_id: light.lametric_sky_light
+data:
+  config:
+    canvas:
+      fill_type: scale
+      render_mode: pixel
+      post_process:
+        type: none</code></pre>
+
+                <h3>Example: pixel mode with fading effect</h3>
+                <pre><code>service: lametric_hass_local.start_stream
+target:
+  entity_id: light.lametric_sky_light
+data:
+  config:
+    canvas:
+      fill_type: scale
+      render_mode: pixel
+      post_process:
+        type: effect
+        params:
+          effect_type: fading_pixels
+          effect_params:
+            smooth: true
+            pixel_fill: 1.0
+            fade_speed: 0.005
+            pixel_base: 0.05</code></pre>
+            </section>
+
+            <!-- send_stream_data -->
+            <section id="send-frames">
+                <h2>send_stream_data</h2>
+
+                <p>Sends one RGB888 frame to an active LMSP stream session. This service assembles an LMSP UDP
+                    packet from the provided pixel data and the session ID, then sends it to the device's UDP port
+                    (usually&nbsp;9999).</p>
+
+                <div class="note">
+                    <strong>No HTTP call</strong>
+                    Unlike all other services, <code>send_stream_data</code> does <strong>not</strong> call an HTTP
+                    API endpoint. It sends a raw UDP datagram directly to the device's streaming port.
+                </div>
+
+                <h3>Fields</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Required</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>session_id</code></td>
+                            <td>yes</td>
+                            <td>string</td>
+                            <td>The <code>session_id</code> returned by <code>start_stream</code>. If this value
+                                does not match the ID currently active on the device, the packet is silently
+                                discarded.</td>
+                        </tr>
+                        <tr>
+                            <td><code>rgb_data</code></td>
+                            <td>yes</td>
+                            <td>list of <code>[R, G, B]</code> triplets</td>
+                            <td>One <code>[R, G, B]</code> triplet per pixel, ordered left-to-right, top-to-bottom.
+                                Each channel value is an integer 0&#8211;255. The number of triplets must equal
+                                <code>canvas_width &#215; canvas_height</code> (from the stream status response).
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Canvas dimensions</h3>
+                <p>Query <code>GET /api/v2/device/stream</code> before starting a session to get the exact canvas
+                    size for the connected device. The integration also stores this in the Light entity's attributes
+                    once a stream is active.</p>
+                <pre><code>GET /api/v2/device/stream
+→ {
+  "canvas": {
+    "pixel":    { "size": { "width": 24, "height": 8 } },
+    "triangle": { "size": { "width": 48, "height": 16 } }
+  },
+  "port": 9999,
+  "status": "stopped"
+}</code></pre>
+
+                <h3>Example</h3>
+                <pre><code>service: lametric_hass_local.send_stream_data
+target:
+  entity_id: light.lametric_sky_light
+data:
+  session_id: "{{ session_id }}"
+  rgb_data: "[[255,0,0],[255,0,0],[0,255,0],[0,0,255],...]"</code></pre>
+
+                <div class="tip">
+                    <strong>Automation tip</strong>
+                    Store the <code>session_id</code> returned by <code>start_stream</code> in a template variable or
+                    input_text entity, then pass it to <code>send_stream_data</code> in a loop or repeat action.
+                </div>
+            </section>
+
+            <!-- stop_stream -->
+            <section id="stop-stream">
+                <h2>stop_stream</h2>
+
+                <div class="api-ref">
+                    <span class="api-method put">PUT</span>
+                    <span class="api-path">/api/v2/device/stream/stop</span>
+                    <span class="api-version">API 2.3.0+</span>
+                </div>
+
+                <p>Stops the active streaming session. The device returns to its normal app display immediately.
+                    The service takes no additional fields beyond the entity target.</p>
+
+                <pre><code>service: lametric_hass_local.stop_stream
+target:
+  entity_id: light.lametric_sky_light</code></pre>
+
+                <h3>API response</h3>
+                <pre><code>{
+  "success": {
+    "data": {
+      "status": "stopped"
+    },
+    "path": "api/v2/device/stream/stop"
+  }
+}</code></pre>
+            </section>
+
+            <!-- LMSP protocol -->
+            <section id="lmsp">
+                <h2>LMSP UDP packet format</h2>
+                <p>This section describes the low-level wire format used by the integration when sending frames.
+                    It is provided for debugging and advanced use-cases. Full reference:
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-stream.html"
+                        target="_blank" rel="noopener">LaMetric Streaming API</a>.
+                </p>
+
+                <div class="note">
+                    <strong>Byte order</strong>
+                    All multi-byte integer fields use <strong>little-endian</strong> byte order.
+                </div>
+
+                <h3>Packet header (28 bytes fixed)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Offset</th>
+                            <th>Size (bytes)</th>
+                            <th>Field</th>
+                            <th>Value / Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>0</td>
+                            <td>4</td>
+                            <td>Protocol name</td>
+                            <td>ASCII <code>lmsp</code> = <code>0x6c 0x6d 0x73 0x70</code></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>2</td>
+                            <td>Version</td>
+                            <td><code>0x01 0x00</code> (version&nbsp;1, little-endian)</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>16</td>
+                            <td>Session ID</td>
+                            <td>UUID bytes from <code>start_stream</code> response (no dashes, raw 16&nbsp;bytes).
+                                Packets with a mismatched session ID are silently discarded by the device.</td>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td>1</td>
+                            <td>Content encoding</td>
+                            <td><code>0x00</code>&nbsp;=&nbsp;RAW, <code>0x01</code>&nbsp;=&nbsp;PNG,
+                                <code>0x02</code>&nbsp;=&nbsp;JPEG, <code>0x03</code>&nbsp;=&nbsp;GIF.
+                                The integration always uses <code>0x00</code> (RAW RGB888).</td>
+                        </tr>
+                        <tr>
+                            <td>23</td>
+                            <td>1</td>
+                            <td>Reserved</td>
+                            <td><code>0x00</code></td>
+                        </tr>
+                        <tr>
+                            <td>24</td>
+                            <td>1</td>
+                            <td>Canvas area count</td>
+                            <td>Number of canvas areas in this packet. The integration always sends
+                                <code>0x01</code> (one area per packet).</td>
+                        </tr>
+                        <tr>
+                            <td>25</td>
+                            <td>1</td>
+                            <td>Reserved</td>
+                            <td><code>0x00</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Canvas area descriptor (8 bytes per area)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Offset</th>
+                            <th>Size (bytes)</th>
+                            <th>Field</th>
+                            <th>Value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>26</td>
+                            <td>2</td>
+                            <td>X offset</td>
+                            <td>0&#8211;canvas_width; usually <code>0x00 0x00</code></td>
+                        </tr>
+                        <tr>
+                            <td>28</td>
+                            <td>2</td>
+                            <td>Y offset</td>
+                            <td>0&#8211;canvas_height; usually <code>0x00 0x00</code></td>
+                        </tr>
+                        <tr>
+                            <td>30</td>
+                            <td>2</td>
+                            <td>Width</td>
+                            <td>Canvas width in pixels (e.g. <code>0x18 0x00</code> for 24)</td>
+                        </tr>
+                        <tr>
+                            <td>32</td>
+                            <td>2</td>
+                            <td>Height</td>
+                            <td>Canvas height in pixels (e.g. <code>0x08 0x00</code> for 8)</td>
+                        </tr>
+                        <tr>
+                            <td>34</td>
+                            <td>2</td>
+                            <td>Data length</td>
+                            <td><code>width &#215; height &#215; 3</code> bytes (RGB888). For a 24&#215;8 canvas:
+                                576&nbsp;bytes = <code>0x40 0x02</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Pixel data</h3>
+                <p>Immediately after the area descriptor: <code>width &#215; height</code> RGB888 triplets,
+                    ordered left-to-right, top-to-bottom. Each triplet is three bytes: R, G, B.</p>
+
+                <h3>Total packet size</h3>
+                <p>26 (header) + 10 (area descriptor) + <code>width &#215; height &#215; 3</code> (pixel data)</p>
+                <p>For a 24&#215;8 pixel canvas: 26 + 10 + 576 = <strong>612 bytes</strong></p>
+
+                <h3>Annotated example (24&#215;8, all red)</h3>
+                <pre><code>6c 6d 73 70       // "lmsp"
+01 00             // version 1
+a2 89 1a a8 91 ab 4f 8e
+8a 1a 16 eb 31 9b 00 f3  // session_id (16 bytes)
+00                // RAW encoding
+00                // reserved
+01                // 1 canvas area
+00                // reserved
+00 00             // x = 0
+00 00             // y = 0
+18 00             // width = 24
+08 00             // height = 8
+40 02             // data length = 576
+ff 00 00  ff 00 00  ff 00 00  ...  // 192 red pixels (24*8)</code></pre>
+
+                <p>Full LMSP reference:
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-stream.html"
+                        target="_blank" rel="noopener">LaMetric Streaming API</a>.
+                </p>
+            </section>
+
+        </main>
+    </div>
+</body>
+
+</html>

@@ -4,282 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>lametric-hass-local</title>
-    <style>
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            --bg: #0f1117;
-            --surface: #1a1d27;
-            --border: #2a2d3a;
-            --accent: #4f8ef7;
-            --accent-dim: #2a4a8a;
-            --text: #e2e4ed;
-            --muted: #7a7f99;
-            --code-bg: #13151f;
-            --radius: 8px;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.65;
-            font-size: 15px;
-        }
-
-        a {
-            color: var(--accent);
-            text-decoration: none;
-        }
-
-        a:hover {
-            text-decoration: underline;
-        }
-
-        /* ── Layout ── */
-        .layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        nav {
-            width: 240px;
-            flex-shrink: 0;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            padding: 2rem 1.25rem;
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            overflow-y: auto;
-        }
-
-        nav .logo {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--text);
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            margin-bottom: 2rem;
-        }
-
-        nav .logo span {
-            color: var(--accent);
-        }
-
-        nav ul {
-            list-style: none;
-        }
-
-        nav ul li {
-            margin-bottom: 0.1rem;
-        }
-
-        nav ul li a {
-            display: block;
-            padding: 0.35rem 0.6rem;
-            border-radius: 5px;
-            color: var(--muted);
-            font-size: 0.875rem;
-            transition: background 0.15s, color 0.15s;
-        }
-
-        nav ul li a:hover,
-        nav ul li a.active {
-            background: var(--accent-dim);
-            color: var(--text);
-            text-decoration: none;
-        }
-
-        nav .section-label {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: var(--muted);
-            padding: 1rem 0.6rem 0.3rem;
-        }
-
-        main {
-            flex: 1;
-            padding: 3rem 4rem;
-            max-width: 860px;
-        }
-
-        /* ── Hero ── */
-        .hero {
-            margin-bottom: 3.5rem;
-        }
-
-        .hero h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero h1 span {
-            color: var(--accent);
-        }
-
-        .hero p {
-            color: var(--muted);
-            max-width: 560px;
-        }
-
-        .badges {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            background: var(--accent-dim);
-            color: var(--accent);
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-        }
-
-        /* ── Sections ── */
-        section {
-            margin-bottom: 3.5rem;
-        }
-
-        h2 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
-
-        h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin: 1.75rem 0 0.75rem;
-            color: var(--text);
-        }
-
-        p {
-            margin-bottom: 0.75rem;
-            color: var(--text);
-        }
-
-        code {
-            font-family: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
-            font-size: 0.85em;
-            background: var(--code-bg);
-            padding: 0.1em 0.35em;
-            border-radius: 4px;
-            color: #c9d1d9;
-        }
-
-        pre {
-            background: var(--code-bg);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.1rem 1.25rem;
-            overflow-x: auto;
-            margin: 0.75rem 0 1.25rem;
-            font-size: 0.83rem;
-            line-height: 1.6;
-        }
-
-        pre code {
-            background: none;
-            padding: 0;
-            font-size: inherit;
-            color: #c9d1d9;
-        }
-
-        ul,
-        ol {
-            margin: 0.5rem 0 1rem 1.25rem;
-        }
-
-        li {
-            margin-bottom: 0.25rem;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem 1.1rem;
-        }
-
-        .card h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.35rem;
-        }
-
-        .card p {
-            font-size: 0.8rem;
-            color: var(--muted);
-            margin: 0;
-        }
-
-        .note {
-            background: var(--surface);
-            border-left: 3px solid var(--accent);
-            padding: 0.75rem 1rem;
-            border-radius: 0 var(--radius) var(--radius) 0;
-            font-size: 0.875rem;
-            color: var(--muted);
-            margin: 1rem 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
-        }
-
-        th,
-        td {
-            text-align: left;
-            padding: 0.5rem 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        th {
-            color: var(--muted);
-            font-weight: 600;
-        }
-
-        @media (max-width: 768px) {
-            nav {
-                display: none;
-            }
-
-            main {
-                padding: 2rem 1.25rem;
-            }
-        }
-    </style>
+    <title>lametric-hass-local — Overview</title>
+    <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
@@ -287,42 +13,41 @@
 
         <!-- ── Sidebar ── -->
         <nav>
-            <div class="logo"><span>lametric</span>-hass-local</div>
+            <a class="logo" href="index.html"><span>lametric</span>-hass-local</a>
             <ul>
-                <li><a href="#overview">Overview</a></li>
-                <li><a href="#installation">Installation</a></li>
-                <li><a href="#configuration">Configuration</a></li>
-                <li><a href="#configuration" style="padding-left:1.4rem">Manual</a></li>
-                <li><a href="#configuration" style="padding-left:1.4rem">Cloud OAuth</a></li>
-            </ul>
-
-            <div class="section-label">Services</div>
-            <ul>
-                <li><a href="#show-message">show_message</a></li>
-                <li><a href="#show-chart">show_chart</a></li>
-            </ul>
-
-            <div class="section-label">Entity Services</div>
-            <ul>
-                <li><a href="#screensaver">set_screensaver</a></li>
-                <li><a href="#scenes">activate_action</a></li>
-                <li><a href="#start-stream">start_stream (SKY)</a></li>
-                <li><a href="#send-frames">send_stream_data (SKY)</a></li>
-            </ul>
-
-            <div class="section-label">Streaming (SKY)</div>
-            <ul>
-                <li><a href="#streaming">Overview</a></li>
+                <li><a href="index.html" class="page-active">Overview</a></li>
+                <li><a href="index.html#installation" style="padding-left:1.4rem">Installation</a></li>
+                <li><a href="index.html#configuration" style="padding-left:1.4rem">Configuration</a></li>
+                <li><a href="index.html#discovery" style="padding-left:1.4rem">Discovery</a></li>
             </ul>
 
             <div class="section-label">Entities</div>
             <ul>
-                <li><a href="#entities">All Entities</a></li>
+                <li><a href="entities.html">All Entities</a></li>
             </ul>
 
-            <div class="section-label">Reference</div>
+            <div class="section-label">Services</div>
             <ul>
-                <li><a href="#contributing">Contributing</a></li>
+                <li><a href="services.html">show_message</a></li>
+                <li><a href="services.html#show-chart">show_chart</a></li>
+            </ul>
+
+            <div class="section-label">Entity Services</div>
+            <ul>
+                <li><a href="entity-services.html">set_screensaver</a></li>
+                <li><a href="entity-services.html#activate-action">activate_action</a></li>
+            </ul>
+
+            <div class="section-label">Streaming (SKY)</div>
+            <ul>
+                <li><a href="streaming.html">Overview &amp; LMSP</a></li>
+            </ul>
+
+            <div class="section-label">Project</div>
+            <ul>
+                <li><a href="contributing.html">Contributing</a></li>
+                <li><a href="code-of-conduct.html">Code of Conduct</a></li>
+                <li><a href="security.html">Security</a></li>
             </ul>
         </nav>
 
@@ -332,36 +57,50 @@
             <!-- Hero -->
             <div class="hero" id="overview">
                 <h1><span>lametric</span>-hass-local</h1>
-                <p>Local Home Assistant integration for LaMetric devices using the device API
-                    (<code>lametric-py</code>) with Zeroconf / SSDP / DHCP discovery and a config flow.</p>
+                <p>A local Home Assistant integration for LaMetric devices. It polls the device directly over the LAN
+                    using the LaMetric Device API v2 (via <code>lametric-py</code>) and supports automatic
+                    discovery via Zeroconf, SSDP, and DHCP.</p>
                 <div class="badges">
                     <span class="badge">Home Assistant</span>
                     <span class="badge">HACS</span>
-                    <span class="badge">local polling</span>
+                    <span class="badge">local_polling</span>
                     <span class="badge">MIT</span>
+                    <span class="badge">API v2.3.0</span>
                 </div>
             </div>
 
-            <!-- Features -->
+            <!-- Feature overview -->
             <section>
                 <div class="card-grid">
                     <div class="card">
-                        <h4>Entities</h4>
-                        <p>Button, Light (SKY), Number, Scene, Select, Sensor, Switch, Text, and Update.</p>
+                        <h4>9 Entity Platforms</h4>
+                        <p>Button, Light (SKY), Number, Scene, Select, Sensor, Switch, Text, and Update — each backed
+                            by a specific Device API endpoint.</p>
                     </div>
                     <div class="card">
                         <h4>Services</h4>
-                        <p><code>show_message</code>, <code>show_chart</code>, and pixel streaming (SKY). Screensaver
-                            control via entity service.</p>
-                        </p>
+                        <p><code>show_message</code> and <code>show_chart</code> send notifications directly to
+                            <code>POST /api/v2/device/notifications</code>.</p>
                     </div>
                     <div class="card">
-                        <h4>Discovery</h4>
-                        <p>Automatic device detection via Zeroconf, SSDP, and DHCP.</p>
+                        <h4>Entity Services</h4>
+                        <p>Screensaver control (<code>set_screensaver</code>) and widget action dispatch
+                            (<code>activate_action</code>).</p>
                     </div>
                     <div class="card">
-                        <h4>Config Flow</h4>
-                        <p>Manual entry (IP + API key) or cloud-assisted OAuth setup.</p>
+                        <h4>Pixel Streaming</h4>
+                        <p>Push raw RGB888 frames over UDP via the LaMetric Streaming Protocol (LMSP) — SKY devices
+                            only.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Auto-Discovery</h4>
+                        <p>Devices are found automatically via Zeroconf (<code>_lametric-api._tcp.local.</code>),
+                            SSDP, and DHCP hostname matching.</p>
+                    </div>
+                    <div class="card">
+                        <h4>Cloud-Assisted Setup</h4>
+                        <p>Optional OAuth 2.0 flow retrieves the device IP and API key. After setup, all
+                            communication is local only.</p>
                     </div>
                 </div>
             </section>
@@ -369,487 +108,152 @@
             <!-- Installation -->
             <section id="installation">
                 <h2>Installation</h2>
-                <p>The recommended way is to install via <a href="https://hacs.xyz">HACS</a>:</p>
-                <ol>
-                    <li>Open HACS in Home Assistant and go to <strong>Integrations</strong>.</li>
-                    <li>Click the three-dot menu → <strong>Custom repositories</strong>.</li>
+
+                <h3>Via HACS (recommended)</h3>
+                <ol class="steps">
+                    <li>Open <strong>HACS</strong> in Home Assistant and navigate to <strong>Integrations</strong>.</li>
+                    <li>Click the three-dot menu &#8594; <strong>Custom repositories</strong>.</li>
                     <li>Add <code>ElectroAttacks/lametric-hass-local</code> with category <em>Integration</em>.</li>
-                    <li>Search for <strong>LaMetric Local</strong> and install it.</li>
+                    <li>Search for <strong>LaMetric Local</strong> and click <strong>Download</strong>.</li>
                     <li>Restart Home Assistant.</li>
                 </ol>
-                <p>Alternatively, copy <code>custom_components/lametric_hass_local/</code> manually into your HA
-                    <code>custom_components/</code> folder and restart.
-                </p>
+
+                <h3>Manual installation</h3>
+                <p>Copy the <code>custom_components/lametric_hass_local/</code> folder into your Home Assistant
+                    <code>custom_components/</code> directory and restart. The folder name must be exactly
+                    <code>lametric_hass_local</code>.</p>
+
+                <div class="note">
+                    <strong>Requirement</strong>
+                    Home Assistant 2024.1 or later. The Python library <code>lametric-py &ge; 1.3.5</code> is
+                    installed automatically as a dependency.
+                </div>
             </section>
 
             <!-- Configuration -->
             <section id="configuration">
                 <h2>Configuration</h2>
-                <p>Go to <strong>Settings → Devices &amp; Services → Add Integration</strong> and search for
-                    <strong>LaMetric Local</strong>.
-                </p>
+                <p>Go to <strong>Settings &#8594; Devices &amp; Services &#8594; Add Integration</strong> and search for
+                    <strong>LaMetric Local</strong>. Two setup paths are available.</p>
 
-                <h3>Option 1 — Manual setup</h3>
-                <p>Enter the device IP address and the API key. You can find the API key in the LaMetric app under
-                    <em>Settings → Wi-Fi</em> and <em>Settings → Developer → API Key</em>.
-                </p>
+                <h3>Option 1 &#8212; Manual (IP + API key)</h3>
+                <p>Enter the device's IP address and API key directly. The API key is available in the LaMetric
+                    mobile app under <em>Device &#8594; Settings &#8594; Wi-Fi</em>, or in the developer portal at
+                    <a href="https://developer.lametric.com/user/devices" target="_blank"
+                        rel="noopener">developer.lametric.com/user/devices</a>.</p>
 
-                <h3>Option 2 — Cloud-assisted OAuth (recommended)</h3>
+                <div class="note">
+                    <strong>Authentication</strong>
+                    The Device API uses HTTP Basic Auth with username <code>dev</code> and the API key as the
+                    password. All requests target <code>https://&lt;device-ip&gt;:4343/api/v2/</code> (HTTPS, port
+                    4343, self-signed certificate &#8212; TLS verification is bypassed in lametric-py).
+                    See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-authorization.html"
+                        target="_blank" rel="noopener">LaMetric Authorization docs</a>.
+                </div>
+
+                <h3>Option 2 &#8212; Cloud-assisted OAuth 2.0 (recommended)</h3>
                 <p>The integration can retrieve your device IP and API key automatically via the LaMetric Cloud OAuth
-                    2.0 flow. The device is still controlled <strong>locally</strong> after setup — the cloud is only
-                    used once to discover credentials.</p>
+                    2.0 flow. The cloud is used <strong>only once</strong> during initial setup &#8212; all subsequent
+                    communication is purely local.</p>
 
-                <ol>
-                    <li>Sign in at <a href="https://developer.lametric.com">developer.lametric.com</a> and press
-                        <strong>Create new app</strong>. Choose type <em>Notification Source</em> (or <em>Personal</em>
-                        is sufficient for private use).
+                <ol class="steps">
+                    <li>
+                        Sign in at <a href="https://developer.lametric.com" target="_blank"
+                            rel="noopener">developer.lametric.com</a> and click <strong>Create new app</strong>.
+                        Choose type <em>Notification Source</em> (or <em>Personal</em> for private use).
                     </li>
-                    <li>Set the <strong>OAuth2 Redirect URI</strong> to your Home Assistant callback URL:<br>
-                        <code>https://&lt;your-ha-url&gt;/auth/external/callback</code>
+                    <li>
+                        Set the <strong>OAuth2 Redirect URI</strong> to your Home Assistant external callback URL:
+                        <pre><code>https://&lt;your-ha-url&gt;/auth/external/callback</code></pre>
                     </li>
-                    <li>Copy the <strong>Client ID</strong> and <strong>Client Secret</strong> from the app settings.
+                    <li>
+                        Copy the <strong>Client ID</strong> and <strong>Client Secret</strong> from the app settings
+                        page.
                     </li>
-                    <li>In Home Assistant go to <strong>Settings → Devices &amp; Services → Application
+                    <li>
+                        In Home Assistant go to <strong>Settings &#8594; Devices &amp; Services &#8594; Application
                             Credentials</strong>, click <strong>Add Application Credential</strong>, select
-                        <strong>LaMetric Local</strong>, and paste the Client ID and Client Secret.
+                        <strong>LaMetric Local</strong>, and paste both values.
                     </li>
-                    <li>Start the integration setup and choose <strong>Import from LaMetric Cloud</strong>. You will be
-                        redirected to the LaMetric authorization URL:<br>
-                        <code>https://developer.lametric.com/api/v2/oauth2/authorize?client_id=…&amp;redirect_uri=…&amp;response_type=code&amp;scope=basic+devices_read</code>
+                    <li>
+                        Start the integration setup and choose <strong>Import from LaMetric Cloud</strong>. Home
+                        Assistant redirects you to:
+                        <pre><code>https://developer.lametric.com/api/v2/oauth2/authorize
+  ?client_id=&lt;your-client-id&gt;
+  &amp;redirect_uri=https://&lt;your-ha-url&gt;/auth/external/callback
+  &amp;response_type=code
+  &amp;scope=basic+devices_read</code></pre>
                     </li>
-                    <li>After granting access, LaMetric redirects back to Home Assistant with an authorization code.
-                        The integration exchanges it for an access token at:<br>
-                        <code>https://developer.lametric.com/api/v2/oauth2/token</code>
+                    <li>
+                        Grant access. LaMetric redirects back with an authorization code. The integration exchanges
+                        it for an access token:
+                        <pre><code>POST https://developer.lametric.com/api/v2/oauth2/token</code></pre>
                     </li>
-                    <li>The integration uses the token to list your devices and automatically fills in the device IP
-                        and API key. From this point on no cloud connection is needed.</li>
+                    <li>
+                        The integration fetches your device list from the Cloud API and automatically fills in the
+                        device IP and API key. No further cloud access is required.
+                    </li>
                 </ol>
 
                 <div class="note">
-                    The scopes requested are <code>basic</code> and <code>devices_read</code>. Credentials belong to
-                    your own developer account and are never shared. HACS custom integrations cannot ship bundled OAuth
-                    credentials.
-                </div>
-
-                <h3>Discovery</h3>
-                <p>Discovery via Zeroconf, SSDP, or DHCP will pre-fill the device IP automatically. You only need to
-                    confirm and enter the API key (or proceed with OAuth).</p>
-            </section>
-
-            <!-- show_message -->
-            <section id="show-message">
-                <h2>Service: show_message</h2>
-                <p>Sends a text notification with an optional icon and sound to a LaMetric device.</p>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>device_id</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>Target LaMetric device</td>
-                        </tr>
-                        <tr>
-                            <td><code>message</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>Text to display</td>
-                        </tr>
-                        <tr>
-                            <td><code>icon</code></td>
-                            <td>no</td>
-                            <td>—</td>
-                            <td>Icon ID from <a
-                                    href="https://developer.lametric.com/icons">developer.lametric.com/icons</a></td>
-                        </tr>
-                        <tr>
-                            <td><code>sound</code></td>
-                            <td>no</td>
-                            <td>—</td>
-                            <td>Sound ID (e.g. <code>positive1</code>, <code>alarm3</code>)</td>
-                        </tr>
-                        <tr>
-                            <td><code>cycles</code></td>
-                            <td>no</td>
-                            <td><code>1</code></td>
-                            <td>How many times to repeat the notification (0 = infinite)</td>
-                        </tr>
-                        <tr>
-                            <td><code>icon_type</code></td>
-                            <td>no</td>
-                            <td><code>none</code></td>
-                            <td><code>none</code> / <code>info</code> / <code>alert</code></td>
-                        </tr>
-                        <tr>
-                            <td><code>priority</code></td>
-                            <td>no</td>
-                            <td><code>info</code></td>
-                            <td><code>info</code> / <code>warning</code> / <code>critical</code></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <pre><code>service: lametric_hass_local.show_message
-data:
-  device_id: "your-device-id"
-  message: "Deploy finished"
-  icon: "a7956"
-  sound: "positive1"
-  cycles: 1
-  priority: info</code></pre>
-
-                <p>You can also use the legacy <code>notify.lametric_*</code> platform service with the same optional
-                    fields passed under <code>data:</code>.</p>
-            </section>
-
-            <!-- show_chart -->
-            <section id="show-chart">
-                <h2>Service: show_chart</h2>
-                <p>Sends a spike chart notification built from a list of numeric values.</p>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>device_id</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>Target LaMetric device</td>
-                        </tr>
-                        <tr>
-                            <td><code>data</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>List of numbers to plot, e.g. <code>[1,2,3,4,5,4,3,2,1]</code></td>
-                        </tr>
-                        <tr>
-                            <td><code>sound</code></td>
-                            <td>no</td>
-                            <td>—</td>
-                            <td>Sound ID</td>
-                        </tr>
-                        <tr>
-                            <td><code>cycles</code></td>
-                            <td>no</td>
-                            <td><code>1</code></td>
-                            <td>Repeat count</td>
-                        </tr>
-                        <tr>
-                            <td><code>icon_type</code></td>
-                            <td>no</td>
-                            <td><code>none</code></td>
-                            <td><code>none</code> / <code>info</code> / <code>alert</code></td>
-                        </tr>
-                        <tr>
-                            <td><code>priority</code></td>
-                            <td>no</td>
-                            <td><code>info</code></td>
-                            <td><code>info</code> / <code>warning</code> / <code>critical</code></td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <pre><code>service: lametric_hass_local.show_chart
-data:
-  device_id: "your-device-id"
-  data: [1, 3, 5, 7, 5, 3, 1]
-  sound: "statistic"</code></pre>
-            </section>
-
-            <!-- set_screensaver -->
-            <section id="screensaver">
-                <h2>Entity Service: set_screensaver</h2>
-                <p>Enables or disables the screensaver and optionally configures its mode. This is an <strong>entity
-                        service</strong> — target the <code>brightness_mode</code> select entity of the device.</p>
-
-                <div class="note">
-                    <code>mode_params</code> is only evaluated when <code>mode</code> is set to <code>time_based</code>.
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>enabled</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>Turn screensaver on or off</td>
-                        </tr>
-                        <tr>
-                            <td><code>mode</code></td>
-                            <td>no</td>
-                            <td><code>when_dark</code></td>
-                            <td><code>when_dark</code> / <code>time_based</code></td>
-                        </tr>
-                        <tr>
-                            <td><code>mode_params</code></td>
-                            <td>no</td>
-                            <td>—</td>
-                            <td>Only used with <code>time_based</code>: <code>enabled</code>, <code>start_time</code>,
-                                <code>end_time</code>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <pre><code>service: lametric_hass_local.set_screensaver
-target:
-  entity_id: select.lametric_brightness_mode
-data:
-  enabled: true
-  mode: time_based
-  mode_params:
-    enabled: true
-    start_time: "2000-01-01T22:00:00"
-    end_time: "2000-01-01T08:00:00"</code></pre>
-            </section>
-
-            <!-- Streaming Overview -->
-            <section id="streaming">
-                <h2>Pixel Streaming (SKY)</h2>
-                <p>LaMetric SKY supports the LaMetric Streaming Protocol (LMSP) for pushing raw RGB888 frames over
-                    UDP. The flow is:</p>
-                <ol>
-                    <li>Start a stream — <code>start_stream</code> — returns a <code>session_id</code>.</li>
-                    <li>Send frames in a loop — <code>send_stream_data</code>.</li>
-                    <li>Stop the stream — <code>stop_stream</code>.</li>
-                </ol>
-                <div class="note">
-                    Pixel streaming is only available on LaMetric SKY devices. The service calls will return an error
-                    on other models.
+                    <strong>Scopes</strong>
+                    <code>basic</code> and <code>devices_read</code> &#8212; read-only cloud scopes. Credentials belong
+                    to your own developer account and are never stored server-side or shared. HACS custom integrations
+                    cannot ship bundled OAuth credentials &#8212; you must register your own app in the developer
+                    portal. See the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/cloud-authorization.html"
+                        target="_blank" rel="noopener">LaMetric Cloud OAuth2 docs</a>.
                 </div>
             </section>
 
-            <!-- start_stream -->
-            <section id="start-stream">
-                <h2>Entity Service: start_stream</h2>
-                <p>Starts an LMSP stream session on the SKY light entity. Returns a <code>session_id</code> that must be
-                    passed to
-                    <code>send_stream_data</code>.
-                </p>
-
-                <pre><code>service: lametric_hass_local.start_stream
-target:
-  entity_id: light.lametric_sky_light
-data:
-  config:
-    canvas:
-      fill_type: scale        # scale | tile
-      render_mode: pixel      # pixel | triangle
-      post_process:
-        type: none            # none | effect</code></pre>
-
-                <h3>With fading pixels effect</h3>
-                <pre><code>service: lametric_hass_local.start_stream
-target:
-  entity_id: light.lametric_sky_light
-data:
-  config:
-    canvas:
-      fill_type: scale
-      render_mode: pixel
-      post_process:
-        type: effect
-        params:
-          effect_type: fading_pixels
-          effect_params:
-            smooth: true
-            pixel_fill: 1.0
-            fade_speed: 0.005
-            pixel_base: 0.05</code></pre>
-            </section>
-
-            <!-- send_stream_data -->
-            <section id="send-frames">
-                <h2>Entity Service: send_stream_data</h2>
-                <p>Sends one RGB888 frame to an active LMSP stream session.</p>
+            <!-- Discovery -->
+            <section id="discovery">
+                <h2>Discovery</h2>
+                <p>Three discovery handlers detect LaMetric devices on the local network automatically. When a device
+                    is found, the config flow pre-fills the IP address and only asks for the API key (or offers the
+                    OAuth path).</p>
 
                 <table>
                     <thead>
                         <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Description</th>
+                            <th>Protocol</th>
+                            <th>Match criteria</th>
+                            <th>Notes</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>session_id</code></td>
-                            <td>yes</td>
-                            <td>Session ID returned by <code>start_stream</code></td>
+                            <td><strong>Zeroconf</strong></td>
+                            <td>Service type <code>_lametric-api._tcp.local.</code></td>
+                            <td>Primary method; most reliable on most networks.</td>
                         </tr>
                         <tr>
-                            <td><code>rgb_data</code></td>
-                            <td>yes</td>
-                            <td>List of <code>[R, G, B]</code> triplets, one per pixel, left-to-right top-to-bottom</td>
+                            <td><strong>SSDP</strong></td>
+                            <td>UPnP device type <code>urn:schemas-upnp-org:device:LaMetric:1</code></td>
+                            <td>Fallback when multicast DNS is blocked.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DHCP</strong></td>
+                            <td>Hostname prefix <code>lametric-*</code> or registered MAC</td>
+                            <td>Last resort; relies on hostname propagation from the DHCP server.</td>
                         </tr>
                     </tbody>
                 </table>
 
-                <pre><code>service: lametric_hass_local.send_stream_data
-target:
-  entity_id: light.lametric_sky_light
-data:
-  session_id: "{{ session_id }}"
-  rgb_data: "[[255,0,0],[255,0,0],[0,255,0],...]"</code></pre>
+                <p>Each discovered device is registered as a separate config entry, so multiple LaMetric devices on
+                    the same network are fully supported.</p>
 
-                <p>Use <code>stop_stream</code> to end the session:</p>
-                <pre><code>service: lametric_hass_local.stop_stream
-target:
-  entity_id: light.lametric_sky_light</code></pre>
-            </section>
-
-            <!-- Scenes -->
-            <section id="scenes">
-                <h2>Scenes</h2>
-                <p>Each installed LaMetric app widget is exposed as a Home Assistant scene entity. Activating a scene
-                    brings the corresponding widget to the foreground. The <code>is_active</code> attribute reflects
-                    whether the widget is currently visible on the device.</p>
-
-                <h3>Entity Service: activate_action</h3>
-                <p>To trigger a specific widget action, use the <code>activate_action</code> entity service instead of
-                    <code>scene.turn_on</code>:
-                </p>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Required</th>
-                            <th>Default</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>action_id</code></td>
-                            <td>yes</td>
-                            <td>—</td>
-                            <td>ID of the widget action to trigger</td>
-                        </tr>
-                        <tr>
-                            <td><code>action_parameters</code></td>
-                            <td>no</td>
-                            <td>—</td>
-                            <td>Key/value map of parameters required by the action</td>
-                        </tr>
-                        <tr>
-                            <td><code>visible</code></td>
-                            <td>no</td>
-                            <td><code>true</code></td>
-                            <td>Bring the widget to the foreground after triggering</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <pre><code>service: lametric_hass_local.activate_action
-target:
-  entity_id: scene.lametric_weather
-data:
-  action_id: "forecast"
-  action_parameters:
-    location: "Berlin"
-  visible: true</code></pre>
-
-                <div class="note">
-                    Calling <code>scene.turn_on</code> activates the widget without triggering any action.
+                <div class="tip">
+                    <strong>Tip</strong>
+                    If automatic discovery does not work, assign a static IP in your router and use the manual setup
+                    path. Open the LaMetric app at least once after connecting to Wi-Fi &#8212; this triggers the device
+                    to announce itself on the local network.
                 </div>
-            </section>
 
-            <!-- Entities -->
-            <section id="entities">
-                <h2>All Entities</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Platform</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Button</strong></td>
-                            <td>Navigate to the next or previous app, dismiss the current notification, or dismiss all
-                                notifications</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Light</strong></td>
-                            <td>Controls the SKY display brightness and on/off state (SKY only)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Number</strong></td>
-                            <td>Sets display brightness (non-SKY, %) and audio volume (%); ranges are reported by the
-                                device</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Scene</strong></td>
-                            <td>One entity per installed app widget — activates the widget</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Select</strong></td>
-                            <td>Controls the brightness mode (<code>auto</code> / <code>manual</code>) of the display
-                                (non-SKY)</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Sensor</strong></td>
-                            <td>Wi-Fi signal strength (%) — diagnostic, disabled by default</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Switch</strong></td>
-                            <td>Toggles display on/off and Bluetooth on/off</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Text</strong></td>
-                            <td>Sets the Bluetooth display name of the device</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Update</strong></td>
-                            <td>Tracks installed and latest firmware version; available on OS 2.3.0 and later</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <!-- Contributing -->
-            <section id="contributing">
-                <h2>Contributing</h2>
-                <p>See <a
-                        href="https://github.com/ElectroAttacks/lametric-hass-local/blob/main/.github/CONTRIBUTING.md">CONTRIBUTING.md</a>
-                    for guidelines on pull requests, code style, and tests.</p>
-
-                <h3>Run the test suite</h3>
-                <pre><code>uv sync --dev
-uv run pytest</code></pre>
-
-                <h3>Lint and type-check</h3>
-                <pre><code>uv run ruff check .
-uv run ruff format .
-uv run mypy .</code></pre>
-
-                <p>If this integration is useful to you, consider
-                    <a href="https://github.com/sponsors/ElectroAttacks">sponsoring the project</a>. ❤️
+                <p>For the full discovery mechanism, see the
+                    <a href="https://lametric-documentation.readthedocs.io/en/latest/reference-docs/device-discovery.html"
+                        target="_blank" rel="noopener">LaMetric Device Discovery</a> reference.
                 </p>
             </section>
 
