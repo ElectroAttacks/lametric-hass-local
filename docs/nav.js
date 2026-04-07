@@ -1,7 +1,6 @@
 (function () {
     "use strict";
 
-    // ── Active section tracking via IntersectionObserver ──────────────────
     const sections = Array.from(document.querySelectorAll("main [id]"));
     const navLinks = Array.from(document.querySelectorAll("nav a[href]"));
 
@@ -10,10 +9,6 @@
     const currentFile =
         window.location.pathname.split("/").pop() || "index.html";
 
-    /**
-     * Given a section id, mark the matching nav link as active and clear
-     * the active class from all other links.
-     */
     function setActive(id) {
         navLinks.forEach(function (link) {
             const href = link.getAttribute("href");
@@ -23,33 +18,32 @@
         });
     }
 
-    // IntersectionObserver fires when a section crosses the upper 30 % of
-    // the viewport. rootMargin pushes the detection line down so the label
-    // changes only once the heading is clearly visible.
-    const observer = new IntersectionObserver(
-        function (entries) {
-            // Find the topmost section that is currently intersecting.
-            const visible = entries
-                .filter(function (e) {
-                    return e.isIntersecting;
-                })
-                .sort(function (a, b) {
-                    return (
-                        a.boundingClientRect.top - b.boundingClientRect.top
-                    );
-                });
-
-            if (visible.length) {
-                setActive(visible[0].target.id);
-            }
-        },
-        {
-            rootMargin: "-80px 0px -60% 0px",
-            threshold: 0,
+    function updateActive() {
+        // At the bottom of the page always activate the last section,
+        // because short final sections may never cross the scroll threshold.
+        if (
+            window.scrollY + window.innerHeight >=
+            document.documentElement.scrollHeight - 20
+        ) {
+            setActive(sections[sections.length - 1].id);
+            return;
         }
-    );
 
-    sections.forEach(function (s) {
-        observer.observe(s);
-    });
+        // The active section is the last one whose top edge is above 40 % of
+        // the viewport (i.e. it is already well into view from the top).
+        const threshold = window.innerHeight * 0.4;
+        let current = null;
+        for (var i = 0; i < sections.length; i++) {
+            if (sections[i].getBoundingClientRect().top <= threshold) {
+                current = sections[i];
+            }
+        }
+
+        if (current) {
+            setActive(current.id);
+        }
+    }
+
+    window.addEventListener("scroll", updateActive, { passive: true });
+    updateActive();
 })();
