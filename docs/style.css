@@ -152,10 +152,15 @@ nav .section-label-link > a:hover {
 }
 
 nav .section-label-active.section-label-link > a {
+    background: var(--accent-dim);
     color: var(--accent);
+    font-weight: 600;
+    border-left: 2px solid var(--accent);
+    padding-left: calc(0.6rem - 2px);
 }
 
 nav .section-label-active.section-label-link > a:hover {
+    background: var(--accent-dim);
     color: var(--accent);
 }
 
