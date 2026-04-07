@@ -109,8 +109,8 @@ nav ul li a:hover {
 
 /* in-page section currently in view */
 nav ul li a.active {
-    background: rgba(79, 142, 247, 0.18);
-    color: var(--text);
+    color: var(--accent);
+    box-shadow: inset 2px 0 0 rgba(79, 142, 247, 0.5);
 }
 
 /* current page */
