@@ -219,3 +219,35 @@ def test_send_stream_data_raises_on_api_error(coordinator: MagicMock) -> None:
 
     with pytest.raises(HomeAssistantError):
         asyncio.run(entity._async_send_stream_data("sess-1", bytes([0, 0, 0])))
+
+
+# ── extra_state_attributes ────────────────────────────────────────────────────
+
+
+def test_extra_state_attributes_returns_empty_when_stream_state_none(
+    coordinator: MagicMock,
+) -> None:
+    """extra_state_attributes is empty when coordinator.stream_state is None."""
+    coordinator.stream_state = None
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+    assert entity.extra_state_attributes == {}
+
+
+def test_extra_state_attributes_returns_stream_data_when_stream_state_present(
+    coordinator: MagicMock,
+) -> None:
+    """extra_state_attributes includes stream status and canvas dimensions."""
+    stream = MagicMock()
+    stream.status = "receiving"
+    stream.canvas.pixel.size.height = 8
+    stream.canvas.pixel.size.width = 24
+    stream.canvas.triangle.size.height = 16
+    stream.canvas.triangle.size.width = 48
+    coordinator.stream_state = stream
+
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+    attrs = entity.extra_state_attributes
+
+    assert attrs["stream_status"] == "receiving"
+    assert attrs["canvas_pixel"] == {"height": 8, "width": 24}
+    assert attrs["canvas_triangle"] == {"height": 16, "width": 48}

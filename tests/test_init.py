@@ -143,3 +143,18 @@ def test_async_unload_entry_skips_reload_on_failure(
 
     assert result is False
     mock_reload.assert_not_awaited()
+
+
+# ── application_credentials ───────────────────────────────────────────────────
+
+
+def test_async_get_authorization_server_returns_correct_urls() -> None:
+    """async_get_authorization_server returns the LaMetric OAuth endpoints."""
+    from custom_components.lametric_hass_local.application_credentials import (
+        async_get_authorization_server,
+    )
+
+    server = asyncio.run(async_get_authorization_server(MagicMock()))
+
+    assert "lametric.com" in server.authorize_url
+    assert "lametric.com" in server.token_url

@@ -252,3 +252,42 @@ def test_coerce_stream_config_from_dict_path() -> None:
         _coerce_stream_config({"width": 8, "height": 8})
 
     mock_from_dict.assert_called_once()
+
+
+def test_coerce_stream_config_unwraps_canvas_key() -> None:
+    """canvas-wrapped dict is unwrapped before passing to StreamConfig.from_dict."""
+    from unittest.mock import MagicMock, patch
+
+    inner = {
+        "fill_type": "scale",
+        "render_mode": "pixel",
+        "post_process": {"type": "none"},
+    }
+
+    with patch(
+        "custom_components.lametric_hass_local.light.StreamConfig.from_dict",
+        return_value=MagicMock(),
+    ) as mock_from_dict:
+        _coerce_stream_config({"canvas": inner})
+
+    mock_from_dict.assert_called_once_with(inner)
+
+
+def test_coerce_stream_config_fixes_null_post_process_type() -> None:
+    """post_process.type=None is coerced to 'none' before StreamConfig.from_dict."""
+    from unittest.mock import MagicMock, patch
+
+    inner = {
+        "fill_type": "scale",
+        "render_mode": "pixel",
+        "post_process": {"type": None},
+    }
+
+    with patch(
+        "custom_components.lametric_hass_local.light.StreamConfig.from_dict",
+        return_value=MagicMock(),
+    ) as mock_from_dict:
+        _coerce_stream_config(inner)
+
+    called_with = mock_from_dict.call_args[0][0]
+    assert called_with["post_process"]["type"] == "none"

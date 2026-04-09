@@ -145,3 +145,14 @@ def test_setup_entry_adds_available_entities(coordinator: MagicMock) -> None:
     asyncio.run(async_setup_entry(MagicMock(), config_entry, collected.extend))  # type: ignore[arg-type]
     # Both brightness (TIME model) and volume (audio.available=True) should be added
     assert len(collected) >= 1
+
+
+def test_available_delegates_to_description(
+    coordinator: MagicMock, device_state: DeviceState
+) -> None:
+    """available is True when coordinator is up and description.available() is True."""
+    entity = LaMetricNumberEntity(
+        coordinator=coordinator, description=_brightness_desc()
+    )
+    # Coordinator mock has last_update_success as a truthy MagicMock by default.
+    assert entity.available is True
