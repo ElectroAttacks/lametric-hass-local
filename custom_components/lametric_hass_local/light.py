@@ -53,8 +53,11 @@ def _coerce_stream_config(value: object) -> StreamConfig:
     if isinstance(value, StreamConfig):
         return value
     if isinstance(value, dict):
-        # YAML/JSON may parse bare ``none`` as Python None; fix known enum fields.
+        # The service schema nests all stream settings under a 'canvas' key.
         data = dict(value)
+        if "canvas" in data:
+            data = dict(data["canvas"])
+        # YAML/JSON may parse bare ``none`` as Python None; fix known enum fields.
         post = data.get("post_process")
         if isinstance(post, dict):
             post = dict(post)
