@@ -26,7 +26,7 @@
     ],
     "quality_scale": "bronze",
     "requirements": [
-        "lametric-py>=1.3.7"
+        "lametric-py>=1.3.8"
     ],
     "single_config_entry": false,
     "ssdp": [
@@ -34,7 +34,7 @@
             "deviceType": "urn:schemas-upnp-org:device:LaMetric:1"
         }
     ],
-    "version": "3.0.4",
+    "version": "3.0.5",
     "zeroconf": [
         {
             "type": "_lametric-api._tcp.local."
