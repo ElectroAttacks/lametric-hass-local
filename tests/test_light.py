@@ -2,7 +2,9 @@
 
 import asyncio
 import math
-from unittest.mock import AsyncMock, MagicMock
+from collections.abc import Coroutine
+from dataclasses import replace as dc_replace
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from homeassistant.util.color import brightness_to_value, value_to_brightness
@@ -71,7 +73,7 @@ def test_turn_on_calls_set_display_on(coordinator: MagicMock) -> None:
 def test_turn_on_with_brightness_calls_set_display_brightness(
     coordinator: MagicMock,
 ) -> None:
-    """async_turn_on with ATTR_BRIGHTNESS also calls set_display with brightness."""
+    """async_turn_on sends on and brightness in one device call."""
     from homeassistant.components.light import ATTR_BRIGHTNESS
 
     coordinator.device.set_display = AsyncMock()
@@ -80,7 +82,10 @@ def test_turn_on_with_brightness_calls_set_display_brightness(
     asyncio.run(entity.async_turn_on(**{ATTR_BRIGHTNESS: 128}))
 
     expected_brightness = math.ceil(brightness_to_value(BRIGHTNESS_SCALE, 128))
-    coordinator.device.set_display.assert_any_await(brightness=expected_brightness)
+    coordinator.device.set_display.assert_awaited_once_with(
+        on=True,
+        brightness=expected_brightness,
+    )
 
 
 def test_turn_off_calls_set_display_off(coordinator: MagicMock) -> None:
@@ -91,6 +96,69 @@ def test_turn_off_calls_set_display_off(coordinator: MagicMock) -> None:
     asyncio.run(entity.async_turn_off())
 
     coordinator.device.set_display.assert_awaited_once_with(on=False)
+
+
+def test_turn_on_optimistically_updates_coordinator_state(
+    coordinator: MagicMock, device_state: DeviceState
+) -> None:
+    """async_turn_on updates the local coordinator state before refresh."""
+    from homeassistant.components.light import ATTR_BRIGHTNESS
+
+    coordinator.device.set_display = AsyncMock()
+    coordinator.async_set_updated_data = MagicMock()
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    asyncio.run(entity.async_turn_on(**{ATTR_BRIGHTNESS: 128}))
+
+    expected_brightness = math.ceil(brightness_to_value(BRIGHTNESS_SCALE, 128))
+    expected_display = dc_replace(
+        device_state.display,
+        on=True,
+        brightness=expected_brightness,
+    )
+    expected_state = dc_replace(device_state, display=expected_display)
+    coordinator.async_set_updated_data.assert_called_once_with(expected_state)
+
+
+def test_turn_off_optimistically_updates_coordinator_state(
+    coordinator: MagicMock, device_state: DeviceState
+) -> None:
+    """async_turn_off updates the local coordinator state before refresh."""
+    coordinator.device.set_display = AsyncMock()
+    coordinator.async_set_updated_data = MagicMock()
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+
+    asyncio.run(entity.async_turn_off())
+
+    expected_display = dc_replace(device_state.display, on=False)
+    expected_state = dc_replace(device_state, display=expected_display)
+    coordinator.async_set_updated_data.assert_called_once_with(expected_state)
+
+
+def test_turn_off_schedules_refresh_when_entity_has_hass(
+    coordinator: MagicMock,
+) -> None:
+    """async_turn_off should not block on refresh once the entity is added."""
+    scheduled: list[tuple[Coroutine[object, object, object], str]] = []
+
+    def track_task(coro: Coroutine[object, object, object], *, name: str) -> None:
+        scheduled.append((coro, name))
+        coro.close()
+
+    coordinator.device.set_display = AsyncMock()
+    coordinator.async_set_updated_data = MagicMock()
+    coordinator.async_request_refresh = AsyncMock()
+    entity = LaMetricLightEntity(coordinator, _sky_desc())
+    fake_hass = MagicMock()
+    fake_hass.async_create_task = MagicMock(side_effect=track_task)
+    entity.entity_id = "light.lametric_sky_light"
+
+    with patch.object(entity, "_get_hass_for_refresh", return_value=fake_hass):
+        asyncio.run(entity.async_turn_off())
+
+    coordinator.async_request_refresh.assert_not_awaited()
+    fake_hass.async_create_task.assert_called_once()
+    assert scheduled[0][1] == "lametric_refresh_light.lametric_sky_light"
 
 
 # ── setup_entry guard ─────────────────────────────────────────────────────────
