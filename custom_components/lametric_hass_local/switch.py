@@ -10,7 +10,7 @@ from homeassistant.components.switch import SwitchEntity, SwitchEntityDescriptio
 from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
-from lametric import DeviceState, LaMetricDevice
+from lametric import DeviceModels, DeviceState, LaMetricDevice
 
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
@@ -36,7 +36,9 @@ SWITCHES = [
         key="display_on",
         translation_key="display_on",
         entity_category=EntityCategory.CONFIG,
-        available=lambda state: state.display.on is not None,
+        available=lambda state: (
+            state.display.on is not None and state.model != DeviceModels.SKY
+        ),
         get_state=lambda state: bool(state.display.on),
         set_state=lambda device, on: device.set_display(on=on),
     ),
