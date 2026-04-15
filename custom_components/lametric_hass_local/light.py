@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from dataclasses import replace as dc_replace
 from typing import Any
 
 import voluptuous as vol
@@ -164,6 +165,40 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
         self._attr_color_mode = ColorMode.BRIGHTNESS
 
+    def _update_display_state(
+        self, *, is_on: bool, brightness: int | None = None
+    ) -> None:
+        """Apply the expected display state locally until the next refresh."""
+
+        current_display = self.coordinator.data.display
+        updated_display = dc_replace(
+            current_display,
+            on=is_on,
+            brightness=current_display.brightness if brightness is None else brightness,
+        )
+        self.coordinator.async_set_updated_data(
+            dc_replace(self.coordinator.data, display=updated_display)
+        )
+
+    def _get_hass_for_refresh(self) -> HomeAssistant | None:
+        """Return the Home Assistant instance when the entity has been added."""
+
+        return getattr(self, "_hass", None)
+
+    async def _async_refresh_after_command(self) -> None:
+        """Refresh device state without blocking the service call in Home Assistant."""
+
+        hass = self._get_hass_for_refresh()
+
+        if hass is None:
+            await self.coordinator.async_request_refresh()
+            return
+
+        hass.async_create_task(
+            self.coordinator.async_request_refresh(),
+            name=f"lametric_refresh_{self.entity_id}",
+        )
+
     @property
     def is_on(self) -> bool | None:
         """Return whether the LaMetric display light is enabled."""
@@ -204,19 +239,22 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     @lametric_api_exception_handler  # type: ignore[arg-type]
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the display light on and optionally set brightness."""
-
-        await self.entity_description.state_set(self.coordinator.device, True)
-
         brightness = kwargs.get(ATTR_BRIGHTNESS)
+        device_brightness: int | None = None
 
         if brightness is not None:
-            brightness = math.ceil(brightness_to_value(BRIGHTNESS_SCALE, brightness))
-
-            await self.entity_description.brightness_set(
-                self.coordinator.device, brightness
+            device_brightness = math.ceil(
+                brightness_to_value(BRIGHTNESS_SCALE, brightness)
             )
+            await self.coordinator.device.set_display(
+                on=True,
+                brightness=device_brightness,
+            )
+        else:
+            await self.entity_description.state_set(self.coordinator.device, True)
 
-        await self.coordinator.async_request_refresh()
+        self._update_display_state(is_on=True, brightness=device_brightness)
+        await self._async_refresh_after_command()
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
     async def async_turn_off(self, **_kwargs: Any) -> None:
@@ -224,7 +262,8 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
 
         await self.entity_description.state_set(self.coordinator.device, False)
 
-        await self.coordinator.async_request_refresh()
+        self._update_display_state(is_on=False)
+        await self._async_refresh_after_command()
 
     async def _async_start_stream(self, config: StreamConfig) -> dict[str, Any]:
         """Start a pixel-streaming session (SKY only)."""
