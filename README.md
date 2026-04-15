@@ -10,9 +10,13 @@ Local Home Assistant integration for LaMetric devices using the device API
 
 ## Requirements
 
-- Home Assistant 2026.1.0 or later
+- Home Assistant 2026.4.2 or later
 - A LaMetric device on the local network
-- `lametric-py ≥ 1.3.5` (installed automatically as a dependency)
+- `lametric-py ≥ 1.3.8` (installed automatically as a dependency)
+
+## Development
+
+For local development with `uv sync --dev`, use Python 3.14.2 or later.
 
 ## Installation
 
