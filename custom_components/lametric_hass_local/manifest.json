@@ -6,9 +6,7 @@
         "@ElectroAttacks"
     ],
     "config_flow": true,
-    "dependencies": [
-        "application_credentials"
-    ],
+    "dependencies": [],
     "dhcp": [
         {
             "hostname": "lametric-*"
