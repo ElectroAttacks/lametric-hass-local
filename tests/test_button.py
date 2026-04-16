@@ -70,6 +70,30 @@ def test_dismiss_all_notifications_press(
     coordinator.device.dismiss_all_notifications.assert_awaited_once()
 
 
+def test_press_does_not_fall_back_to_base_press(
+    coordinator: MagicMock, mock_hass: MagicMock
+) -> None:
+    """Button presses should not call the base ButtonEntity press implementation."""
+    coordinator.device.activate_next_app = AsyncMock()
+    entity = LaMetricButtonEntity(coordinator, _description("next_app"))
+    entity.hass = mock_hass
+
+    asyncio.run(entity.async_press())
+
+    mock_hass.async_add_executor_job.assert_not_awaited()
+
+
+def test_press_requests_refresh(coordinator: MagicMock, mock_hass: MagicMock) -> None:
+    """Successful button presses should refresh coordinator data afterwards."""
+    coordinator.device.activate_next_app = AsyncMock()
+    entity = LaMetricButtonEntity(coordinator, _description("next_app"))
+    entity.hass = mock_hass
+
+    asyncio.run(entity.async_press())
+
+    coordinator.async_request_refresh.assert_awaited_once()
+
+
 def test_all_button_keys_are_unique() -> None:
     """Every button description has a distinct key."""
     keys = [b.key for b in BUTTONS]

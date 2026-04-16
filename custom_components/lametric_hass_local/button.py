@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
 from homeassistant.core import HomeAssistant
@@ -71,8 +71,6 @@ async def async_setup_entry(
 class LaMetricButtonEntity(LaMetricEntity, ButtonEntity):
     """Button entity that triggers an action on the LaMetric device."""
 
-    entity_description: LaMetricButtonEntityDescription
-
     def __init__(
         self,
         coordinator: LaMetricCoordinator,
@@ -84,11 +82,17 @@ class LaMetricButtonEntity(LaMetricEntity, ButtonEntity):
         self.entity_description = description
         self._attr_unique_id = f"{coordinator.data.serial_number}-{description.key}"
 
+    @property  # pyright: ignore[reportIncompatibleMethodOverride]
+    def available(self) -> bool:
+        """Return whether the button is currently available."""
+        return self.coordinator.last_update_success
+
     @lametric_api_exception_handler
+    # pyright: ignore[reportIncompatibleMethodOverride]
     async def async_press(self) -> None:
         """Run the configured button action on the device."""
-        await self.entity_description.action(self.coordinator.device)
+        description = cast(LaMetricButtonEntityDescription, self.entity_description)
 
-        await super().async_press()
+        await description.action(self.coordinator.device)
 
         await self.coordinator.async_request_refresh()
