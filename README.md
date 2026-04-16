@@ -6,7 +6,7 @@
 [![Docs](https://img.shields.io/badge/docs-electroattacks.github.io-blue)](https://electroattacks.github.io/lametric-hass-local/)
 
 Local Home Assistant integration for LaMetric devices using the device API
-(`lametric-py`) with Zeroconf / SSDP / DHCP discovery and a config flow.
+(`lametric-py`) with Zeroconf / SSDP / DHCP discovery and a manual config flow.
 
 ## Requirements
 
@@ -24,6 +24,14 @@ For local development with `uv sync --dev`, use Python 3.14.2 or later.
 
 Install via HACS (recommended) or copy `custom_components/lametric_hass_local/` manually
 into your HA `custom_components/` folder and restart Home Assistant.
+
+## Setup
+
+Add the integration in Home Assistant and enter the device host plus API key.
+If discovery already found the device, only the API key is required.
+
+The API key is available in the LaMetric mobile app under Device -> Settings -> Wi-Fi,
+or in the developer portal at https://developer.lametric.com/user/devices.
 
 ## Documentation
 
