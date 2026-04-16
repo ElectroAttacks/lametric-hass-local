@@ -25,6 +25,9 @@ PLATFORMS = [
 # How often the coordinator polls the device local API.
 UPDATE_INTERVAL = timedelta(seconds=30)
 
+# How often installed apps should be refreshed from the device API.
+APPS_REFRESH_INTERVAL = timedelta(minutes=3)
+
 
 LOGGER = logging.getLogger(__package__)
 
