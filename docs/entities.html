@@ -17,7 +17,8 @@
 
             <div class="section-label section-label-link"><a href="index.html">Overview</a></div>
 
-            <div class="section-label section-label-link section-label-active"><a href="entities.html">Entities</a></div>
+            <div class="section-label section-label-link section-label-active"><a href="entities.html">Entities</a>
+            </div>
             <ul>
                 <li><a href="entities.html#button">Button</a></li>
                 <li><a href="entities.html#light">Light (SKY)</a></li>
@@ -243,8 +244,9 @@
                 <h2>Scene</h2>
 
                 <p>One scene entity is created for <strong>every installed app widget</strong> on the device.
-                    The list is updated on each coordinator refresh, so widgets added or removed via the LaMetric
-                    app are reflected automatically without restarting Home Assistant. Available on all models.</p>
+                    The installed-app list is refreshed periodically, currently about every three minutes, so newly
+                    added widgets are picked up automatically without restarting Home Assistant. Available on all
+                    models.</p>
 
                 <ul>
                     <li><strong><code>scene.turn_on</code></strong> &#8212; brings the target widget to the
