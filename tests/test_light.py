@@ -43,6 +43,17 @@ def _sky_description():
 def _build_sky_coordinator() -> MagicMock:
     coordinator = MagicMock()
     coordinator.data = _build_device_state(model=DeviceModels.SKY)
+    coordinator.data = dc_replace(
+        coordinator.data,
+        display=dc_replace(
+            coordinator.data.display,
+            brightness_limit=dc_replace(
+                coordinator.data.display.brightness_limit,
+                min=BRIGHTNESS_SCALE[0],
+                max=BRIGHTNESS_SCALE[1],
+            ),
+        ),
+    )
     coordinator.stream_state = None
     coordinator.last_update_success = True
     coordinator.device.host = "192.168.1.100"
@@ -196,6 +207,26 @@ def test_entity_state_properties_reflect_coordinator_data() -> None:
     )
 
 
+def test_brightness_uses_display_brightness_limit_range() -> None:
+    """Brightness conversion should respect the display's enforced limit range."""
+    coordinator = _build_sky_coordinator()
+    coordinator.data = dc_replace(
+        coordinator.data,
+        display=dc_replace(
+            coordinator.data.display,
+            brightness=40,
+            brightness_limit=dc_replace(
+                coordinator.data.display.brightness_limit,
+                min=10,
+                max=60,
+            ),
+        ),
+    )
+    entity = LaMetricLightEntity(coordinator, _sky_description())
+
+    assert entity.brightness == value_to_brightness((10, 60), 40.0)
+
+
 def test_entity_unavailable_when_coordinator_failed_or_display_state_unknown() -> None:
     """Availability should drop when the device is offline or on/off is unknown."""
     coordinator = _build_sky_coordinator()
@@ -254,12 +285,23 @@ def test_async_turn_on_sets_display_and_refreshes() -> None:
 def test_async_turn_on_converts_brightness_to_device_scale() -> None:
     """Brightness should be converted from HA scale to LaMetric scale."""
     coordinator = _build_sky_coordinator()
+    coordinator.data = dc_replace(
+        coordinator.data,
+        display=dc_replace(
+            coordinator.data.display,
+            brightness_limit=dc_replace(
+                coordinator.data.display.brightness_limit,
+                min=10,
+                max=60,
+            ),
+        ),
+    )
     coordinator.device.set_display = AsyncMock()
     entity = LaMetricLightEntity(coordinator, _sky_description())
 
     asyncio.run(entity.async_turn_on(brightness=128))
 
-    expected = math.ceil(brightness_to_value(BRIGHTNESS_SCALE, 128))
+    expected = math.ceil(brightness_to_value((10, 60), 128))
     coordinator.device.set_display.assert_awaited_once_with(
         on=True, brightness=expected)
 

@@ -191,6 +191,13 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
         self._attr_color_mode = ColorMode.BRIGHTNESS
 
+    def _brightness_scale(self) -> tuple[int, int]:
+        """Return the brightness range currently enforced by the device."""
+        if limits := self.coordinator.data.display.brightness_limit:
+            return int(limits.min), int(limits.max)
+
+        return BRIGHTNESS_SCALE
+
     @property
     def available(self) -> bool:
         """Return whether the light is currently usable."""
@@ -209,7 +216,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     def brightness(self) -> int | None:
         """Return brightness on Home Assistant's 0-255 scale."""
         brightness = self.coordinator.data.display.brightness
-        return value_to_brightness(BRIGHTNESS_SCALE, float(brightness))
+        return value_to_brightness(self._brightness_scale(), float(brightness))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
@@ -236,8 +243,9 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         brightness = kwargs.get(ATTR_BRIGHTNESS)
 
         if brightness is not None:
-            brightness = math.ceil(brightness_to_value(
-                BRIGHTNESS_SCALE, brightness))
+            brightness = math.ceil(
+                brightness_to_value(self._brightness_scale(), brightness)
+            )
 
         await self.coordinator.device.set_display(on=True, brightness=brightness)
 
