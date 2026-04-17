@@ -3,10 +3,8 @@
 from __future__ import annotations
 
 import math
-from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
-from dataclasses import replace as dc_replace
-from typing import Any
+from collections.abc import Callable, Mapping
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.components.light import (
@@ -16,7 +14,6 @@ from homeassistant.components.light import (
 )
 from homeassistant.components.light.const import ColorMode
 from homeassistant.core import HomeAssistant, SupportsResponse
-from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.entity_platform import (
     AddConfigEntryEntitiesCallback,
     async_get_current_platform,
@@ -24,11 +21,7 @@ from homeassistant.helpers.entity_platform import (
 from homeassistant.util.color import brightness_to_value, value_to_brightness
 from lametric import (
     DeviceModels,
-    DeviceState,
-    LaMetricApiError,
-    LaMetricDevice,
     StreamConfig,
-    StreamState,
 )
 
 from .const import (
@@ -49,61 +42,101 @@ from .helpers import lametric_api_exception_handler
 BRIGHTNESS_SCALE = (1, 100)
 
 
+LIGHTS = [
+    LightEntityDescription(
+        key="sky_light",
+        translation_key="sky_light",
+    )
+]
+
+
 def _coerce_stream_config(value: object) -> StreamConfig:
     """Coerce a plain dict into a StreamConfig dataclass."""
     if isinstance(value, StreamConfig):
         return value
-    if isinstance(value, dict):
-        # The service schema nests all stream settings under a 'canvas' key.
-        data = dict(value)
-        if "canvas" in data:
-            data = dict(data["canvas"])
-        # YAML/JSON may parse bare ``none`` as Python None; fix known enum fields.
-        post = data.get("post_process")
-        if isinstance(post, dict):
-            post = dict(post)
-            if post.get("type") is None:
-                post["type"] = "none"
-            data["post_process"] = post
-        return StreamConfig.from_dict(data)
-    raise vol.Invalid(f"Cannot convert {type(value)} to StreamConfig")
+
+    if not isinstance(value, Mapping):
+        raise vol.Invalid(f"Cannot convert {type(value)} to StreamConfig")
+
+    data = dict(cast(Mapping[str, Any], value))
+
+    if "canvas" in data:
+        canvas = data["canvas"]
+
+        if not isinstance(canvas, Mapping):
+            raise vol.Invalid("config.canvas must be an object")
+
+        data = dict(cast(Mapping[str, Any], canvas))
+
+    post = data.get("post_process")
+
+    if isinstance(post, Mapping):
+        normalized_post = dict(cast(Mapping[str, Any], post))
+
+        if normalized_post.get("type") is None:
+            normalized_post["type"] = "none"
+
+        params = normalized_post.get("params")
+
+        if isinstance(params, Mapping):
+            normalized_params = dict(cast(Mapping[str, Any], params))
+
+            if normalized_params.get("effect_type") is None:
+                normalized_params["effect_type"] = "none"
+
+            normalized_post["params"] = normalized_params
+
+        data["post_process"] = normalized_post
+
+    try:
+        from_dict = cast(Callable[[Mapping[str, Any]],
+                         StreamConfig], StreamConfig.from_dict)
+
+        return from_dict(data)
+
+    except Exception as err:
+        raise vol.Invalid("config is not a valid StreamConfig") from err
+
+
+def _coerce_rgb_triplet(pixel: object) -> tuple[int, int, int]:
+    """Validate a single RGB triplet payload."""
+    if not isinstance(pixel, (list, tuple)):
+        raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets")
+
+    channels: list[Any] = list(pixel)
+
+    if len(channels) != 3:
+        raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets")
+
+    validated: list[int] = []
+
+    for channel in channels:
+        if (
+            isinstance(channel, bool)
+            or not isinstance(channel, int)
+            or not 0 <= channel <= 255
+        ):
+            raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets")
+
+        validated.append(channel)
+
+    return validated[0], validated[1], validated[2]
 
 
 def _coerce_rgb_data(value: object) -> bytes:
     """Flatten a list of [R, G, B] triplets into raw RGB888 bytes."""
     if isinstance(value, bytes):
         return value
-    if isinstance(value, list):
-        try:
-            flat = [channel for pixel in value for channel in pixel]
-            return bytes(flat)
-        except (TypeError, ValueError) as err:
-            raise vol.Invalid("rgb_data must be a list of [R, G, B] triplets") from err
-    raise vol.Invalid(f"Cannot convert {type(value)} to bytes")
 
+    if not isinstance(value, list):
+        raise vol.Invalid(f"Cannot convert {type(value)} to bytes")
 
-@dataclass(frozen=True, kw_only=True)
-class LaMetricLightEntityDescription(LightEntityDescription):
-    """Description for a LaMetric light entity."""
+    flat: list[int] = []
 
-    brightness_get: Callable[[DeviceState], int | None]
-    brightness_set: Callable[[LaMetricDevice, int], Awaitable[Any]]
-    state_get: Callable[[DeviceState], bool]
-    state_set: Callable[[LaMetricDevice, bool], Awaitable[Any]]
+    for pixel in cast(list[object], value):
+        flat.extend(_coerce_rgb_triplet(pixel))
 
-
-LIGHTS = [
-    LaMetricLightEntityDescription(
-        key="sky_light",
-        translation_key="sky_light",
-        brightness_get=lambda state: state.display.brightness,
-        brightness_set=lambda device, brightness: device.set_display(
-            brightness=brightness
-        ),
-        state_get=lambda state: bool(state.display.on),
-        state_set=lambda device, state: device.set_display(on=state),
-    )
-]
+    return bytes(flat)
 
 
 async def async_setup_entry(
@@ -112,24 +145,21 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     """Set up LaMetric light entities for a config entry."""
-
     coordinator = config_entry.runtime_data
+    if coordinator.data.model != DeviceModels.SKY:
+        return
 
     async_add_entities(
-        LaMetricLightEntity(coordinator, description)
-        for description in LIGHTS
-        if coordinator.data.model == DeviceModels.SKY
+        LaMetricLightEntity(coordinator, description) for description in LIGHTS
     )
 
     platform = async_get_current_platform()
-
     platform.async_register_entity_service(
         SERVICE_START_STREAM,
         {vol.Required(CONF_STREAM_CONFIG): _coerce_stream_config},
         "_async_start_stream",
         supports_response=SupportsResponse.OPTIONAL,
     )
-
     platform.async_register_entity_service(
         SERVICE_STOP_STREAM,
         {},
@@ -149,78 +179,42 @@ async def async_setup_entry(
 class LaMetricLightEntity(LaMetricEntity, LightEntity):
     """Light entity backed by LaMetric display state."""
 
-    entity_description: LaMetricLightEntityDescription
-
     def __init__(
         self,
         coordinator: LaMetricCoordinator,
-        description: LaMetricLightEntityDescription,
+        description: LightEntityDescription,
     ) -> None:
         """Initialize the LaMetric light entity."""
-
         super().__init__(coordinator)
-
         self.entity_description = description
         self._attr_unique_id = f"{coordinator.data.serial_number}-{description.key}"
         self._attr_supported_color_modes = {ColorMode.BRIGHTNESS}
         self._attr_color_mode = ColorMode.BRIGHTNESS
 
-    def _update_display_state(
-        self, *, is_on: bool, brightness: int | None = None
-    ) -> None:
-        """Apply the expected display state locally until the next refresh."""
-
-        current_display = self.coordinator.data.display
-        updated_display = dc_replace(
-            current_display,
-            on=is_on,
-            brightness=current_display.brightness if brightness is None else brightness,
-        )
-        self.coordinator.async_set_updated_data(
-            dc_replace(self.coordinator.data, display=updated_display)
-        )
-
-    def _get_hass_for_refresh(self) -> HomeAssistant | None:
-        """Return the Home Assistant instance when the entity has been added."""
-
-        return getattr(self, "_hass", None)
-
-    async def _async_refresh_after_command(self) -> None:
-        """Refresh device state without blocking the service call in Home Assistant."""
-
-        hass = self._get_hass_for_refresh()
-
-        if hass is None:
-            await self.coordinator.async_request_refresh()
-            return
-
-        hass.async_create_task(
-            self.coordinator.async_request_refresh(),
-            name=f"lametric_refresh_{self.entity_id}",
+    @property
+    def available(self) -> bool:
+        """Return whether the light is currently usable."""
+        display = self.coordinator.data.display
+        return (
+            self.coordinator.last_update_success
+            and display.on is not None
         )
 
     @property
     def is_on(self) -> bool | None:
-        """Return whether the LaMetric display light is enabled."""
-
-        return self.entity_description.state_get(self.coordinator.data)
+        """Return whether the display is on."""
+        return self.coordinator.data.display.on
 
     @property
     def brightness(self) -> int | None:
-        """Return brightness in Home Assistant 0-255 scale."""
-
-        brightness = self.entity_description.brightness_get(self.coordinator.data)
-
-        if brightness is None:
-            return None
-
+        """Return brightness on Home Assistant's 0-255 scale."""
+        brightness = self.coordinator.data.display.brightness
         return value_to_brightness(BRIGHTNESS_SCALE, float(brightness))
 
     @property
     def extra_state_attributes(self) -> dict[str, Any]:
-        """Return stream state as extra attributes."""
-        stream: StreamState | None = self.coordinator.stream_state
-
+        """Return the current stream state metadata."""
+        stream = self.coordinator.stream_state
         if stream is None:
             return {}
 
@@ -236,46 +230,40 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
             },
         }
 
-    @lametric_api_exception_handler  # type: ignore[arg-type]
+    @lametric_api_exception_handler
     async def async_turn_on(self, **kwargs: Any) -> None:
         """Turn the display light on and optionally set brightness."""
         brightness = kwargs.get(ATTR_BRIGHTNESS)
-        device_brightness: int | None = None
 
         if brightness is not None:
-            device_brightness = math.ceil(
-                brightness_to_value(BRIGHTNESS_SCALE, brightness)
-            )
-            await self.coordinator.device.set_display(
-                on=True,
-                brightness=device_brightness,
-            )
-        else:
-            await self.entity_description.state_set(self.coordinator.device, True)
+            brightness = math.ceil(brightness_to_value(
+                BRIGHTNESS_SCALE, brightness))
 
-        self._update_display_state(is_on=True, brightness=device_brightness)
-        await self._async_refresh_after_command()
+        await self.coordinator.device.set_display(on=True, brightness=brightness)
 
-    @lametric_api_exception_handler  # type: ignore[arg-type]
+        await self.coordinator.async_request_refresh()
+
+    @lametric_api_exception_handler
     async def async_turn_off(self, **_kwargs: Any) -> None:
         """Turn the display light off."""
 
-        await self.entity_description.state_set(self.coordinator.device, False)
+        await self.coordinator.device.set_display(on=False)
 
-        self._update_display_state(is_on=False)
-        await self._async_refresh_after_command()
+        await self.coordinator.async_request_refresh()
 
+    @lametric_api_exception_handler(
+        connection_error_message=(
+            "Failed to connect to LaMetric device at {host} while starting the "
+            "pixel stream."
+        ),
+        api_error_message=(
+            "API error while starting the pixel stream on LaMetric device at "
+            "{host}."
+        ),
+    )
     async def _async_start_stream(self, config: StreamConfig) -> dict[str, Any]:
         """Start a pixel-streaming session (SKY only)."""
-        try:
-            session_id = await self.coordinator.device.start_stream(
-                stream_config=config
-            )
-        except LaMetricApiError as error:
-            raise HomeAssistantError(
-                f"Failed to start stream on LaMetric device at "
-                f"{self.coordinator.device.host}."
-            ) from error
+        session_id = await self.coordinator.device.start_stream(stream_config=config)
 
         if session_id is None:
             return {
@@ -285,27 +273,40 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
                     f"{self.coordinator.device.host}."
                 ),
             }
+
+        await self.coordinator.async_request_refresh()
+
         return {"success": True, "session_id": session_id}
 
+    @lametric_api_exception_handler(
+        connection_error_message=(
+            "Failed to connect to LaMetric device at {host} while stopping the "
+            "pixel stream."
+        ),
+        api_error_message=(
+            "API error while stopping the pixel stream on LaMetric device at "
+            "{host}."
+        ),
+    )
     async def _async_stop_stream(self) -> None:
         """Stop an active pixel-streaming session (SKY only)."""
-        try:
-            await self.coordinator.device.stop_stream()
-        except LaMetricApiError as error:
-            raise HomeAssistantError(
-                f"Failed to stop stream on LaMetric device at "
-                f"{self.coordinator.device.host}."
-            ) from error
+        await self.coordinator.device.stop_stream()
 
+        await self.coordinator.async_request_refresh()
+
+    @lametric_api_exception_handler(
+        connection_error_message=(
+            "Failed to connect to LaMetric device at {host} while sending pixel "
+            "stream data."
+        ),
+        api_error_message=(
+            "API error while sending pixel stream data to LaMetric device at "
+            "{host}."
+        ),
+    )
     async def _async_send_stream_data(self, session_id: str, rgb_data: bytes) -> None:
         """Send RGB pixel data to an active streaming session (SKY only)."""
-        try:
-            await self.coordinator.device.send_stream_data(
-                session_id=session_id,
-                rgb888_data=rgb_data,
-            )
-        except LaMetricApiError as error:
-            raise HomeAssistantError(
-                f"Failed to send stream data to LaMetric device at "
-                f"{self.coordinator.device.host}."
-            ) from error
+        await self.coordinator.device.send_stream_data(
+            session_id=session_id,
+            rgb888_data=rgb_data,
+        )
