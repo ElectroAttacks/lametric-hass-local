@@ -9,7 +9,7 @@ from homeassistant.core import (
     ServiceCall,
     callback,
 )
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.util.enum import try_parse_enum
 from lametric import (
@@ -17,7 +17,6 @@ from lametric import (
     BuiltinSound,
     GoalFrame,
     IconType,
-    LaMetricApiError,
     Notification,
     NotificationData,
     NotificationPriority,
@@ -38,7 +37,7 @@ from .const import (
     SERVICE_SHOW_MESSAGE,
 )
 from .coordinator import LaMetricCoordinator
-from .helpers import async_get_coordinator_by_device_id
+from .helpers import async_get_coordinator_by_device_id, async_handle_lametric_call
 
 SERVICE_BASE_SCHEMA = vol.Schema(
     {
@@ -79,7 +78,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
         )
 
         await async_send_notification(
-            coordinator, call, [SpikeChartFrame(chart_data=call.data[CONF_DATA])]
+            coordinator,
+            call,
+            [SpikeChartFrame(chart_data=call.data[CONF_DATA])],
         )
 
     async def _async_service_message(call: ServiceCall) -> None:
@@ -150,10 +151,15 @@ async def async_send_notification(
     )
 
     host = getattr(getattr(coordinator, "device", None), "host", "unknown")
-    try:
-        await coordinator.device.send_notification(notification=notification)
-
-    except LaMetricApiError as error:
-        raise HomeAssistantError(
-            f"Failed to send notification to LaMetric device at {host}."
-        ) from error
+    await async_handle_lametric_call(
+        coordinator.device.send_notification(notification=notification),
+        host=host,
+        connection_error_message=(
+            "Failed to connect to LaMetric device at {host} while sending the "
+            "notification service payload."
+        ),
+        api_error_message=(
+            "API error while sending the notification service payload to "
+            "LaMetric device at {host}."
+        ),
+    )

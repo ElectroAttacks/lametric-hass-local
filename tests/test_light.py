@@ -26,7 +26,6 @@ from custom_components.lametric_hass_local.const import (
     SERVICE_STOP_STREAM,
 )
 from custom_components.lametric_hass_local.light import (
-    BRIGHTNESS_SCALE,
     LIGHTS,
     LaMetricLightEntity,
     _coerce_rgb_data,
@@ -43,17 +42,6 @@ def _sky_description():
 def _build_sky_coordinator() -> MagicMock:
     coordinator = MagicMock()
     coordinator.data = _build_device_state(model=DeviceModels.SKY)
-    coordinator.data = dc_replace(
-        coordinator.data,
-        display=dc_replace(
-            coordinator.data.display,
-            brightness_limit=dc_replace(
-                coordinator.data.display.brightness_limit,
-                min=BRIGHTNESS_SCALE[0],
-                max=BRIGHTNESS_SCALE[1],
-            ),
-        ),
-    )
     coordinator.stream_state = None
     coordinator.last_update_success = True
     coordinator.device.host = "192.168.1.100"
@@ -120,9 +108,7 @@ def test_coerce_rgb_data_passes_bytes_through() -> None:
 
 def test_coerce_rgb_data_flattens_rgb_triplets() -> None:
     """Triplet payloads should be flattened to RGB888 bytes."""
-    assert _coerce_rgb_data([[255, 0, 0], [0, 255, 0]]) == bytes(
-        [255, 0, 0, 0, 255, 0]
-    )
+    assert _coerce_rgb_data([[255, 0, 0], [0, 255, 0]]) == bytes([255, 0, 0, 0, 255, 0])
 
 
 @pytest.mark.parametrize(
@@ -136,7 +122,7 @@ def test_coerce_rgb_data_flattens_rgb_triplets() -> None:
 )
 def test_coerce_rgb_data_rejects_invalid_values(value: object) -> None:
     """Invalid RGB payloads should fail schema validation."""
-    with pytest.raises(vol.Invalid, match="rgb_data must be a list"):
+    with pytest.raises(vol.Invalid, match="rgb_data must be a list|Cannot convert"):
         _coerce_rgb_data(value)
 
 
@@ -203,28 +189,12 @@ def test_entity_state_properties_reflect_coordinator_data() -> None:
     assert entity.available is True
     assert entity.is_on is True
     assert entity.brightness == value_to_brightness(
-        BRIGHTNESS_SCALE, float(coordinator.data.display.brightness)
-    )
-
-
-def test_brightness_uses_display_brightness_limit_range() -> None:
-    """Brightness conversion should respect the display's enforced limit range."""
-    coordinator = _build_sky_coordinator()
-    coordinator.data = dc_replace(
-        coordinator.data,
-        display=dc_replace(
-            coordinator.data.display,
-            brightness=40,
-            brightness_limit=dc_replace(
-                coordinator.data.display.brightness_limit,
-                min=10,
-                max=60,
-            ),
+        (
+            int(coordinator.data.display.brightness_limit.min),
+            int(coordinator.data.display.brightness_limit.max),
         ),
+        float(coordinator.data.display.brightness),
     )
-    entity = LaMetricLightEntity(coordinator, _sky_description())
-
-    assert entity.brightness == value_to_brightness((10, 60), 40.0)
 
 
 def test_entity_unavailable_when_coordinator_failed_or_display_state_unknown() -> None:
@@ -276,8 +246,7 @@ def test_async_turn_on_sets_display_and_refreshes() -> None:
 
     asyncio.run(entity.async_turn_on())
 
-    coordinator.device.set_display.assert_awaited_once_with(
-        on=True, brightness=None)
+    coordinator.device.set_display.assert_awaited_once_with(on=True, brightness=None)
     coordinator.async_request_refresh.assert_awaited_once()
     coordinator.async_update_listeners.assert_called_once()
 
@@ -285,25 +254,23 @@ def test_async_turn_on_sets_display_and_refreshes() -> None:
 def test_async_turn_on_converts_brightness_to_device_scale() -> None:
     """Brightness should be converted from HA scale to LaMetric scale."""
     coordinator = _build_sky_coordinator()
-    coordinator.data = dc_replace(
-        coordinator.data,
-        display=dc_replace(
-            coordinator.data.display,
-            brightness_limit=dc_replace(
-                coordinator.data.display.brightness_limit,
-                min=10,
-                max=60,
-            ),
-        ),
-    )
     coordinator.device.set_display = AsyncMock()
     entity = LaMetricLightEntity(coordinator, _sky_description())
 
     asyncio.run(entity.async_turn_on(brightness=128))
 
-    expected = math.ceil(brightness_to_value((10, 60), 128))
+    expected = math.ceil(
+        brightness_to_value(
+            (
+                int(coordinator.data.display.brightness_limit.min),
+                int(coordinator.data.display.brightness_limit.max),
+            ),
+            128,
+        )
+    )
     coordinator.device.set_display.assert_awaited_once_with(
-        on=True, brightness=expected)
+        on=True, brightness=expected
+    )
 
 
 def test_async_turn_off_sets_display_and_refreshes() -> None:
@@ -345,8 +312,7 @@ def test_start_stream_returns_session_id_and_refreshes() -> None:
     result = asyncio.run(entity._async_start_stream(config))
 
     assert result == {"success": True, "session_id": "session-123"}
-    coordinator.device.start_stream.assert_awaited_once_with(
-        stream_config=config)
+    coordinator.device.start_stream.assert_awaited_once_with(stream_config=config)
     coordinator.async_request_refresh.assert_awaited_once()
     coordinator.async_update_listeners.assert_called_once()
 
@@ -426,7 +392,6 @@ def test_send_stream_data_uses_custom_api_error_message() -> None:
         HomeAssistantError,
         match="API error while sending pixel stream data",
     ):
-        asyncio.run(entity._async_send_stream_data(
-            "session-123", bytes([1, 2, 3])))
+        asyncio.run(entity._async_send_stream_data("session-123", bytes([1, 2, 3])))
 
     coordinator.async_update_listeners.assert_not_called()

@@ -89,8 +89,9 @@ def _coerce_stream_config(value: object) -> StreamConfig:
         data["post_process"] = normalized_post
 
     try:
-        from_dict = cast(Callable[[Mapping[str, Any]],
-                         StreamConfig], StreamConfig.from_dict)
+        from_dict = cast(
+            Callable[[Mapping[str, Any]], StreamConfig], StreamConfig.from_dict
+        )
 
         return from_dict(data)
 
@@ -202,10 +203,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     def available(self) -> bool:
         """Return whether the light is currently usable."""
         display = self.coordinator.data.display
-        return (
-            self.coordinator.last_update_success
-            and display.on is not None
-        )
+        return self.coordinator.last_update_success and display.on is not None
 
     @property
     def is_on(self) -> bool | None:
@@ -238,7 +236,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         }
 
     @lametric_api_exception_handler
-    async def async_turn_on(self, **kwargs: Any) -> None:
+    async def async_turn_on(self, /, **kwargs: Any) -> None:
         """Turn the display light on and optionally set brightness."""
         brightness = kwargs.get(ATTR_BRIGHTNESS)
 
@@ -252,7 +250,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
         await self.coordinator.async_request_refresh()
 
     @lametric_api_exception_handler
-    async def async_turn_off(self, **_kwargs: Any) -> None:
+    async def async_turn_off(self, /, **_kwargs: Any) -> None:
         """Turn the display light off."""
 
         await self.coordinator.device.set_display(on=False)
@@ -265,8 +263,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
             "pixel stream."
         ),
         api_error_message=(
-            "API error while starting the pixel stream on LaMetric device at "
-            "{host}."
+            "API error while starting the pixel stream on LaMetric device at {host}."
         ),
     )
     async def _async_start_stream(self, config: StreamConfig) -> dict[str, Any]:
@@ -292,8 +289,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
             "pixel stream."
         ),
         api_error_message=(
-            "API error while stopping the pixel stream on LaMetric device at "
-            "{host}."
+            "API error while stopping the pixel stream on LaMetric device at {host}."
         ),
     )
     async def _async_stop_stream(self) -> None:
@@ -308,8 +304,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
             "stream data."
         ),
         api_error_message=(
-            "API error while sending pixel stream data to LaMetric device at "
-            "{host}."
+            "API error while sending pixel stream data to LaMetric device at {host}."
         ),
     )
     async def _async_send_stream_data(self, session_id: str, rgb_data: bytes) -> None:

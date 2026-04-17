@@ -8,14 +8,13 @@ from homeassistant.components.notify.const import ATTR_DATA
 from homeassistant.components.notify.legacy import BaseNotificationService
 from homeassistant.const import CONF_ICON
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.util.enum import try_parse_enum
 from lametric import (
     AlarmSound,
     BuiltinSound,
     IconType,
-    LaMetricApiError,
     LaMetricDevice,
     Notification,
     NotificationData,
@@ -26,6 +25,7 @@ from lametric import (
 
 from .const import CONF_CYCLES, CONF_ICON_TYPE, CONF_PRIORITY, CONF_SOUND
 from .coordinator import LaMetricConfigEntry
+from .helpers import async_handle_lametric_call
 
 
 async def async_get_service(
@@ -88,13 +88,14 @@ class LaMetricNotificationService(BaseNotificationService):
             ),
         )
 
-        host = getattr(self.device, "host", "unknown")
-
-        try:
-            await self.device.send_notification(notification=notification)
-
-        except LaMetricApiError as error:
-            raise HomeAssistantError(
-                f"Failed to send notification to LaMetric device at {host}. "
-                "Check device connectivity and credentials."
-            ) from error
+        await async_handle_lametric_call(
+            self.device.send_notification(notification=notification),
+            host=getattr(self.device, "host", "unknown"),
+            connection_error_message=(
+                "Failed to connect to LaMetric device at {host} while sending "
+                "a notify message."
+            ),
+            api_error_message=(
+                "API error while sending a notify message to LaMetric device at {host}."
+            ),
+        )
