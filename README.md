@@ -2,6 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
 [![GitHub Release](https://img.shields.io/github/v/release/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/ElectroAttacks/lametric-hass-local/total?style=flat-square)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
 [![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](LICENSE)
 [![Docs](https://img.shields.io/badge/docs-electroattacks.github.io-blue)](https://electroattacks.github.io/lametric-hass-local/)
 
