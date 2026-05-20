@@ -208,7 +208,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     @property
     def is_on(self) -> bool | None:
         """Return whether the display is on."""
-        return self.coordinator.data.display.on
+        return cast(bool | None, self.coordinator.data.display.on)
 
     @property
     def brightness(self) -> int | None:

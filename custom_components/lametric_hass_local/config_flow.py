@@ -2,7 +2,7 @@
 
 from collections.abc import Mapping
 from ipaddress import ip_address
-from typing import Any, Self, override
+from typing import Any, Self, cast, override
 
 import voluptuous as vol
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlow, ConfigFlowResult
@@ -63,11 +63,15 @@ class LaMetricConfigFlowHandler(ConfigFlow, domain=DOMAIN):
     ) -> ConfigFlowResult:
         """Handle device discovery coming from DHCP."""
 
+        if discovery_info.macaddress is None:
+            return self.async_abort(reason="invalid_discovery_info")
+
         mac = format_mac(discovery_info.macaddress)
 
         # Check if we've already configured a device with this MAC address
         for entry in self._async_current_entries():
-            if format_mac(entry.data.get(CONF_MAC)) == mac:
+            existing_mac = cast(str | None, entry.data.get(CONF_MAC))
+            if existing_mac is not None and format_mac(existing_mac) == mac:
                 self.hass.config_entries.async_update_entry(
                     entry, data=entry.data | {CONF_HOST: discovery_info.ip}
                 )

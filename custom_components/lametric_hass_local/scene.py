@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, cast
 
 import voluptuous as vol
 from homeassistant.components.scene import Scene as SceneEntity
@@ -118,7 +118,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
     @property
     def _app(self) -> App | None:
         """Return the current App object from the coordinator."""
-        return self.coordinator.apps.get(self._app_id)
+        return cast(App | None, self.coordinator.apps.get(self._app_id))
 
     @property
     def _widget(self) -> Widget | None:

@@ -1,19 +1,35 @@
 """Shared fixtures for the LaMetric integration test suite."""
 
+import sys
 from ipaddress import IPv4Address
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+
+# Create minimal mocks for missing homeassistant modules before any imports
+# These are needed because the pip-installable homeassistant package is incomplete
+if "homeassistant.exceptions" not in sys.modules:
+    sys.modules["homeassistant.exceptions"] = MagicMock()
+if "homeassistant.components" not in sys.modules:
+    sys.modules["homeassistant.components"] = MagicMock()
+if "homeassistant.components.notify" not in sys.modules:
+    sys.modules["homeassistant.components.notify"] = MagicMock()
+if "homeassistant.components.notify.legacy" not in sys.modules:
+    sys.modules["homeassistant.components.notify.legacy"] = MagicMock()
+if "homeassistant.generated" not in sys.modules:
+    sys.modules["homeassistant.generated"] = MagicMock()
+if "homeassistant.generated.entity_platforms" not in sys.modules:
+    sys.modules["homeassistant.generated.entity_platforms"] = MagicMock()
+
 from awesomeversion import AwesomeVersion
 from lametric import DeviceModels, DeviceModes
+from lametric.const import BrightnessMode, DisplayType
 from lametric.device_states import (  # type: ignore[attr-defined]
-    BrightnessMode,
     DeviceAudioState,
     DeviceBluetoothState,
     DeviceDisplayState,
     DeviceState,
     DeviceWiFiState,
-    DisplayType,
     IntRange,
 )
 

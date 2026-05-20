@@ -25,6 +25,9 @@ dev = [
     "pre-commit>=4.5.1",
     "python-semantic-release>=10.5.3",
     "commitizen>=4.13.10",
+    "homeassistant-stubs>=2026.4.4",
+    "pytest-homeassistant-custom-component>=0.13.332",
+    "homeassistant>=2026.5.3",
 ]
 
 # ------------------------------------------------------------------------------
@@ -68,6 +71,7 @@ disallow_any_generics = false
 testpaths = ["tests"]
 pythonpath = ["."]
 addopts = "--cov=custom_components/lametric_hass_local --cov-report=term-missing"
+asyncio_mode = "auto"
 
 # ------------------------------------------------------------------------------
 # SEMANTIC RELEASE (Auto-Versioning)

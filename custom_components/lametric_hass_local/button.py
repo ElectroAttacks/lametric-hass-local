@@ -85,7 +85,7 @@ class LaMetricButtonEntity(LaMetricEntity, ButtonEntity):
     @property  # pyright: ignore[reportIncompatibleMethodOverride]
     def available(self) -> bool:
         """Return whether the button is currently available."""
-        return self.coordinator.last_update_success
+        return bool(self.coordinator.last_update_success)
 
     @lametric_api_exception_handler
     # pyright: ignore[reportIncompatibleMethodOverride]

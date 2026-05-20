@@ -168,7 +168,7 @@ def test_dhcp_updates_existing_entry_and_aborts() -> None:
             DhcpServiceInfo(
                 ip="192.168.1.55",
                 hostname="lametric-time",
-                macaddress="aa:bb:cc:dd:ee:ff",
+                macaddress="aabbccddeeff",
             )
         )
     )
@@ -196,7 +196,7 @@ def test_dhcp_discovery_routes_to_manual_and_stores_host() -> None:
             DhcpServiceInfo(
                 ip="192.168.1.55",
                 hostname="lametric-time",
-                macaddress="AA:BB:CC:DD:EE:FF",
+                macaddress="aabbccddeeff",
             )
         )
     )
