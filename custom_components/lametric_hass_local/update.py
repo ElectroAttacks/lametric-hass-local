@@ -7,6 +7,7 @@ from homeassistant.components.update import UpdateDeviceClass, UpdateEntity
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
+from .const import LOGGER
 from .coordinator import LaMetricConfigEntry, LaMetricCoordinator
 from .entity import LaMetricEntity
 
@@ -23,6 +24,13 @@ async def async_setup_entry(
     """
 
     coordinator = config_entry.runtime_data
+
+    LOGGER.debug(
+        "Update platform setup for %s: os_version=%r (strategy=%s)",
+        coordinator.data.serial_number,
+        str(coordinator.data.os_version),
+        coordinator.data.os_version.strategy,
+    )
 
     if coordinator.data.os_version >= AwesomeVersion("2.3.0"):
         async_add_entities([LaMetricUpdate(coordinator)])

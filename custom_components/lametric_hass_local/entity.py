@@ -8,7 +8,7 @@ from homeassistant.helpers.device_registry import (
 )
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN
+from .const import DOMAIN, LOGGER
 from .coordinator import LaMetricCoordinator
 
 
@@ -21,6 +21,14 @@ class LaMetricEntity(CoordinatorEntity[LaMetricCoordinator]):
         """Build shared device metadata for all LaMetric entities."""
 
         super().__init__(coordinator)
+
+        LOGGER.debug(
+            "Building device info for %s (model=%s, os_version=%s, type=%s)",
+            coordinator.data.serial_number,
+            coordinator.data.model,
+            coordinator.data.os_version,
+            type(coordinator.data.os_version).__name__,
+        )
 
         connections = {(CONNECTION_NETWORK_MAC, format_mac(coordinator.data.wifi.mac))}
 
@@ -36,7 +44,7 @@ class LaMetricEntity(CoordinatorEntity[LaMetricCoordinator]):
             manufacturer="LaMetric Inc.",
             model_id=coordinator.data.model,
             name=coordinator.data.name,
-            sw_version=coordinator.data.os_version,
+            sw_version=str(coordinator.data.os_version),
             serial_number=coordinator.data.serial_number,
             configuration_url=f"https://{coordinator.data.wifi.ipv4}",
         )
