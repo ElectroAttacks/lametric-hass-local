@@ -1151,7 +1151,7 @@ wheels = [
 
 [[package]]
 name = "homeassistant"
-version = "2026.7.1"
+version = "2026.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiodns" },
@@ -1205,21 +1205,21 @@ dependencies = [
     { name = "yarl" },
     { name = "zeroconf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/36/a2/cf69ec57848267f068e3c0ea7b3cf2a9180db14c216828575f447e94fcf6/homeassistant-2026.7.1.tar.gz", hash = "sha256:fbe1dbfd95d786a9dfef03b39a2e649843451ea84b6af6452628d114c42ef4b8", size = 35663843, upload-time = "2026-07-03T19:14:32.974Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4a/c7/17c0efe5e06dfecd2441dd0620f77719a132c62dde8b6872a754a86e152c/homeassistant-2026.7.3.tar.gz", hash = "sha256:cc2f797f5fe9ef58da83b7b1d041a86b9810a1b69bd7b6be54305cee1f580450", size = 35225961, upload-time = "2026-07-21T18:56:54.907Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cc/51/b872a7e97a0509970ea828a36a6c9218033cbaf12d58ea8e40238b2dc79a/homeassistant-2026.7.1-py3-none-any.whl", hash = "sha256:6e5daf937b2f0909fb6645deb9091b14c9ac68f8d6fb5bf7314ae8e3dacb7a0d", size = 58136462, upload-time = "2026-07-03T19:14:26.238Z" },
+    { url = "https://files.pythonhosted.org/packages/73/9a/a5a8e92944a97f485a57ac57050b020e7ffdd7fbf2759a9cc4232efbb6cb/homeassistant-2026.7.3-py3-none-any.whl", hash = "sha256:06ca1b4bccf4c8fbf835f30b270c76bbd050be8ae0f37f7ffcfc856c49aa4472", size = 57506054, upload-time = "2026-07-21T18:56:48.468Z" },
 ]
 
 [[package]]
 name = "homeassistant-stubs"
-version = "2026.7.1"
+version = "2026.7.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "homeassistant" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0f/9b/0bf304732a16fc3263ea0f30818226b1f7f65dd6e2ed9ef9015ef6daa791/homeassistant_stubs-2026.7.1.tar.gz", hash = "sha256:50b1402b95d6e8fbfd2b77fbc1327b9459d23e303bd7d9df226e97336bbf157a", size = 1400667, upload-time = "2026-07-04T04:05:45.669Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a7/7a/f7485d374f819b4a4d06da5480a6e2474cb4a8716ded86aa4c9948fb399a/homeassistant_stubs-2026.7.3.tar.gz", hash = "sha256:e03829e7c6049d0212cd7c8a50b0a245af0c9b5a23393835fc6978a7c2000b5e", size = 1400896, upload-time = "2026-07-22T03:51:22.854Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/aa/d39b4b4769f7d1e11678b201a80c6e5a55df06b8d6c6cc67937730577ae2/homeassistant_stubs-2026.7.1-py3-none-any.whl", hash = "sha256:3b9458b0ab7c4e03b6d47e7229d96dead3729cd60b3246ac7f6dc906c1762cf5", size = 3984908, upload-time = "2026-07-04T04:05:43.588Z" },
+    { url = "https://files.pythonhosted.org/packages/57/04/cd358ccac0c97acfb28c2f999917421b0d9d29c76e9ef5e6b986048c5030/homeassistant_stubs-2026.7.3-py3-none-any.whl", hash = "sha256:8461aa15253bb61ee865a74007fe1bffe8d6e8919e1458abf894d3d1f5e0a72e", size = 3985187, upload-time = "2026-07-22T03:51:21.034Z" },
 ]
 
 [[package]]
@@ -1362,14 +1362,14 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "homeassistant", specifier = ">=2026.6.0" },
-    { name = "lametric-py", specifier = ">=1.3.8" },
+    { name = "homeassistant", specifier = ">=2026.7.3" },
+    { name = "lametric-py", specifier = ">=1.3.13" },
 ]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "commitizen", specifier = ">=4.13.10" },
-    { name = "homeassistant", specifier = ">=2026.6.0" },
+    { name = "homeassistant", specifier = ">=2026.7.3" },
     { name = "homeassistant-stubs", specifier = ">=2026.4.4" },
     { name = "mypy", specifier = ">=1.20.1" },
     { name = "pre-commit", specifier = ">=4.5.1" },
@@ -1382,7 +1382,7 @@ dev = [
 
 [[package]]
 name = "lametric-py"
-version = "1.3.8"
+version = "1.3.13"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -1392,9 +1392,9 @@ dependencies = [
     { name = "orjson" },
     { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/53/56a4ab9908c424908f03d81c52209be38bf8da5e602972853e441891a198/lametric_py-1.3.8.tar.gz", hash = "sha256:a0cfb9599cdb3e2ee31d45f86de14d31e6669d0de1b6ff15aa3a0ec901585ac4", size = 88905, upload-time = "2026-04-10T14:24:14.203Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c0/45/a90af0feaf4ba62fb25ad8a5737de74496cfb0f3ad93445aeb2b01b2d81e/lametric_py-1.3.13.tar.gz", hash = "sha256:920f3e9b78fad5b6c067fd991441d69b48484468856cfcac046e500929ee736d", size = 94266, upload-time = "2026-07-22T19:30:15.153Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/ba/34e04aa79b79f85b6d1a2c91d48d7fa42ed4f233c22716a9d84f75b70649/lametric_py-1.3.8-py3-none-any.whl", hash = "sha256:f1a8d221cc3556210fa60eada6abfaa7e8ae93d8498983349f49b08e0af2bebe", size = 16130, upload-time = "2026-04-10T14:24:12.978Z" },
+    { url = "https://files.pythonhosted.org/packages/56/a1/9e3d15b07aea3bfc7c10c13150c08aed0b36ca255f9249775c82ab162c25/lametric_py-1.3.13-py3-none-any.whl", hash = "sha256:47ccef8bbd10f3161efc88441e2689e5246f66537ba94c9662631a356ecfef9b", size = 16144, upload-time = "2026-07-22T19:30:13.967Z" },
 ]
 
 [[package]]
@@ -1520,14 +1520,14 @@ wheels = [
 
 [[package]]
 name = "mashumaro"
-version = "3.20"
+version = "3.22"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/64/3d/0f1bf475109a816c2a31a8b424750911343f0bce304827a5255df167547e/mashumaro-3.20.tar.gz", hash = "sha256:af4573f14ae61be3fbc3a473158ddfc1420f345410385809fd782e0d79e9215c", size = 191643, upload-time = "2026-02-09T21:53:55.24Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d1/e3/a06dcd2e6df094c5e294721926f1f76da30f50823e2ac233a9198e804891/mashumaro-3.22.tar.gz", hash = "sha256:64538cc365204402a060ebde683a86505b5a4344acf6870d79021e9fbfe57360", size = 197845, upload-time = "2026-05-26T14:39:21.859Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/5a/4fed77781061647d3be98e2f235ef1869289dd839ca0451a8d50a30fcd5c/mashumaro-3.20-py3-none-any.whl", hash = "sha256:648bc326f64c55447988eab67d6bfe3b7958c0961c83590709b1f950f88f4a3c", size = 94942, upload-time = "2026-02-09T21:53:53.343Z" },
+    { url = "https://files.pythonhosted.org/packages/9b/1c/92fd926c2e7763535454683250dbdd8d10aa2f2c62f58d6abbcce4d8b3fc/mashumaro-3.22-py3-none-any.whl", hash = "sha256:17dc4d7294c33ef380a8b929dda0608577aa2141988c00a0c4932310108fe71d", size = 95916, upload-time = "2026-05-26T14:39:20.233Z" },
 ]
 
 [[package]]
@@ -2229,7 +2229,7 @@ wheels = [
 
 [[package]]
 name = "pytest-homeassistant-custom-component"
-version = "0.13.345"
+version = "0.13.347"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohasupervisor" },
@@ -2261,9 +2261,9 @@ dependencies = [
     { name = "tqdm" },
     { name = "unidiff" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/50/1f/63dc55df8b50b92436659c3250a4585bd02b10e819de6a5cdb562e7ca387/pytest_homeassistant_custom_component-0.13.345.tar.gz", hash = "sha256:a4b75ffb27cc6ba108f0fe1539624f38cd5f1ce8d374cb5cbd0cd0eddabafe19", size = 78241, upload-time = "2026-07-04T07:42:09.485Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/74/9e268bd0d1577611ae058ec8102f8d28858f4c60a728596af6d7a216591f/pytest_homeassistant_custom_component-0.13.347.tar.gz", hash = "sha256:b073145b0380b7a777d483712216e62b6b5e18c0cf85d9b5626c448f5f200151", size = 78248, upload-time = "2026-07-22T07:32:51.308Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/b8/a2/a4001eca500244f67e71f81c93d7142c3b55fec8bbd67e06a9d718afd4f9/pytest_homeassistant_custom_component-0.13.345-py3-none-any.whl", hash = "sha256:c29fdec6e58a6876a372f5fedfa489b70d0bcab32067f73ad6b24ef722bc0344", size = 84172, upload-time = "2026-07-04T07:42:08.205Z" },
+    { url = "https://files.pythonhosted.org/packages/54/67/8bf18d81726e045e40f70c98cee30201eaf3535f1ec9db423d153ff1e404/pytest_homeassistant_custom_component-0.13.347-py3-none-any.whl", hash = "sha256:1bb4b96b8bda49f9aee08b43fdf14f222e52dece2c7c12b8cfeeea21dcd35a8c", size = 84172, upload-time = "2026-07-22T07:32:50.097Z" },
 ]
 
 [[package]]
