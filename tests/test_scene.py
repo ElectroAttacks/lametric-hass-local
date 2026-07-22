@@ -124,7 +124,7 @@ def test_extra_state_attributes_expose_is_visible(coordinator: MagicMock) -> Non
     """Scene attributes should expose whether the widget is currently visible."""
     entity = _make_scene(coordinator, visible=True)
 
-    assert entity.extra_state_attributes == {"is_visible": True}
+    assert entity.extra_state_attributes == {"is_visible": True, "actions": {}}
 
 
 def test_extra_state_attributes_mark_missing_widget_not_visible(
@@ -134,7 +134,43 @@ def test_extra_state_attributes_mark_missing_widget_not_visible(
     entity = _make_scene(coordinator)
     coordinator.apps["com.lametric.clock"].widgets = {}
 
-    assert entity.extra_state_attributes == {"is_visible": False}
+    assert entity.extra_state_attributes == {"is_visible": False, "actions": {}}
+
+
+def test_extra_state_attributes_actions_with_parameters(coordinator: MagicMock) -> None:
+    """Actions should be serialised as name→data_type, required marked with '*'."""
+    required_param = MagicMock()
+    required_param.data_type = "int"
+    required_param.required = True
+
+    optional_param = MagicMock()
+    optional_param.data_type = "string"
+    optional_param.required = False
+
+    entity = _make_scene(
+        coordinator,
+        actions={
+            "timer.start": {"duration": required_param},
+            "timer.reset": {"label": optional_param},
+        },
+    )
+
+    assert entity.extra_state_attributes == {
+        "is_visible": True,
+        "actions": {
+            "timer.start": {"duration": "int*"},
+            "timer.reset": {"label": "string"},
+        },
+    }
+
+
+def test_extra_state_attributes_actions_empty_when_none(coordinator: MagicMock) -> None:
+    """actions attribute should be an empty dict when the app exposes no actions."""
+    entity = _make_scene(coordinator, actions=None)
+
+    attrs = entity.extra_state_attributes
+    assert attrs is not None
+    assert attrs["actions"] == {}
 
 
 def test_available_false_when_widget_is_missing(coordinator: MagicMock) -> None:

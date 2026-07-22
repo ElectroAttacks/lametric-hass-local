@@ -148,9 +148,22 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
 
     @property  # pyright: ignore[reportIncompatibleMethodOverride]
     def extra_state_attributes(self) -> Mapping[str, Any] | None:
-        """Return available actions and their parameters for this widget's app."""
+        """Return visibility and available actions with their parameter signatures."""
         widget = self._widget
-        return {"is_visible": False if widget is None else widget.visible}
+        app = self._app
+        actions: dict[str, dict[str, str]] = {}
+
+        if app is not None and app.actions:
+            for action_id, params in app.actions.items():
+                actions[action_id] = {
+                    name: (f"{param.data_type}*" if param.required else param.data_type)
+                    for name, param in params.items()
+                }
+
+        return {
+            "is_visible": False if widget is None else widget.visible,
+            "actions": actions,
+        }
 
     @lametric_api_exception_handler  # type: ignore[arg-type]
     # pyright: ignore[reportIncompatibleMethodOverride]
