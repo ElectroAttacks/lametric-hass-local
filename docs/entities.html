@@ -261,12 +261,13 @@
                 <ul>
                     <li><strong><code>is_visible</code></strong> &#8212; <code>true</code>
                         when the widget is currently shown on the display.</li>
-                    <li><strong><code>actions</code></strong> &#8212; a map of all action IDs the widget
-                        supports, each listing its accepted parameters as
+                    <li><strong><code>actions</code></strong> &#8212; a list of action entries (one per action
+                        ID), for example <code>[{"start": {}}, {"reset": {"duration": "int*"}}]</code>.
+                        Each action lists accepted parameters as
                         <code>name&nbsp;&#8594;&nbsp;data_type</code>. Required parameters are marked with a
-                        trailing <code>*</code> (e.g.&nbsp;<code>"duration":&nbsp;"int*"</code>); optional ones
-                        without (e.g.&nbsp;<code>"label":&nbsp;"string"</code>). Use this to discover what to
-                        pass in <code>action_parameters</code> without consulting external docs.
+                        trailing <code>*</code>; optional ones are not. This attribute is for discovery only:
+                        the <code>activate_action</code> service still expects
+                        <code>action_parameters</code> as a normal object/dict.
                     </li>
                 </ul>
             </section>

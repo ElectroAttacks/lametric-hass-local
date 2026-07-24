@@ -151,14 +151,22 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
         """Return visibility and available actions with their parameter signatures."""
         widget = self._widget
         app = self._app
-        actions: dict[str, dict[str, str]] = {}
+        actions: list[dict[str, dict[str, str]]] = []
 
         if app is not None and app.actions:
             for action_id, params in app.actions.items():
-                actions[action_id] = {
-                    name: (f"{param.data_type}*" if param.required else param.data_type)
-                    for name, param in params.items()
-                }
+                actions.append(
+                    {
+                        action_id: {
+                            name: (
+                                f"{param.data_type}*"
+                                if param.required
+                                else param.data_type
+                            )
+                            for name, param in params.items()
+                        }
+                    }
+                )
 
         return {
             "is_visible": False if widget is None else widget.visible,

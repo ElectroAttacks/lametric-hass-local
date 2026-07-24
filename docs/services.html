@@ -697,7 +697,10 @@ data:
                             <td>object (key-value map)</td>
                             <td>Optional parameters required by the action. The accepted keys and their
                                 types are listed in the <code>actions</code> state attribute of the scene
-                                entity (required parameters carry a trailing <code>*</code>).</td>
+                                entity as a list of action entries (required parameters carry a trailing
+                                <code>*</code>). The service payload itself still uses
+                                <code>action_parameters</code> as a normal object/dict.
+                            </td>
                         </tr>
                         <tr>
                             <td><code>visible</code></td>
@@ -715,7 +718,7 @@ data:
 
 {
   "id": "&lt;action_id&gt;",
-  "params": { ...action_parameters },
+    "parameters": { ...action_parameters },
   "activate": true       // set to visible field value
 }</code></pre>
 
