@@ -1,8 +1,8 @@
 # lametric-hass-local
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/default)
 [![GitHub Release](https://img.shields.io/github/v/release/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
-[![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](LICENSE)
+[![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-electroattacks.github.io-blue)](https://electroattacks.github.io/lametric-hass-local/)
 
 Local Home Assistant integration for LaMetric devices using the device API
@@ -22,7 +22,7 @@ For local development with `uv sync --dev`, use Python 3.14.2 or later.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=lametric-hass-local&category=Integration&owner=ElectroAttacks)
 
-Install via HACS (recommended) or copy `custom_components/lametric_hass_local/` manually
+Install directly from the HACS default store or copy `custom_components/lametric_hass_local/` manually
 into your HA `custom_components/` folder and restart Home Assistant.
 
 ## Setup

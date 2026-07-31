@@ -15,7 +15,7 @@
             "registered_devices": true
         }
     ],
-    "documentation": "https://github.com/ElectroAttacks/lametric-hass-local",
+    "documentation": "https://electroattacks.github.io/lametric-hass-local/",
     "integration_type": "device",
     "iot_class": "local_polling",
     "issue_tracker": "https://github.com/ElectroAttacks/lametric-hass-local/issues",
@@ -32,7 +32,7 @@
             "deviceType": "urn:schemas-upnp-org:device:LaMetric:1"
         }
     ],
-    "version": "3.2.1",
+    "version": "3.2.2",
     "zeroconf": [
         {
             "type": "_lametric-api._tcp.local."
