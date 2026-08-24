@@ -122,7 +122,11 @@ jobs:
         if: steps.release.outputs.released == 'true'
         run: |
           cd custom_components/lametric_hass_local
-          find . -type f ! -path '*/__pycache__/*' ! -name '*.pyc' | sed 's|^\./||' | zip ../../lametric_hass_local.zip -@
+          find . -type f \
+            ! -path '*/__pycache__/*' \
+            ! -name '*.pyc' \
+            | sed 's|^\./||' \
+            | zip ../../lametric_hass_local.zip -@
 
       - name: Upload HACS release ZIP
         if: steps.release.outputs.released == 'true'
