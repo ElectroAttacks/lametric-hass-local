@@ -110,7 +110,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install build dependencies
-        run: sudo apt-get install -y zip
+        run: sudo apt-get update && sudo apt-get install -y zip
 
       - name: Semantic Release
         id: release
