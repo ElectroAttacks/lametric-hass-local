@@ -117,3 +117,19 @@ jobs:
           commit: false
           changelog: false
           build: false
+
+      - name: Create release asset
+        if: steps.release.outputs.released == 'true'
+        run: |
+          cd custom_components
+          zip -r ../lametric-hass-local.zip lametric_hass_local/
+          cd ..
+
+      - name: Upload release asset
+        if: steps.release.outputs.released == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "${{ steps.release.outputs.tag }}" \
+            lametric-hass-local.zip \
+            --clobber
