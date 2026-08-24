@@ -79,7 +79,7 @@ asyncio_mode = "auto"
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 major_on_zero = false
-build_command = "cd custom_components && zip -r ../lametric-hass-local.zip lametric_hass_local/ && cd .."
+build_command = "python -m zipfile -c lametric-hass-local.zip custom_components/lametric_hass_local/"
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = ["chore", "ci"]
