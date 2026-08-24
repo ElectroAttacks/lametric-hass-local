@@ -109,6 +109,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install zip
+        run: sudo apt-get update && sudo apt-get install -y zip
+
       - name: Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v10.6.1
