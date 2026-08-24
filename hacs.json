@@ -2,6 +2,6 @@
     "name": "LaMetric Local",
     "render_readme": false,
     "homeassistant": "2026.8.2",
-    "zip_release": true,
+    "zip_release": false,
     "filename": "lametric-hass-local.zip"
 }
