@@ -117,3 +117,17 @@ jobs:
           commit: false
           changelog: false
           build: false
+
+      - name: Build HACS release ZIP
+        if: steps.release.outputs.released == 'true'
+        run: |
+          cd custom_components/lametric_hass_local
+          zip -r ../../lametric_hass_local.zip . -x '__pycache__/*' '*/__pycache__/*'
+
+      - name: Upload HACS release ZIP
+        if: steps.release.outputs.released == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          files: ./lametric_hass_local.zip
+          fail_on_unmatched_files: true

@@ -1,6 +1,7 @@
 # lametric-hass-local
 
 [![HACS Default](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/default)
+[![HACS Downloads](https://img.shields.io/github/downloads/ElectroAttacks/lametric-hass-local/total?label=HACS%20Downloads&color=41BDF5)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
 [![GitHub Release](https://img.shields.io/github/v/release/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/releases)
 [![License](https://img.shields.io/github/license/ElectroAttacks/lametric-hass-local)](https://github.com/ElectroAttacks/lametric-hass-local/blob/main/LICENSE)
 [![Docs](https://img.shields.io/badge/docs-electroattacks.github.io-blue)](https://electroattacks.github.io/lametric-hass-local/)
