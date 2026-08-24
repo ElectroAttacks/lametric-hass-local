@@ -117,16 +117,3 @@ jobs:
           commit: false
           changelog: false
           build: true
-
-      - name: Build HACS ZIP asset
-        if: steps.release.outputs.released == 'true'
-        run: |
-          set -euo pipefail
-          mkdir -p dist
-          zip -r dist/lametric-hass-local.zip custom_components/ README.md LICENSE
-
-      - name: Upload ZIP to GitHub Release
-        if: steps.release.outputs.released == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release upload ${{ steps.release.outputs.tag }} dist/lametric-hass-local.zip --clobber
