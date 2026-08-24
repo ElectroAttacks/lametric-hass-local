@@ -1,6 +1,6 @@
 [project]
 name = "lametric-hass-local"
-version = "3.2.8"
+version = "0.1.0"
 description = ""
 authors = [
     { name = "Caspar Weber" }
