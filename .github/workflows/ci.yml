@@ -101,6 +101,7 @@ jobs:
     concurrency: release
     permissions:
       contents: write
+      id-token: write
     outputs:
       released: ${{ steps.release.outputs.released || 'false' }}
       tag: ${{ steps.release.outputs.tag }}
@@ -108,12 +109,37 @@ jobs:
       - uses: actions/checkout@v7
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Semantic Release
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.14
+        run: uv python install 3.14
+
+      - name: Python Semantic Release
         id: release
         uses: python-semantic-release/python-semantic-release@v10.6.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit: false
-          changelog: false
-          build: false
+
+      - name: Create release ZIP
+        if: steps.release.outputs.released == 'true'
+        run: |
+          python -m zipfile -c lametric-hass-local.zip \
+            custom_components/lametric_hass_local/ \
+            README.md \
+            LICENSE
+
+      - name: Upload release artifact
+        if: steps.release.outputs.released == 'true'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ./lametric-hass-local.zip
+          asset_name: lametric-hass-local.zip
+          asset_content_type: application/zip
