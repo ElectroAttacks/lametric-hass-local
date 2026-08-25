@@ -123,7 +123,7 @@ jobs:
         id: release
         run: semantic-release version --no-commit
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.WRITE_TOKEN }}
 
       - name: Create release ZIP
         run: |
