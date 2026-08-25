@@ -98,41 +98,80 @@ jobs:
     needs: [hacs, hassfest]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    concurrency: release
     permissions:
       contents: write
 
     steps:
-      - uses: actions/checkout@v7
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
           enable-cache: true
 
-      - name: Set up Python 3.14
+      - name: Set up Python
         run: uv python install 3.14
 
-      - name: Install Python Semantic Release
+      - name: Install python-semantic-release
         run: uv tool install python-semantic-release
 
-      - name: Create version
-        id: release
-        run: semantic-release version --no-commit
+      - name: Determine next version
+        id: version
+        run: |
+          NEXT_VER=$(semantic-release print-version --next || true)
+          echo "version=${NEXT_VER}" >> $GITHUB_OUTPUT
         env:
-          GH_TOKEN: ${{ secrets.WRITE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate release notes & changelog
+        if: steps.version.outputs.version != ''
+        id: notes
+        run: |
+          RELEASE_NOTES=$(semantic-release changelog --post-to-release-tag "v${{ steps.version.outputs.version }}")
+
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "changelog<<$EOF" >> $GITHUB_OUTPUT
+          echo "$RELEASE_NOTES" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version in files
+        if: steps.version.outputs.version != ''
+        run: |
+          NEW_VER="${{ steps.version.outputs.version }}"
+
+          sed -i "s/^version = \".*\"/version = \"${NEW_VER}\"/" pyproject.toml
+
+          python3 -c "
+          import json
+          path = 'custom_components/lametric_hass_local/manifest.json'
+          with open(path, 'r') as f:
+              data = json.load(f)
+          data['version'] = '${NEW_VER}'
+          with open(path, 'w') as f:
+              json.dump(data, f, indent=2)
+              f.write('\n')
+          "
 
       - name: Create release ZIP
+        if: steps.version.outputs.version != ''
         run: |
           python -m zipfile -c lametric-hass-local.zip \
             custom_components/lametric_hass_local/ \
             README.md \
             LICENSE
 
-      - name: Publish release
-        run: semantic-release publish
+      - name: Create GitHub Release
+        if: steps.version.outputs.version != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "v${{ steps.version.outputs.version }}"
+          name: "v${{ steps.version.outputs.version }}"
+          body: ${{ steps.notes.outputs.changelog }}
+          files: lametric-hass-local.zip
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
