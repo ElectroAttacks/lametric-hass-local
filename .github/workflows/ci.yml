@@ -92,46 +92,46 @@ jobs:
       - name: Validate with hassfest
         uses: "home-assistant/actions/hassfest@master"
 
- # ── Stage 3 ─────────────────────────────────────────────────────────────────
-release:
-  name: "Stage 3 · Semantic Release"
-  needs: [hacs, hassfest]
-  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-  runs-on: ubuntu-latest
-  concurrency: release
-  permissions:
-    contents: write
+  # ── Stage 3 ─────────────────────────────────────────────────────────────────
+  release:
+    name: "Stage 3 · Semantic Release"
+    needs: [hacs, hassfest]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    concurrency: release
+    permissions:
+      contents: write
 
-  steps:
-    - uses: actions/checkout@v7
-      with:
-        fetch-depth: 0
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
-    - name: Install uv
-      uses: astral-sh/setup-uv@v7
-      with:
-        enable-cache: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
 
-    - name: Set up Python 3.14
-      run: uv python install 3.14
+      - name: Set up Python 3.14
+        run: uv python install 3.14
 
-    - name: Install Python Semantic Release
-      run: uv tool install python-semantic-release
+      - name: Install Python Semantic Release
+        run: uv tool install python-semantic-release
 
-    - name: Create version
-      id: release
-      run: semantic-release version --no-commit
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create version
+        id: release
+        run: semantic-release version --no-commit
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Create release ZIP
-      run: |
-        python -m zipfile -c lametric-hass-local.zip \
-          custom_components/lametric_hass_local/ \
-          README.md \
-          LICENSE
+      - name: Create release ZIP
+        run: |
+          python -m zipfile -c lametric-hass-local.zip \
+            custom_components/lametric_hass_local/ \
+            README.md \
+            LICENSE
 
-    - name: Publish release
-      run: semantic-release publish
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Publish release
+        run: semantic-release publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
