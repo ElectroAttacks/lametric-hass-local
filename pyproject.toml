@@ -79,7 +79,6 @@ asyncio_mode = "auto"
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
 major_on_zero = false
-commit_version_number = false
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = ["chore", "ci"]
