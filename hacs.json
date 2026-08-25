@@ -1,16 +1,4 @@
 {
-    "domains": [
-        "button",
-        "light",
-        "notify",
-        "number",
-        "scene",
-        "select",
-        "sensor",
-        "switch",
-        "text",
-        "update"
-    ],
     "homeassistant": "2026.8.2",
     "name": "LaMetric Local",
     "render_readme": false,
