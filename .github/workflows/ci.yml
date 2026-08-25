@@ -92,55 +92,46 @@ jobs:
       - name: Validate with hassfest
         uses: "home-assistant/actions/hassfest@master"
 
-  # ── Stage 3 ─────────────────────────────────────────────────────────────────
-  release:
-    name: "Stage 3 · Semantic Release"
-    needs: [hacs, hassfest]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    concurrency: release
-    permissions:
-      contents: write
-      id-token: write
-    outputs:
-      released: ${{ steps.release.outputs.released || 'false' }}
-      tag: ${{ steps.release.outputs.tag }}
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+ # ── Stage 3 ─────────────────────────────────────────────────────────────────
+release:
+  name: "Stage 3 · Semantic Release"
+  needs: [hacs, hassfest]
+  if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  concurrency: release
+  permissions:
+    contents: write
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7
-        with:
-          enable-cache: true
+  steps:
+    - uses: actions/checkout@v7
+      with:
+        fetch-depth: 0
 
-      - name: Set up Python 3.14
-        run: uv python install 3.14
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        enable-cache: true
 
-      - name: Python Semantic Release
-        id: release
-        uses: python-semantic-release/python-semantic-release@v10.6.1
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          commit: false
+    - name: Set up Python 3.14
+      run: uv python install 3.14
 
-      - name: Create release ZIP
-        if: steps.release.outputs.released == 'true'
-        run: |
-          python -m zipfile -c lametric-hass-local.zip \
-            custom_components/lametric_hass_local/ \
-            README.md \
-            LICENSE
+    - name: Install Python Semantic Release
+      run: uv tool install python-semantic-release
 
-      - name: Upload release artifact
-        if: steps.release.outputs.released == 'true'
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.release.outputs.upload_url }}
-          asset_path: ./lametric-hass-local.zip
-          asset_name: lametric-hass-local.zip
-          asset_content_type: application/zip
+    - name: Create version
+      id: release
+      run: semantic-release version --no-commit
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create release ZIP
+      run: |
+        python -m zipfile -c lametric-hass-local.zip \
+          custom_components/lametric_hass_local/ \
+          README.md \
+          LICENSE
+
+    - name: Publish release
+      run: semantic-release publish
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
