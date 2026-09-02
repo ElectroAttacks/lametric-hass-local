@@ -135,4 +135,4 @@ jobs:
           TAG: ${{ steps.release.outputs.tag }}
         run: |
           gh release create "$TAG" dist/lametric-hass-local.zip \
-            --notes-file release-notes.md --repo "$GITHUB_REPOSITORY"
+            --title "$TAG" --notes-file release-notes.md --repo "$GITHUB_REPOSITORY"
