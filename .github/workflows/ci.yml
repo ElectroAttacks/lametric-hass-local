@@ -10,9 +10,6 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
-permissions:
-  contents: read
-
 # ─── Stage 1: pre-commit ─────────────────────────────────────────────────────
 # JSON/YAML parsing+linting, Ruff, Mypy, Pytest.
 # ─── Stage 2: validate (hacs, hassfest) ──────────────────────────────────────
@@ -109,11 +106,33 @@ jobs:
         with:
           fetch-depth: 0
 
+      # tag/push/vcs_release are all false: PSR only computes the version and
+      # builds the zip. The tag and GitHub Release are created together by
+      # `gh release create` below, same as lametric-py's working workflow -
+      # PSR's own `git push --tags` is what was hitting the tag ruleset.
       - name: Semantic Release
         id: release
-        uses: python-semantic-release/python-semantic-release@v10.6.1
+        uses: python-semantic-release/python-semantic-release@v10.6.2
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           commit: false
           changelog: false
-          build: false
+          build: true
+          tag: false
+          push: false
+          vcs_release: false
+
+      - name: Save Release Notes
+        if: steps.release.outputs.released == 'true'
+        env:
+          NOTES: ${{ steps.release.outputs.release_notes }}
+        run: printf '%s' "$NOTES" > release-notes.md
+
+      - name: Create GitHub Release with Assets
+        if: steps.release.outputs.released == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          gh release create "$TAG" dist/lametric-hass-local.zip \
+            --notes-file release-notes.md --repo "$GITHUB_REPOSITORY"

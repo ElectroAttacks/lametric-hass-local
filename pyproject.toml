@@ -1,6 +1,6 @@
 [project]
 name = "lametric-hass-local"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = [
     { name = "Caspar Weber" }
@@ -77,8 +77,21 @@ asyncio_mode = "auto"
 # SEMANTIC RELEASE (Auto-Versioning)
 # ------------------------------------------------------------------------------
 [tool.semantic_release]
-version_toml = ["pyproject.toml:project.version"]
+version_toml = [
+    "pyproject.toml:project.version"
+]
+version_variables = [
+    "custom_components/lametric_hass_local/manifest.json:version"
+]
 major_on_zero = false
+# The PSR action's Docker image has no `zip` binary, so use Python's stdlib
+# instead. HACS zip_release expects the integration folder's contents at the
+# zip root, which make_archive(root_dir=...) produces directly.
+build_command = """
+mkdir -p dist
+find custom_components/lametric_hass_local -name "__pycache__" -type d -exec rm -rf {} +
+python3 -c "import shutil; shutil.make_archive('dist/lametric-hass-local', 'zip', 'custom_components/lametric_hass_local')"
+"""
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = ["chore", "ci"]
