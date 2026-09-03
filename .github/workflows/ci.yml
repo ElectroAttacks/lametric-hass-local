@@ -10,6 +10,9 @@ on:
   schedule:
     - cron: "0 0 * * *"
 
+permissions:
+  contents: read
+
 # ─── Stage 1: pre-commit ─────────────────────────────────────────────────────
 # JSON/YAML parsing+linting, Ruff, Mypy, Pytest.
 # ─── Stage 2: validate (hacs, hassfest) ──────────────────────────────────────
