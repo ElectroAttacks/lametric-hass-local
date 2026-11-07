@@ -69,7 +69,11 @@ disallow_any_generics = false
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
-addopts = "--cov=custom_components/lametric_hass_local --cov-report=term-missing"
+# Force pytest_homeassistant's plugin to load before setuptools-entrypoint
+# autoload (respx et al. import real httpx, which breaks homeassistant's
+# httpx2.alias_httpx() if it runs first); "no:" blocks the later duplicate
+# autoload registration of the same plugin under its entry-point name.
+addopts = "-p pytest_homeassistant.bootstrap -p no:pytest_homeassistant --cov=custom_components/lametric_hass_local --cov-report=term-missing"
 asyncio_mode = "auto"
 
 # ------------------------------------------------------------------------------
