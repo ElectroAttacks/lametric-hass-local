@@ -3,8 +3,8 @@
 import asyncio
 from unittest.mock import AsyncMock, MagicMock
 
+import probatio as vol
 import pytest
-import voluptuous as vol
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from lametric import IconType, LaMetricApiError, NotificationPriority
 

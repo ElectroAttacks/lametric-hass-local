@@ -5,8 +5,8 @@ import math
 from dataclasses import replace as dc_replace
 from unittest.mock import AsyncMock, MagicMock, call, patch
 
+import probatio as vol
 import pytest
-import voluptuous as vol
 from homeassistant.core import SupportsResponse
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.util.color import brightness_to_value, value_to_brightness
@@ -94,7 +94,7 @@ def test_coerce_stream_config_accepts_nested_canvas_mapping() -> None:
 def test_coerce_stream_config_rejects_invalid_values(
     value: object, message: str
 ) -> None:
-    """Invalid stream config payloads should raise voluptuous errors."""
+    """Invalid stream config payloads should raise probatio errors."""
     with pytest.raises(vol.Invalid, match=message):
         _coerce_stream_config(value)
 

@@ -4,7 +4,7 @@ from collections.abc import Mapping
 from ipaddress import ip_address
 from typing import Any, Self, cast, override
 
-import voluptuous as vol
+import probatio as vol
 from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_API_KEY, CONF_HOST, CONF_MAC
 from homeassistant.data_entry_flow import AbortFlow

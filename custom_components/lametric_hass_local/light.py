@@ -6,7 +6,7 @@ import math
 from collections.abc import Callable, Mapping
 from typing import Any, cast
 
-import voluptuous as vol
+import probatio as vol
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
     LightEntity,
@@ -208,7 +208,7 @@ class LaMetricLightEntity(LaMetricEntity, LightEntity):
     @property
     def is_on(self) -> bool | None:
         """Return whether the display is on."""
-        return cast(bool | None, self.coordinator.data.display.on)
+        return self.coordinator.data.display.on
 
     @property
     def brightness(self) -> int | None:

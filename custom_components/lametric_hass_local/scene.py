@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any, cast
+from typing import Any
 
-import voluptuous as vol
+import probatio as vol
 from homeassistant.components.scene import Scene as SceneEntity
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
@@ -118,7 +118,7 @@ class LaMetricSceneEntity(LaMetricEntity, SceneEntity):
     @property
     def _app(self) -> App | None:
         """Return the current App object from the coordinator."""
-        return cast(App | None, self.coordinator.apps.get(self._app_id))
+        return self.coordinator.apps.get(self._app_id)
 
     @property
     def _widget(self) -> Widget | None:
